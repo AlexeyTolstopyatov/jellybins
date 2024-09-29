@@ -1,7 +1,7 @@
 # Немного о проекте
 JellyBins ("измененно jelly beans") - Утилита для анализа двоичных исполняемых файлов. Мне было безумно интересно узнать больше о содержимом приложений в разных Операционных системах.
 Планируется сделать логику для анализа
- - Приложений и компонентов Microsoft Windows 
+ - Приложений и компонентов Microsoft Windows / IBM eComStation (or OS/2) / DOS
     - ```PE``` "Portable Executable"
     - ```LE``` "Linear Executable"
     - ```VxD``` "Virtual Device Driver"
