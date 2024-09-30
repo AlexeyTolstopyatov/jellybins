@@ -54,27 +54,26 @@ void printmz(struct MZ_HEADER *exec)
 /*
  * Выводит таблицу содержания PE заголовка.
 */
-void printpe(struct NT_HEADER *exec)
+void printpe(struct PE_HEADER *exec)
 {
     printf("PE HEADER TABLE\n");
     printf("----------------\n");
 
-    printf("HEADER\t\t\t");
-    winfo(&exec->pe_signature);
+    printf("HEADER\t\t\tPE\n");
     printf("MACHINE\t\t\t");
-    binfo(&exec->header.machine);
+    binfo(&exec->machine);
     printf("SECTIONS \t\t");
-    binfo(&exec->header.sections_count);
+    binfo(&exec->sections_count);
     printf("TIMESTAMP\t\t");
-    winfo(&exec->header.time_stamp);
+    winfo(&exec->time_stamp);
     printf("TABLE POINTER\t\t");
-    winfo(&exec->header.symtable_ptr);
+    winfo(&exec->symtable_ptr);
     printf("CHARS COUNT\t\t");
-    winfo(&exec->header.symbols_count);
+    winfo(&exec->symbols_count);
     printf("OPT HEADER \t\t");
-    binfo(&exec->header.sizeof_optional_header);
+    binfo(&exec->sizeof_optional_header);
     printf("CHARACTERS \t\t");
-    binfo(&exec->header.characteristics);
+    binfo(&exec->characteristics);
 }
 
 /*
@@ -375,7 +374,7 @@ void osnefh(__uint8_t *os)
         printf("Windows\n");
         break;
     default:
-        printf("unknown\n");
+        printf("unknown Operating System\n");
         break;
     }
 }
@@ -401,7 +400,7 @@ void oslxfh(__uint16_t *os)
         printf("Windows 386\n");
         break;
     default:
-        printf("unknown\n");
+        printf("unknown Operating System\n");
         break;
     }
 }

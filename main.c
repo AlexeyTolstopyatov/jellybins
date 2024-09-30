@@ -54,15 +54,15 @@ int main(int argc, char* argv[])
     case PE_SIGNATURE_ARM_SEGMENT:
     case PE_SIGNATURE_INTEL_SEGMENT:
     {
-        struct NT_HEADER nt;
+        struct WINNT_HEADER nt;
 
         fseek(file, exec.next_signature, 0);
-        fread(&nt, sizeof(struct NT_HEADER), 1, file);
+        fread(&nt, sizeof(struct WINNT_HEADER), 1, file);
         
         if (*argv[2] == 'a' || *argv[2] == 't')
         {
-            printpe(&nt);
-            printope(&nt.optional_header);
+            printpe(&nt.winnt_main);
+            printope(&nt.winnt_optional);
         }
         break;
     }
