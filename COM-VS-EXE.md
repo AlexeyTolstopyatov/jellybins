@@ -59,6 +59,20 @@ DOS имеет четыре требования для инициализаци
 # Например
 
 ```asm
+data segment para public “data”;сегмент данных
+message db “Введите две 16-теричные цифры, $”
+data ends
+
+stk segment stack
+db 256 dup (“?”);сегмент стека
+stk ends
+code segment para public “code”;начало сегмента кода
+
+main proc.      ;начало процедуры main
+
+assume cs:code,ds:data,ss:stk
+
+mov ax,data.    ;адрес сегмента данных в регистр ах
 mov ds,ax
 mov ah,9
 
