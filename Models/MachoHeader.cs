@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace jellybins.Models
 {
-    internal class LinearExecutableHeader
+    // Mach microkernel model for Apple binaries/executables
+    internal class MachoHeader
     {
     }
 }

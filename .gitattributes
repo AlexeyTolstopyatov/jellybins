@@ -1,4 +1,6 @@
 # Auto detect text files and perform LF normalization
 * text=auto
 *.cs diff=csharp
+*.md diff=markdown
 *.cs linguist-detectable=true
+*.md linguist-detectable=true
