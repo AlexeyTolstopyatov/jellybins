@@ -9,7 +9,7 @@ namespace jellybins.Middleware;
  *         Item Creator
  * Класс, предоставляющий логику заполнения элементов окна
  */
-public class ItemCreator
+public static class ItemCreator
 {
     public static void NewListItem(ref ListView item, string content, SolidColorBrush color) =>
         item.Items.Add(new TextBlock()

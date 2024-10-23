@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Automation;
+using System.Windows.Documents;
 using System.Windows.Media;
 using jellybins.Binary;
 using jellybins.Models;
@@ -19,6 +20,19 @@ namespace jellybins.Middleware
     /// </summary>
     internal static class BinaryReportCreator
     {
+        private static void CreateFlagDescription(
+            string content,
+            SolidColorBrush foreground,
+            ref BinaryHeaderPage bin
+            )
+        {
+            bin.FlagsNames.Items.Add(
+                new TextBlock()
+                {
+                    Foreground = foreground,
+                    Text = content,
+                });
+        }
         public static bool TryParseNetComponentMethods(
             string assembly, 
             ref BinaryProceduresPage netp)
@@ -39,6 +53,7 @@ namespace jellybins.Middleware
             netp.libname.Text = netl.Name;
             netp.libtype.Text = netl.Title;
 
+            
             foreach (string item in netl.Types)
             {
                 netp.libmethods.Items.Add(new TextBlock()
@@ -70,7 +85,7 @@ namespace jellybins.Middleware
             ushort head)
         {
             bin.binprops.Text = $"Начало файла: 0x{head:x}";
-            bin.bintype.Text = BinaryInformation.GetInformation(BinaryInformationPrinter.Other);
+            bin.bintype.Text = BinaryInformation.GetInformation(BinaryType.Other);
             bin.ThisArchLabel.Text =
                 bin.ThisOsVersionLabel.Text =
                     bin.ThisOsLabel.Text =
@@ -83,8 +98,8 @@ namespace jellybins.Middleware
             ref BinaryHeaderPage bin,
             ref NtHeader nt)
         {
-            bin.binprops.Text = BinaryInformation.GetInformation(BinaryInformationPrinter.Portable);
-            bin.bintype.Text = BinaryInformation.GetType(BinaryInformationPrinter.Portable);
+            bin.binprops.Text = BinaryInformation.GetInformation(BinaryType.Portable);
+            bin.bintype.Text = BinaryInformation.GetType(BinaryType.Portable);
             bin.bintable.Children.Add(new CardExpander()
             {
                 IsExpanded = true,
@@ -155,6 +170,8 @@ namespace jellybins.Middleware
             bin.OsVerLabel.Text =
                 PeInformationBlock.VersionToString(nt.WinNtOptional.MajorOsVersion, nt.WinNtOptional.MinorOsVersion);
             // Flags Enumeration here.
+            
+            CreateFlagDescription("Основные", Brushes.Cyan, ref bin);
             bin.LoaderFlags.Items.Add(new TextBlock()
             {
                 Foreground = Brushes.Cyan,
@@ -167,6 +184,7 @@ namespace jellybins.Middleware
                 Text = PeInformationBlock.EnvironmentFlagToString(nt.WinNtOptional.Subsystem)
             });
             
+            CreateFlagDescription("PE характеристики", Brushes.GreenYellow, ref bin);
             foreach (var characteristic in PeInformationBlock.CharacteristicsToStrings(nt.WinNtMain.Characteristics))
             {
                 if (characteristic != string.Empty)
@@ -176,21 +194,24 @@ namespace jellybins.Middleware
                         Text = characteristic
                     });
             }
-            if (nt.WinNtOptional.Win32Version != 0)
-                bin.LoaderFlags.Items.Add(new TextBlock()
-                {
-                    Foreground = Brushes.OrangeRed,
-                    Text = $"Возможная жертва заражения (0x{nt.WinNtOptional.Win32Version:x})"
-                });
             
+            // Ну как-то так.
+            if (nt.WinNtOptional.Win32Version == 0) return;
+            
+            CreateFlagDescription("Необычные значения", Brushes.OrangeRed, ref bin);
+            bin.LoaderFlags.Items.Add(new TextBlock()
+            {
+                Foreground = Brushes.OrangeRed,
+                Text = $"Возможная жертва заражения (0x{nt.WinNtOptional.Win32Version:x})"
+            });
         }
 
         public static void TryParseNeHeader(
             ref BinaryHeaderPage bin,
             ref NeHeader ne)
         {
-            bin.binprops.Text = BinaryInformation.GetInformation(BinaryInformationPrinter.New);
-            bin.bintype.Text = BinaryInformation.GetType(BinaryInformationPrinter.New);
+            bin.binprops.Text = BinaryInformation.GetInformation(BinaryType.New);
+            bin.bintype.Text = BinaryInformation.GetType(BinaryType.New);
             bin.bintable.Children.Add(
                 new CardExpander()
                 {
@@ -247,34 +268,28 @@ namespace jellybins.Middleware
                 bin.OsRequiredLabel.Text = NeInformationBlock.WindowsVersionToString(ne.major, ne.minor);
             
             // Loader Flags Enumeration
+            CreateFlagDescription("Основные", Brushes.Cyan, ref bin);
+            ItemCreator.NewListItem(ref bin.LoaderFlags, "16-разрядный", Brushes.Cyan);
+            
+            CreateFlagDescription("Программные флаги", Brushes.Yellow, ref bin);
             foreach (var programFlag in NeInformationBlock.ProgramFlagsToStrings(ne.pflags))
             {
                 if (programFlag != string.Empty)
-                    bin.LoaderFlags.Items.Add(new TextBlock()
-                    {
-                        Foreground = Brushes.Yellow,
-                        Text = programFlag
-                    });
+                    ItemCreator.NewListItem(ref bin.LoaderFlags, programFlag, Brushes.Yellow);
             }
 
+            CreateFlagDescription("Флаги приложения", Brushes.SpringGreen, ref bin);
             foreach (var appFlag in NeInformationBlock.ApplicationFlagsToStrings(ne.aflags))
             {
                 if (appFlag != String.Empty)
-                    bin.LoaderFlags.Items.Add(new TextBlock()
-                    {
-                        Foreground = Brushes.SpringGreen,
-                        Text = appFlag
-                    });
+                    ItemCreator.NewListItem(ref bin.LoaderFlags, appFlag, Brushes.SpringGreen);
             }
 
+            CreateFlagDescription("Флаги для IBM OS/2", Brushes.CornflowerBlue, ref bin);
             foreach (var oFlag in NeInformationBlock.OtherFlagsToStrings(ne.flagsothers))
             {
                 if (oFlag != string.Empty)
-                    bin.LoaderFlags.Items.Add(new TextBlock()
-                    {
-                        Foreground = Brushes.CornflowerBlue,
-                        Text = oFlag
-                    });
+                    ItemCreator.NewListItem(ref bin.LoaderFlags, oFlag, Brushes.CornflowerBlue);
             }
         }
         
@@ -282,8 +297,8 @@ namespace jellybins.Middleware
             ref BinaryHeaderPage binp,
             ref LeHeader le)
         {
-            binp.binprops.Text = BinaryInformation.GetInformation(BinaryInformationPrinter.Linear);
-            binp.bintype.Text = BinaryInformation.GetType(BinaryInformationPrinter.Linear);
+            binp.binprops.Text = BinaryInformation.GetInformation(BinaryType.Linear);
+            binp.bintype.Text = BinaryInformation.GetType(BinaryType.Linear);
             binp.bintable.Children.Add(
                 new CardExpander()
                 {
@@ -352,6 +367,7 @@ namespace jellybins.Middleware
             binp.OsRequiredLabel.Text = LeInformationBlock.OperatingSystemFlagToString(le.TargetOperatingSystem);
             binp.ArchRequiredLabel.Text = LeInformationBlock.ProcessorFlagToString(le.CPUType);
 
+            CreateFlagDescription("Флаги определения модуля", Brushes.Cyan, ref binp);
             foreach (var mtFlag in LeInformationBlock.ModuleFlagsToStrings(le.ModuleTypeFlags))
             {
                 if (mtFlag != string.Empty)
@@ -365,6 +381,7 @@ namespace jellybins.Middleware
             
             if (le.WindowsVXDDeviceID == 0) return;
             
+            CreateFlagDescription("Флаги определения для Windows", Brushes.CornflowerBlue, ref binp);
             binp.LoaderFlags.Items.Add(new TextBlock()
             {
                 Text = "Драйвер устройства (VxD)",
@@ -377,8 +394,8 @@ namespace jellybins.Middleware
             ref BinaryHeaderPage bin,
             ref ClrHeader clr)
         {
-            bin.binprops.Text = BinaryInformation.GetInformation(BinaryInformationPrinter.NetObject);
-            bin.bintype.Text = BinaryInformation.GetType(BinaryInformationPrinter.NetObject);
+            // bin.binprops.Text = BinaryInformation.GetInformation(BinaryType.NetObject);
+            // bin.bintype.Text = BinaryInformation.GetType(BinaryType.NetObject);
             bin.bintable.Children.Add(
                 new CardExpander()
                 {
@@ -402,6 +419,8 @@ namespace jellybins.Middleware
                     MaxWidth = 300,
                     VerticalAlignment = VerticalAlignment.Top
                 });
+            
+            CreateFlagDescription("Флаги определения CLR среды", Brushes.CornflowerBlue, ref bin);
             foreach (var flag in ClrInformationBlock.LinkerFlagsToStrings(clr.LinkerFlags))
             {
                 if (flag != String.Empty)
@@ -412,6 +431,7 @@ namespace jellybins.Middleware
                     });
             }
         }
+
         private static void TryParseVxdHeader(
             ref BinaryHeaderPage bin,
             ref LeHeader vdd
@@ -438,8 +458,7 @@ namespace jellybins.Middleware
                     MaxWidth = 300,
                     VerticalAlignment = VerticalAlignment.Top
                 });
-        }
-        
+    }
         
         public static void TryParseMzHeader(
             ref BinaryHeaderPage binp, 
@@ -473,15 +492,12 @@ namespace jellybins.Middleware
                 MaxWidth = 300,
                 VerticalAlignment = VerticalAlignment.Top
             });
-            //(string, string, string) machine = DeterminantEngine.GetThisMachineFlags();
-            binp.bintype.Text = BinaryInformation.GetType(BinaryInformationPrinter.MarkZbykowski);
-            binp.binprops.Text = BinaryInformation.GetInformation(BinaryInformationPrinter.MarkZbykowski);
+            binp.bintype.Text = BinaryInformation.GetType(BinaryType.MarkZbykowski);
+            binp.binprops.Text = BinaryInformation.GetInformation(BinaryType.MarkZbykowski);
             binp.OsRequiredLabel.Text = "Microsoft DOS";
             binp.OsVerLabel.Text = "2.0";
             binp.ArchRequiredLabel.Text = "Intel x86 (i286 IA32)";
-            // binp.ThisArchLabel.Text = machine.Item2;
-            // binp.ThisOsVersionLabel.Text = machine.Item3;
-            // binp.ThisOsLabel.Text = machine.Item1;
+            
         }
     }
 }
