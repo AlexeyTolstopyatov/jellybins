@@ -32,9 +32,9 @@ namespace jellybins.Models
         {
             Loaded = true;
             Parallel.Invoke(() => CreateMembersCollection(path));
-            Title       = BinaryInformation.GetTitle(BinaryInformationPrinter.NetObject);
-            Description = BinaryInformation.GetInformation(BinaryInformationPrinter.NetObject);
-            SystemType  = BinaryInformation.GetType(BinaryInformationPrinter.NetObject);
+            Title       = BinaryInformation.GetTitle(BinaryType.NetObject);
+            Description = BinaryInformation.GetInformation(BinaryType.NetObject);
+            SystemType  = BinaryInformation.GetType(BinaryType.NetObject);
         }
 
         private void CreateMembersCollection(string path) 
