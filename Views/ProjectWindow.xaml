@@ -1,0 +1,71 @@
+﻿<ui:FluentWindow x:Class="jellybins.Views.ProjectWindow"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:jellybins.Views"
+        mc:Ignorable="d"
+        Background="#212121"
+        Title="ProjectWindow" Height="300" Width="450">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="110"/>
+            <RowDefinition Height="75"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <ui:TitleBar Title="Тип поиска"/>
+
+        <ui:Card Grid.Row="1"
+                 Margin="20">
+            <ui:Card.Content>
+                <ui:TextBlock TextWrapping="Wrap">
+                    <Run Text="Создайте проект, выбрав способ поиска информации внутри двоичного файла."/>
+                </ui:TextBlock>
+            </ui:Card.Content>
+        </ui:Card>    
+        
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <ui:CardControl x:Name="header"
+                            Grid.Column="0"
+                            Grid.Row="1"
+                            HorizontalContentAlignment="Center"
+                            Click="header_Click"
+                            Margin="10">
+                <ui:CardControl.Content>
+                    <StackPanel Orientation="Horizontal" >
+                        <ui:SymbolIcon
+                            Symbol="Settings48"/>
+                        <ui:TextBlock
+                            Text=" Общие свойства"
+                            TextWrapping="Wrap"/>
+                    </StackPanel>
+                </ui:CardControl.Content>
+            </ui:CardControl>
+
+            <ui:CardControl x:Name="full"
+                            Grid.Column="1"
+                            HorizontalContentAlignment="Center"
+                            Click="full_Click"
+                            Margin="10">
+                <ui:CardControl.Content>
+                    <StackPanel Orientation="Horizontal"
+                                >
+                        <ui:SymbolIcon
+                            Symbol="CalendarSettings48"/>
+                        <ui:TextBlock
+                               Text=" Внутренние функции"
+                               TextWrapping="Wrap"/>
+                    </StackPanel>
+                </ui:CardControl.Content>
+            </ui:CardControl>
+        </Grid>
+    </Grid>
+</ui:FluentWindow>
