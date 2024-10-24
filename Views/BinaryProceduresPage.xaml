@@ -7,6 +7,8 @@
       xmlns:local="clr-namespace:jellybins.Views"
       mc:Ignorable="d" 
       SizeChanged="Page_SizeChanged"
+      ui:Design.Background="Transparent"
+      Background="#212121"
       d:DesignHeight="550" d:DesignWidth="620"
       Title="NetObjectPage">
 

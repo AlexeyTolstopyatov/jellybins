@@ -17,7 +17,7 @@ namespace jellybins.Models
     ///     
     /// </summary>
     
-    internal class NetComponentInternals
+    internal class ClrInternals
     {
         public string? Name { get; private set; }
         public string Description { get; private set; }
@@ -28,13 +28,13 @@ namespace jellybins.Models
         public string Title { get; private set; }
         public bool Loaded { get; private set; }
 
-        public NetComponentInternals(string path) 
+        public ClrInternals(string path) 
         {
             Loaded = true;
             Parallel.Invoke(() => CreateMembersCollection(path));
-            Title       = BinaryInformation.GetTitle(BinaryType.NetObject);
-            Description = BinaryInformation.GetInformation(BinaryType.NetObject);
-            SystemType  = BinaryInformation.GetType(BinaryType.NetObject);
+            Title       = JbTypeInformation.GetTitle(JbFileType.NetObject);
+            Description = JbTypeInformation.GetInformation(JbFileType.NetObject);
+            SystemType  = JbTypeInformation.GetType(JbFileType.NetObject);
         }
 
         private void CreateMembersCollection(string path) 
@@ -64,9 +64,9 @@ namespace jellybins.Models
             {
                 Loaded = false;
 #if DEBUG
-                ExceptionsController.ShowException(e);
+                JbAppReport.ShowException(e);
 #else
-                ExceptionsController.ShowException(new OperationCancelledException("Не удалось загрузить сборку"))
+                JbAppReport.ShowException(new OperationCancelledException("Не удалось загрузить сборку"))
 #endif
                 return;
             }

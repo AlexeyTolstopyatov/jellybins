@@ -1,10 +1,6 @@
 ﻿using System.IO;
-using System.Runtime.InteropServices;
 using System.Windows;
-
-using jellybins.Binary;
 using jellybins.Middleware;
-using jellybins.Models;
 using Microsoft.Win32;
 using Wpf.Ui.Controls;
 
@@ -18,6 +14,7 @@ namespace jellybins.Views
         public MainWindow()
         {
             InitializeComponent();
+            frame.Content = new AboutPage();
         }
 
         /// <summary>
@@ -72,55 +69,12 @@ namespace jellybins.Views
             };
             frame.Content = hPage;
 
-            ushort mzSign = BinarySearcher.GetUInt16(path, 0);
-            if (BinaryInformation.DetectType(mzSign) == BinaryType.Other)
-            {
-                BinaryReportCreator.TryParseUnknown(ref hPage, mzSign);
-                return;
-            }
+            JbAnalyser analysing = JbAnalyser.Get(path, ref hPage);
+            JbAnalyser reference = JbAnalyser.Set(@"C:\Windows\explorer.exe", ref hPage);
             
-            MzHeader mz = new();
-            BinarySearcher.Fill(ref path, ref mz);
-            BinaryReportCreator.TryParseMzHeader(ref hPage, ref mz);
-            
-            ushort word = BinarySearcher.GetUInt16(path, mz.e_lfanew);
-            
-            switch (BinaryInformation.DetectType(word))
-            {
-                case BinaryType.Linear:
-                    LeHeader le = new();
-                    BinarySearcher.Fill(ref path, ref le, (int)mz.e_lfanew);
-                    BinaryReportCreator.TryParseLeHeader(ref hPage, ref le);
-                    break;
-                case BinaryType.New:
-                    NeHeader ne = new();
-                    BinarySearcher.Fill(ref path, ref ne, (int)mz.e_lfanew);
-                    BinaryReportCreator.TryParseNeHeader(ref hPage, ref ne);
-                    break;
-                case BinaryType.Portable:
-                    NtHeader nt = new();
-                    BinarySearcher.Fill(ref path, ref nt, (int)mz.e_lfanew);
-                    BinaryReportCreator.TryParsePortableHeader(ref hPage, ref nt);
-                    
-                    // Если внутри PE файла есть сведения о CIL/CLR Надо узнать где они будут
-                    // располагаться.
-                    // Смещение CLR заголовка зависит от разрядности файла, как и положение
-                    // всех сегментов/структур (стоящих после PE заголовка)
-                    int offset = nt.WinNtOptional.Magic switch
-                    {
-                        0x10b => 80,
-                        0x20b => 200,
-                        _ => 0
-                    };
-                    if (BinarySearcher.GetUInt32(path, offset) != 0)
-                    {
-                        ClrHeader clr = new();
-                        BinarySearcher.Fill(ref path, ref clr);
-                        BinaryReportCreator.TryParseCommonLangRuntimeHeader(ref hPage, ref clr);
-                    }
-                    break;
-            }
-            
+            hPage.IsCompat.Text = JbAnalyser.EqualsToString(
+                analysing.Characteristics,
+                reference.Characteristics);
         }
 
         
@@ -131,9 +85,8 @@ namespace jellybins.Views
         private void CreateProceduresList(string path)
         {
             BinaryProceduresPage page = new();
-            if (BinaryReportCreator.TryParseNetComponentMethods(path, ref page))
+            if (JbCommonReport.TryParseNetComponentMethods(path, ref page))
                 frame.Content = page;
-
         }
         #endregion
         private void FluentWindow_SizeChanged(object sender, SizeChangedEventArgs e) 
@@ -160,9 +113,10 @@ namespace jellybins.Views
             {
                 Title = "Jelly Bins",
                 Content = @$"Рассчет кучи: {
-                    Math.Round((before - after) / Math.Pow(1024, 2), 3)
+                    Math.Round((after - before) / Math.Pow(1024, 2), 3)
                 } Мб",
             }.ShowDialogAsync();
+            frame.Content = new AboutPage();
             #endif
         }
     }

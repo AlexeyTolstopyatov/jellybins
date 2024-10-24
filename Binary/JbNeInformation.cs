@@ -13,7 +13,7 @@ namespace jellybins.Binary;
  *                  OtherFlagsToStrings(ushort):        Возвращает список расшифрованных флагов загрузчика для OS/2
  *                  WindowsVersionToString(byte, byte): Возвращает требуемую версию Windows для двичного файла
  */
-public static class NeInformationBlock
+public static class JbNeInformation
 {
     /// <summary>
     /// Читает флаги модуля

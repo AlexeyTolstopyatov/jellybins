@@ -12,7 +12,7 @@ namespace jellybins.Binary;
  *                  VersionFlagToString(ushort, ushort)     Возвращает версию в виде строки
  *                  EnvironmentFlagToString(ushort):        Возвращает тип подсистемы (окружения)
  */
-public static class PeInformationBlock
+public static class JbPeInformation
 {
     /// <summary>
     /// Определяет архитектуру процессора для двоичного файла
@@ -35,7 +35,7 @@ public static class PeInformationBlock
     /// </summary>
     /// <returns></returns>
     public static string OperatingSystemToString() => 
-        "Microsoft Windows NT";
+        "Microsoft Windows";
 
     /// <summary>
     /// Определяет разрядность двоичного файла
@@ -68,7 +68,7 @@ public static class PeInformationBlock
             PortableEnvironment.GraphicalInterface => "Оконное приложение Windows",
             PortableEnvironment.PosixConsoleInterface => "Консольное приложение POSIX",
             PortableEnvironment.Os2ConsoleInterface => "Консольное Приложение OS/2",
-            PortableEnvironment.WindowsNative => "",
+            PortableEnvironment.WindowsNative => "Использует Windows Runtime (WinRT)",
             PortableEnvironment.WindowsCeGraphicalInterface => "Оконное приложение Windows CE",
             _ => ""
         };

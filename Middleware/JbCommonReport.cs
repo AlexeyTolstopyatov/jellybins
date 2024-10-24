@@ -1,6 +1,4 @@
 ﻿using System.Windows;
-using System.Windows.Automation;
-using System.Windows.Documents;
 using System.Windows.Media;
 using jellybins.Binary;
 using jellybins.Models;
@@ -11,38 +9,24 @@ using TextBlock = Wpf.Ui.Controls.TextBlock;
 
 /*
  * JellyBins (C) Толстопятов Алексей А. 2024
- * 
+ *      Binary Common Report
+ * Здесь содержится вся логика по созданию и заполнению главной страницы
+ * (Страницы общих свойств).
  */
 namespace jellybins.Middleware
 {
-    /// <summary>
-    /// Здесь содержится весь хлам по созданию страниц
-    /// </summary>
-    internal static class BinaryReportCreator
+    internal static class JbCommonReport
     {
-        private static void CreateFlagDescription(
-            string content,
-            SolidColorBrush foreground,
-            ref BinaryHeaderPage bin
-            )
-        {
-            bin.FlagsNames.Items.Add(
-                new TextBlock()
-                {
-                    Foreground = foreground,
-                    Text = content,
-                });
-        }
         public static bool TryParseNetComponentMethods(
             string assembly, 
             ref BinaryProceduresPage netp)
         {
             netp.libmethods.Items.Clear();
-            NetComponentInternals netl = new NetComponentInternals(assembly);
+            ClrInternals netl = new(assembly);
             
             if (!netl.Loaded)
             {
-                ExceptionsController.ShowException(
+                JbAppReport.ShowException(
                     new InvalidOperationException("Двоичный файл не был загружен")
                 );
 
@@ -85,7 +69,7 @@ namespace jellybins.Middleware
             ushort head)
         {
             bin.binprops.Text = $"Начало файла: 0x{head:x}";
-            bin.bintype.Text = BinaryInformation.GetInformation(BinaryType.Other);
+            bin.bintype.Text = JbTypeInformation.GetInformation(JbFileType.Other);
             bin.ThisArchLabel.Text =
                 bin.ThisOsVersionLabel.Text =
                     bin.ThisOsLabel.Text =
@@ -94,12 +78,12 @@ namespace jellybins.Middleware
                                 bin.ArchRequiredLabel.Text = "Не рассчитано";
             
         }
-        public static void TryParsePortableHeader(
+        public static JbFileChars TryParsePortableHeader(
             ref BinaryHeaderPage bin,
             ref NtHeader nt)
         {
-            bin.binprops.Text = BinaryInformation.GetInformation(BinaryType.Portable);
-            bin.bintype.Text = BinaryInformation.GetType(BinaryType.Portable);
+            bin.binprops.Text = JbTypeInformation.GetInformation(JbFileType.Portable);
+            bin.bintype.Text = JbTypeInformation.GetType(JbFileType.Portable);
             bin.bintable.Children.Add(new CardExpander()
             {
                 IsExpanded = true,
@@ -165,53 +149,46 @@ namespace jellybins.Middleware
                 MaxWidth = 300,
                 VerticalAlignment = VerticalAlignment.Top
             });
-            bin.ArchRequiredLabel.Text = PeInformationBlock.ProcessorFlagToString(nt.WinNtMain.Machine);
-            bin.OsRequiredLabel.Text = PeInformationBlock.OperatingSystemToString();
+            bin.ArchRequiredLabel.Text = JbPeInformation.ProcessorFlagToString(nt.WinNtMain.Machine);
+            bin.OsRequiredLabel.Text = JbPeInformation.OperatingSystemToString();
             bin.OsVerLabel.Text =
-                PeInformationBlock.VersionToString(nt.WinNtOptional.MajorOsVersion, nt.WinNtOptional.MinorOsVersion);
-            // Flags Enumeration here.
+                JbPeInformation.VersionToString(nt.WinNtOptional.MajorOsVersion, nt.WinNtOptional.MinorOsVersion);
             
-            CreateFlagDescription("Основные", Brushes.Cyan, ref bin);
-            bin.LoaderFlags.Items.Add(new TextBlock()
-            {
-                Foreground = Brushes.Cyan,
-                Text = PeInformationBlock.MagicFlagToString(nt.WinNtOptional.Magic)
-            });
-
-            bin.LoaderFlags.Items.Add(new TextBlock()
-            {
-                Foreground = Brushes.Cyan,
-                Text = PeInformationBlock.EnvironmentFlagToString(nt.WinNtOptional.Subsystem)
-            });
+            JbElement.SetFlagDescription("Основные", Brushes.Cyan, ref bin);
+            JbElement.SetFlag(ref bin.LoaderFlags, JbPeInformation.MagicFlagToString(nt.WinNtOptional.Magic), Brushes.Cyan);
+            JbElement.SetFlag(ref bin.LoaderFlags, JbPeInformation.EnvironmentFlagToString(nt.WinNtOptional.Subsystem), Brushes.Cyan);
             
-            CreateFlagDescription("PE характеристики", Brushes.GreenYellow, ref bin);
-            foreach (var characteristic in PeInformationBlock.CharacteristicsToStrings(nt.WinNtMain.Characteristics))
+            JbElement.SetFlagDescription("PE характеристики", Brushes.GreenYellow, ref bin);
+            foreach (var characteristic in JbPeInformation.CharacteristicsToStrings(nt.WinNtMain.Characteristics))
             {
                 if (characteristic != string.Empty)
-                    bin.LoaderFlags.Items.Add(new TextBlock()
-                    {
-                        Foreground = Brushes.GreenYellow,
-                        Text = characteristic
-                    });
+                    JbElement.SetFlag(ref bin.LoaderFlags, characteristic, Brushes.GreenYellow);
             }
+
+            if (nt.WinNtOptional.Win32Version == 0) return new JbFileChars(
+                JbFileOs.Windows,
+                JbFileType.Portable,
+                nt.WinNtOptional.MajorOsVersion,
+                nt.WinNtOptional.MinorOsVersion
+                );
             
-            // Ну как-то так.
-            if (nt.WinNtOptional.Win32Version == 0) return;
+            JbElement.SetFlagDescription("Необычные значения", Brushes.OrangeRed, ref bin);
+            JbElement.SetFlag(ref bin.LoaderFlags, $"Значение Win32Version = 0x{nt.WinNtOptional.Win32Version:x}", Brushes.OrangeRed);
             
-            CreateFlagDescription("Необычные значения", Brushes.OrangeRed, ref bin);
-            bin.LoaderFlags.Items.Add(new TextBlock()
-            {
-                Foreground = Brushes.OrangeRed,
-                Text = $"Возможная жертва заражения (0x{nt.WinNtOptional.Win32Version:x})"
-            });
+            return new JbFileChars(
+                JbFileOs.Windows,
+                JbFileType.Portable,
+                nt.WinNtOptional.MajorSubSystemVersion,
+                nt.WinNtOptional.MinorSubSystemVersion
+            );
         }
 
-        public static void TryParseNeHeader(
+        public static JbFileChars TryParseNeHeader(
             ref BinaryHeaderPage bin,
             ref NeHeader ne)
         {
-            bin.binprops.Text = BinaryInformation.GetInformation(BinaryType.New);
-            bin.bintype.Text = BinaryInformation.GetType(BinaryType.New);
+            bin.binprops.Text = JbTypeInformation.GetInformation(JbFileType.New);
+            bin.bintype.Text = JbTypeInformation.GetType(JbFileType.New);
             bin.bintable.Children.Add(
                 new CardExpander()
                 {
@@ -259,46 +236,56 @@ namespace jellybins.Middleware
                     VerticalAlignment = VerticalAlignment.Top
                 });
             
-            bin.OsRequiredLabel.Text = NeInformationBlock.OperatingSystemFlagToString(ne.os);
-            bin.OsVerLabel.Text = NeInformationBlock.WindowsVersionToString(ne.major, ne.minor);
-            bin.ArchRequiredLabel.Text = NeInformationBlock.ProcessorFlagToString(ne.pflags);
+            bin.OsRequiredLabel.Text = JbNeInformation.OperatingSystemFlagToString(ne.os);
+            bin.OsVerLabel.Text = JbNeInformation.WindowsVersionToString(ne.major, ne.minor);
+            bin.ArchRequiredLabel.Text = JbNeInformation.ProcessorFlagToString(ne.pflags);
 
-            if (NeInformationBlock.OperatingSystemFlagToString(ne.os) == String.Empty &
-                NeInformationBlock.WindowsVersionToString(ne.major, ne.minor) != String.Empty)
-                bin.OsRequiredLabel.Text = NeInformationBlock.WindowsVersionToString(ne.major, ne.minor);
+            if (JbNeInformation.OperatingSystemFlagToString(ne.os) == String.Empty &
+                JbNeInformation.WindowsVersionToString(ne.major, ne.minor) != String.Empty)
+                bin.OsRequiredLabel.Text = JbNeInformation.WindowsVersionToString(ne.major, ne.minor);
             
             // Loader Flags Enumeration
-            CreateFlagDescription("Основные", Brushes.Cyan, ref bin);
-            ItemCreator.NewListItem(ref bin.LoaderFlags, "16-разрядный", Brushes.Cyan);
+            JbElement.SetFlagDescription("Основные", Brushes.Cyan, ref bin);
+            JbElement.SetFlag(ref bin.LoaderFlags, "16-разрядный", Brushes.Cyan);
             
-            CreateFlagDescription("Программные флаги", Brushes.Yellow, ref bin);
-            foreach (var programFlag in NeInformationBlock.ProgramFlagsToStrings(ne.pflags))
+            JbElement.SetFlagDescription("Программные флаги", Brushes.Yellow, ref bin);
+            foreach (var programFlag in JbNeInformation.ProgramFlagsToStrings(ne.pflags))
             {
                 if (programFlag != string.Empty)
-                    ItemCreator.NewListItem(ref bin.LoaderFlags, programFlag, Brushes.Yellow);
+                    JbElement.SetFlag(ref bin.LoaderFlags, programFlag, Brushes.Yellow);
             }
 
-            CreateFlagDescription("Флаги приложения", Brushes.SpringGreen, ref bin);
-            foreach (var appFlag in NeInformationBlock.ApplicationFlagsToStrings(ne.aflags))
+            JbElement.SetFlagDescription("Флаги приложения", Brushes.SpringGreen, ref bin);
+            foreach (var appFlag in JbNeInformation.ApplicationFlagsToStrings(ne.aflags))
             {
                 if (appFlag != String.Empty)
-                    ItemCreator.NewListItem(ref bin.LoaderFlags, appFlag, Brushes.SpringGreen);
+                    JbElement.SetFlag(ref bin.LoaderFlags, appFlag, Brushes.SpringGreen);
             }
 
-            CreateFlagDescription("Флаги для IBM OS/2", Brushes.CornflowerBlue, ref bin);
-            foreach (var oFlag in NeInformationBlock.OtherFlagsToStrings(ne.flagsothers))
+            JbElement.SetFlagDescription("Флаги для IBM OS/2", Brushes.CornflowerBlue, ref bin);
+            foreach (var oFlag in JbNeInformation.OtherFlagsToStrings(ne.flagsothers))
             {
                 if (oFlag != string.Empty)
-                    ItemCreator.NewListItem(ref bin.LoaderFlags, oFlag, Brushes.CornflowerBlue);
+                    JbElement.SetFlag(ref bin.LoaderFlags, oFlag, Brushes.CornflowerBlue);
             }
+
+            return new JbFileChars(
+                ((NewRequiredOperatingSystem)ne.os is 
+                    NewRequiredOperatingSystem.Windows386 or 
+                    NewRequiredOperatingSystem.Windows386) ? 
+                    JbFileOs.Windows : JbFileOs.Os2,
+                JbFileType.New,
+                ne.major,
+                ne.minor
+            );
         }
         
-        public static void TryParseLeHeader(
+        public static JbFileChars TryParseLeHeader(
             ref BinaryHeaderPage binp,
             ref LeHeader le)
         {
-            binp.binprops.Text = BinaryInformation.GetInformation(BinaryType.Linear);
-            binp.bintype.Text = BinaryInformation.GetType(BinaryType.Linear);
+            binp.binprops.Text = JbTypeInformation.GetInformation(JbFileType.Linear);
+            binp.bintype.Text = JbTypeInformation.GetType(JbFileType.Linear);
             binp.bintable.Children.Add(
                 new CardExpander()
                 {
@@ -364,38 +351,42 @@ namespace jellybins.Middleware
                     VerticalAlignment = VerticalAlignment.Top
                 });
 
-            binp.OsRequiredLabel.Text = LeInformationBlock.OperatingSystemFlagToString(le.TargetOperatingSystem);
-            binp.ArchRequiredLabel.Text = LeInformationBlock.ProcessorFlagToString(le.CPUType);
+            binp.OsRequiredLabel.Text = JbLeInformation.OperatingSystemFlagToString(le.TargetOperatingSystem);
+            binp.ArchRequiredLabel.Text = JbLeInformation.ProcessorFlagToString(le.CPUType);
 
-            CreateFlagDescription("Флаги определения модуля", Brushes.Cyan, ref binp);
-            foreach (var mtFlag in LeInformationBlock.ModuleFlagsToStrings(le.ModuleTypeFlags))
+            JbElement.SetFlagDescription("Флаги определения модуля", Brushes.Cyan, ref binp);
+            foreach (var mtFlag in JbLeInformation.ModuleFlagsToStrings(le.ModuleTypeFlags))
             {
                 if (mtFlag != string.Empty)
-                    binp.LoaderFlags.Items.Add(
-                        new TextBlock()
-                        {
-                            Foreground = Brushes.Cyan,
-                            Text = mtFlag
-                        });
+                    JbElement.SetFlag(ref binp.LoaderFlags, mtFlag, Brushes.Cyan);
             }
             
-            if (le.WindowsVXDDeviceID == 0) return;
+            if (le.WindowsVXDDeviceID == 0) return new JbFileChars(
+                ((LinearOperatingSystemFlag)le.TargetOperatingSystem == LinearOperatingSystemFlag.OS2) ? 
+                    JbFileOs.Os2 : JbFileOs.Windows,
+                JbFileType.Linear,
+                1,
+                0
+                );
             
-            CreateFlagDescription("Флаги определения для Windows", Brushes.CornflowerBlue, ref binp);
+            JbElement.SetFlagDescription("Флаги определения для Windows", Brushes.CornflowerBlue, ref binp);
             binp.LoaderFlags.Items.Add(new TextBlock()
             {
                 Text = "Драйвер устройства (VxD)",
                 Foreground = Brushes.CornflowerBlue,
             });
             TryParseVxdHeader(ref binp, ref le);
+            return new JbFileChars(
+                os: JbFileOs.Windows,
+                JbFileType.Linear,
+                3,
+                0);
         }
 
         public static void TryParseCommonLangRuntimeHeader(
             ref BinaryHeaderPage bin,
             ref ClrHeader clr)
         {
-            // bin.binprops.Text = BinaryInformation.GetInformation(BinaryType.NetObject);
-            // bin.bintype.Text = BinaryInformation.GetType(BinaryType.NetObject);
             bin.bintable.Children.Add(
                 new CardExpander()
                 {
@@ -420,15 +411,11 @@ namespace jellybins.Middleware
                     VerticalAlignment = VerticalAlignment.Top
                 });
             
-            CreateFlagDescription("Флаги определения CLR среды", Brushes.CornflowerBlue, ref bin);
-            foreach (var flag in ClrInformationBlock.LinkerFlagsToStrings(clr.LinkerFlags))
+            JbElement.SetFlagDescription("Флаги определения CLR среды", Brushes.CornflowerBlue, ref bin);
+            foreach (var flag in JbClrInformation.LinkerFlagsToStrings(clr.LinkerFlags))
             {
                 if (flag != String.Empty)
-                    bin.LoaderFlags.Items.Add(new TextBlock()
-                    {
-                        Foreground = Brushes.CornflowerBlue,
-                        Text = flag
-                    });
+                    JbElement.SetFlag(ref bin.LoaderFlags, flag, Brushes.CornflowerBlue);
             }
         }
 
@@ -458,7 +445,7 @@ namespace jellybins.Middleware
                     MaxWidth = 300,
                     VerticalAlignment = VerticalAlignment.Top
                 });
-    }
+        }
         
         public static void TryParseMzHeader(
             ref BinaryHeaderPage binp, 
@@ -470,7 +457,7 @@ namespace jellybins.Middleware
                 Header = "MZ",
                 Content = new ListView()
                 {
-                    Items = 
+                    Items =
                     {
                         "Подпись 0x" + mz.e_sign.ToString("x"),
                         "Размер последнего блока 0x"+ mz.e_lastb.ToString("x"),
@@ -492,12 +479,31 @@ namespace jellybins.Middleware
                 MaxWidth = 300,
                 VerticalAlignment = VerticalAlignment.Top
             });
-            binp.bintype.Text = BinaryInformation.GetType(BinaryType.MarkZbykowski);
-            binp.binprops.Text = BinaryInformation.GetInformation(BinaryType.MarkZbykowski);
+            binp.bintype.Text = JbTypeInformation.GetType(JbFileType.MarkZbykowski);
+            binp.binprops.Text = JbTypeInformation.GetInformation(JbFileType.MarkZbykowski);
             binp.OsRequiredLabel.Text = "Microsoft DOS";
             binp.OsVerLabel.Text = "2.0";
             binp.ArchRequiredLabel.Text = "Intel x86 (i286 IA32)";
-            
+        }
+
+        
+        public static JbFileChars TryParseReference(
+            ref BinaryHeaderPage bin,
+            ref NtHeader nt
+            )
+        {
+            bin.ThisArchLabel.Text = JbPeInformation.ProcessorFlagToString(nt.WinNtMain.Machine);
+            bin.ThisOsLabel.Text = JbPeInformation.OperatingSystemToString();
+            bin.ThisOsVersionLabel.Text = JbPeInformation.VersionToString(
+                nt.WinNtOptional.MajorOsVersion, 
+                nt.WinNtOptional.MinorOsVersion);
+
+            return new JbFileChars(
+                JbFileOs.Windows,
+                JbFileType.Portable,
+                nt.WinNtOptional.MajorSubSystemVersion,
+                nt.WinNtOptional.MinorSubSystemVersion
+                );
         }
     }
 }

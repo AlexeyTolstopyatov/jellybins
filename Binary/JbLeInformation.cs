@@ -11,7 +11,7 @@ namespace jellybins.Binary;
  *                  ModuleFlagsToStrings(uint): Возвращает список расшифрованных флагов из таблицы определения файла
  *
  */
-public static class LeInformationBlock
+public static class JbLeInformation
 {
     /// <summary>
     /// Распознает флаг операционной системы

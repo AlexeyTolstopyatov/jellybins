@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace jellybins.Models
 {
     // A-Out binaries
-    internal class AssemblerOutputHeader 
+    internal class AoutHeader 
     {
     }
 }

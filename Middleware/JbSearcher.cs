@@ -12,7 +12,7 @@ using System.Runtime.InteropServices;
  */
 namespace jellybins.Middleware
 {
-    internal static class BinarySearcher
+    internal static class JbSearcher
     {
         /// <summary>
         /// Читает файл и записывает в структуру

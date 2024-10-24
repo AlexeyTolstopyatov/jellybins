@@ -1,6 +1,6 @@
 ﻿namespace jellybins.Binary;
 
-public static class ClrInformationBlock
+public static class JbClrInformation
 {
     public static string[] LinkerFlagsToStrings(uint flags)
     {

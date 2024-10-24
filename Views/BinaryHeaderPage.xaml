@@ -6,8 +6,9 @@
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       xmlns:local="clr-namespace:jellybins.Views"
       mc:Ignorable="d"
+      ui:Design.Background="Transparent"
       Background="#212121"
-      d:DesignHeight="500" d:DesignWidth="900"
+      d:DesignHeight="600" d:DesignWidth="900"
       Title="BinaryHeaderPage"
       SizeChanged="BinaryHeaderPage_OnSizeChanged">
 
@@ -113,13 +114,11 @@
                                          x:Name="bintype"/>
                                     <LineBreak/>
                                     <LineBreak/>
-                                    <Run
-                                        FontSize="20"
-                                        Text="Выполняется в среде: "/>
+                                </TextBlock>
+                                <TextBlock Grid.Column="1">
                                     <Run 
-                                        x:Name="EnvironmentType"
-                                        Foreground="Yellow"
-                                        FontSize="21"/>
+                                        x:Name="IsCompat"
+                                        Foreground="Yellow"/>
                                 </TextBlock>
                             </Grid>
                         </ui:Card.Content>
