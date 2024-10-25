@@ -5,12 +5,14 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:local="clr-namespace:jellybins.Views"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      
       mc:Ignorable="d"
       Title="About" Height="600" Width="900">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="70"/>
             <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="30"/>
         </Grid.ColumnDefinitions>
@@ -21,30 +23,45 @@
             <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
         
-        <ui:Card 
-            Grid.Row="1" 
+        <ui:Card
             Grid.Column="1"
-            Padding="30">
-            <ui:TextBlock
-                TextWrapping="Wrap">
-                <Run
-                    FontSize="30"
-                    Text="Jelly Bins"/>
-                <LineBreak/>
-                <LineBreak/>
-                <Run Text="Узнайте побольше о том, что не можете запустить! Создайте отчет о основных свойствах двоичного файла!"/>
-            </ui:TextBlock>
+            Grid.Row="1">
+            <ui:Card.Content>
+                <StackPanel>
+                    <ui:Card 
+                        Grid.Row="1" 
+                        Grid.Column="1"
+                        Padding="30">
+                        <ui:TextBlock
+                            TextWrapping="Wrap">
+                            <Run
+                                FontSize="30"
+                                Text="Jelly Bins"/>
+                            <LineBreak/>
+                            <LineBreak/>
+                            <Run Text="Узнайте побольше о том, что не можете запустить! Создайте отчет о основных свойствах двоичного файла!"/>
+                        </ui:TextBlock>
+                    </ui:Card>
+        
+                    <ui:Card>
+                        <StackPanel
+                            Orientation="Horizontal">
+                            <StackPanel>
+                                <ui:TextBlock
+                                    Text="Поддерживаемые форматы"
+                                    FontSize="16"/>
+                                <ui:ListView>
+                                    <TextBlock Text="Переносные исполняемые (PE)"/>
+                                    <TextBlock Text="Линейные исполняемые 16 бит (LX)"/>
+                                    <TextBlock Text="Линейные исполняемые 32 бит (LE)"/>
+                                    <TextBlock Text="Новые исполняемые 16 бит (NE)"/>
+                                </ui:ListView>
+                            </StackPanel>
+                        </StackPanel>
+                    </ui:Card>
+                </StackPanel>
+            </ui:Card.Content>
         </ui:Card>
         
-        <ui:Card 
-            Grid.Row="1"
-            Grid.Column="2">
-            <ui:ListView>
-                <TextBlock Text="PE"/>
-                <TextBlock Text="LX"/>
-                <TextBlock Text="LE"/>
-                <TextBlock Text="NE"/>
-            </ui:ListView>
-        </ui:Card>
     </Grid>
 </Page>
