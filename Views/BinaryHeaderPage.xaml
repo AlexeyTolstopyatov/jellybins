@@ -115,7 +115,9 @@
                                     <LineBreak/>
                                     <LineBreak/>
                                 </TextBlock>
-                                <TextBlock Grid.Column="1">
+                                <TextBlock
+                                    TextWrapping="Wrap"
+                                    Grid.Column="1">
                                     <Run 
                                         x:Name="IsCompat"
                                         Foreground="Yellow"/>

@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Windows;
+using jellybins.Config;
 using jellybins.Middleware;
 using Microsoft.Win32;
 using Wpf.Ui.Controls;
@@ -14,6 +15,7 @@ namespace jellybins.Views
         public MainWindow()
         {
             InitializeComponent();
+            JbConfigReader.Read();
             frame.Content = new AboutPage();
         }
 
@@ -34,20 +36,17 @@ namespace jellybins.Views
                 Multiselect = false,
             };
 
-            if (dlg.ShowDialog() == true && dlg.FileName != string.Empty)
-            {
-                if (string.IsNullOrEmpty(dlg.FileName))
-                    return;
+            if (dlg.ShowDialog() != true || dlg.FileName == string.Empty) return;
+            if (string.IsNullOrEmpty(dlg.FileName)) return;
 
-                ProjectWindow requirements = new();
-                requirements.ShowDialog();
+            ProjectWindow requirements = new();
+            requirements.ShowDialog();
 
-                //Checking for: loading 2 pages/1 page
-                if (!requirements.OnlyHeaderContentRequired)
-                    CreateProceduresList(dlg.FileName);
-                else
-                    CreateHeaderContent(dlg.FileName);
-            }
+            //Checking for: loading 2 pages/1 page
+            if (!requirements.OnlyHeaderContentRequired)
+                CreateProceduresList(dlg.FileName);
+            else
+                CreateHeaderContent(dlg.FileName);
         }
         #region Business Logic ware
         /// <summary>
