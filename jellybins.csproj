@@ -7,6 +7,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Version>1.1.0</Version>
+    <Authors>Alexey Tolstopyatov</Authors>
+    <PackageIcon>Assets\beans.png</PackageIcon>
+    <RepositoryUrl>https://github.com/AlexeyTolstopyatov/jellybins</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>

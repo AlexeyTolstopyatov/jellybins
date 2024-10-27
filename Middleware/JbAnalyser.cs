@@ -1,5 +1,4 @@
-﻿using System.Reflection.PortableExecutable;
-using jellybins.Binary;
+﻿using jellybins.Binary;
 using jellybins.Models;
 using jellybins.Views;
 
@@ -60,13 +59,13 @@ public class JbAnalyser
         ushort mzSign = JbSearcher.GetUInt16(path, 0);
         if (JbTypeInformation.DetectType(mzSign) == JbFileType.Other)
         {
-            JbCommonReport.TryParseUnknown(ref hPage, mzSign);
+            JbCommon.TryParseUnknown(ref hPage, mzSign);
             return new JbAnalyser();
         }
 
         MzHeader mz = new();
         JbSearcher.Fill(ref path, ref mz);
-        JbCommonReport.TryParseMzHeader(ref hPage, ref mz);
+        JbCommon.TryParseMzHeader(ref hPage, ref mz);
 
         ushort word = JbSearcher.GetUInt16(path, mz.e_lfanew);
 
@@ -76,7 +75,7 @@ public class JbAnalyser
                 LeHeader le = new();
                 JbSearcher.Fill(ref path, ref le, (int)mz.e_lfanew);
                 JbFileChars lch = 
-                    JbCommonReport.TryParseLeHeader(ref hPage, ref le);
+                    JbCommon.TryParseLeHeader(ref hPage, ref le);
                 return new JbAnalyser()
                 {
                     Characteristics = lch
@@ -85,7 +84,7 @@ public class JbAnalyser
                 NeHeader ne = new();
                 JbSearcher.Fill(ref path, ref ne, (int)mz.e_lfanew);
                 JbFileChars nch = 
-                    JbCommonReport.TryParseNeHeader(ref hPage, ref ne);
+                    JbCommon.TryParseNeHeader(ref hPage, ref ne);
                 return new JbAnalyser()
                 {
                     Characteristics = nch
@@ -94,7 +93,7 @@ public class JbAnalyser
                 NtHeader nt = new();
                 JbSearcher.Fill(ref path, ref nt, (int)mz.e_lfanew);
                 JbFileChars pch =
-                    JbCommonReport.TryParsePortableHeader(ref hPage, ref nt);
+                    JbCommon.TryParsePortableHeader(ref hPage, ref nt);
 
                 // Если внутри PE файла есть сведения о CIL/CLR Надо узнать где они будут
                 // располагаться.
@@ -110,7 +109,7 @@ public class JbAnalyser
                 {
                     ClrHeader clr = new();
                     JbSearcher.Fill(ref path, ref clr);
-                    JbCommonReport.TryParseCommonLangRuntimeHeader(ref hPage, ref clr);
+                    JbCommon.TryParseCommonLangRuntimeHeader(ref hPage, ref clr);
                 }
 
                 return new JbAnalyser()
@@ -145,7 +144,7 @@ public class JbAnalyser
         ushort word = 
         JbSearcher.GetUInt16(path, doshead.e_lfanew);
         JbSearcher.Fill(ref path, ref winnt, (int)doshead.e_lfanew);
-        JbFileChars chars = JbCommonReport.TryParseReference(ref bin, ref winnt);
+        JbFileChars chars = JbCommon.TryParseReference(ref bin, ref winnt);
         return new JbAnalyser()
         {
             Characteristics = chars

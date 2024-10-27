@@ -1,5 +1,7 @@
 ﻿using System.IO;
+using System.Runtime.CompilerServices;
 using System.Windows;
+using jellybins.Binary;
 using jellybins.Config;
 using jellybins.Middleware;
 using Microsoft.Win32;
@@ -15,10 +17,12 @@ namespace jellybins.Views
         public MainWindow()
         {
             InitializeComponent();
-            JbConfigReader.Read();
+            //JbConfigReader.Read();
             frame.Content = new AboutPage();
         }
 
+        private BinaryHeaderPage? _binaryHeaderPage;
+        
         /// <summary>
         /// При нажатии на кнопку "Открыть"
         /// Если указан файл, выводит диалог с выбором анализа
@@ -67,13 +71,16 @@ namespace jellybins.Views
                 }
             };
             frame.Content = hPage;
-
+            
             JbAnalyser analysing = JbAnalyser.Get(path, ref hPage);
             JbAnalyser reference = JbAnalyser.Set(@"C:\Windows\explorer.exe", ref hPage);
             
             hPage.IsCompat.Text = JbAnalyser.EqualsToString(
                 analysing.Characteristics,
                 reference.Characteristics);
+
+            JbAppReport.Information("Created CommonReport global instance");
+            _binaryHeaderPage = hPage;
         }
 
         
@@ -84,9 +91,20 @@ namespace jellybins.Views
         private void CreateProceduresList(string path)
         {
             BinaryProceduresPage page = new();
-            if (JbCommonReport.TryParseNetComponentMethods(path, ref page))
+            if (JbCommon.TryParseNetComponentMethods(path, ref page))
                 frame.Content = page;
         }
+
+        private void Collect()
+        {
+            if (_binaryHeaderPage is null) return;
+            if (frame.Content.GetType() == typeof(BinaryHeaderPage))
+            {
+                JbReport.CommonCollect();
+                //JbReport.CommonSaveAsXml();
+            }
+        }
+        
         #endregion
         private void FluentWindow_SizeChanged(object sender, SizeChangedEventArgs e) 
         {
@@ -107,7 +125,7 @@ namespace jellybins.Views
             long after = 
                 GC.GetGCMemoryInfo().HeapSizeBytes;
             
-            #if DEBUG
+#if DEBUG
             _ =  new Wpf.Ui.Controls.MessageBox()
             {
                 Title = "Jelly Bins",
@@ -116,7 +134,8 @@ namespace jellybins.Views
                 } Мб",
             }.ShowDialogAsync();
             frame.Content = new AboutPage();
-            #endif
+            _binaryHeaderPage = null;
+#endif
         }
     }
 }
