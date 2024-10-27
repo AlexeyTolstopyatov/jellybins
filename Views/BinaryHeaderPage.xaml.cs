@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using jellybins.Models;
 
 namespace jellybins.Views
 {
@@ -8,6 +9,10 @@ namespace jellybins.Views
     /// </summary>
     public partial class BinaryHeaderPage : Page
     {
+        public List<string> FlagNamesSource { get; set; } = new();
+        public List<string> FlagsSource { get; set; } = new();
+        public List<JbStringHead> ListViewsSources = new();
+        
         public BinaryHeaderPage()
         {
             InitializeComponent();

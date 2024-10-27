@@ -31,5 +31,23 @@ namespace jellybins.Binary
             File.WriteAllText(AppDomain.CurrentDomain.BaseDirectory + "\\" + reportName, 
                 exception.ToString());
         }
+
+        public static void Information(string message)
+            => WriteLine(message, ConsoleColor.Cyan);
+
+        public static void Warning(string message)
+            => WriteLine(message, ConsoleColor.Yellow);
+
+        public static void Exception(string message)
+            => WriteLine(message, ConsoleColor.Red);
+        
+        
+        // ReSharper disable once MemberCanBePrivate.Global
+        public static void WriteLine(string message, ConsoleColor cc)
+        {
+            Console.ForegroundColor = cc;
+            Console.WriteLine(message);
+            Console.ResetColor();
+        }
     }
 }
