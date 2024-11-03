@@ -1,0 +1,166 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\Projects\\cs\\jellybins\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{48470B58-7221-4D1D-BB50-30553BEE5B02}|jellybins\\jellybins.csproj|d:\\projects\\cs\\jellybins\\jellybins\\processing\\reportcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{48470B58-7221-4D1D-BB50-30553BEE5B02}|jellybins\\jellybins.csproj|solutionrelative:jellybins\\processing\\reportcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{48470B58-7221-4D1D-BB50-30553BEE5B02}|jellybins\\jellybins.csproj|d:\\projects\\cs\\jellybins\\jellybins\\views\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{48470B58-7221-4D1D-BB50-30553BEE5B02}|jellybins\\jellybins.csproj|solutionrelative:jellybins\\views\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{48470B58-7221-4D1D-BB50-30553BEE5B02}|jellybins\\jellybins.csproj|d:\\projects\\cs\\jellybins\\jellybins\\views\\binaryheaderpage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{48470B58-7221-4D1D-BB50-30553BEE5B02}|jellybins\\jellybins.csproj|solutionrelative:jellybins\\views\\binaryheaderpage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{48470B58-7221-4D1D-BB50-30553BEE5B02}|jellybins\\jellybins.csproj|d:\\projects\\cs\\jellybins\\jellybins\\views\\binaryheaderpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{48470B58-7221-4D1D-BB50-30553BEE5B02}|jellybins\\jellybins.csproj|solutionrelative:jellybins\\views\\binaryheaderpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{48470B58-7221-4D1D-BB50-30553BEE5B02}|jellybins\\jellybins.csproj|d:\\projects\\cs\\jellybins\\jellybins\\models\\generalpropertiestable.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{48470B58-7221-4D1D-BB50-30553BEE5B02}|jellybins\\jellybins.csproj|solutionrelative:jellybins\\models\\generalpropertiestable.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{48470B58-7221-4D1D-BB50-30553BEE5B02}|jellybins\\jellybins.csproj|d:\\projects\\cs\\jellybins\\jellybins\\progress\\todo.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}",
+      "RelativeMoniker": "D:0:0:{48470B58-7221-4D1D-BB50-30553BEE5B02}|jellybins\\jellybins.csproj|solutionrelative:jellybins\\progress\\todo.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{48470B58-7221-4D1D-BB50-30553BEE5B02}|jellybins\\jellybins.csproj|d:\\projects\\cs\\jellybins\\jellybins\\models\\markzbikowskyheader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{48470B58-7221-4D1D-BB50-30553BEE5B02}|jellybins\\jellybins.csproj|solutionrelative:jellybins\\models\\markzbikowskyheader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 254,
+          "SelectedChildIndex": 7,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:129:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:132:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:130:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:131:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "ReportController.cs",
+              "DocumentMoniker": "D:\\Projects\\cs\\jellybins\\jellybins\\Processing\\ReportController.cs",
+              "RelativeDocumentMoniker": "jellybins\\Processing\\ReportController.cs",
+              "ToolTip": "D:\\Projects\\cs\\jellybins\\jellybins\\Processing\\ReportController.cs*",
+              "RelativeToolTip": "jellybins\\Processing\\ReportController.cs*",
+              "ViewState": "AgIAAE4AAAAAAAAAAAAAAGMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-10-11T11:50:53.975Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "MainWindow.xaml.cs",
+              "DocumentMoniker": "D:\\Projects\\cs\\jellybins\\jellybins\\Views\\MainWindow.xaml.cs",
+              "RelativeDocumentMoniker": "jellybins\\Views\\MainWindow.xaml.cs",
+              "ToolTip": "D:\\Projects\\cs\\jellybins\\jellybins\\Views\\MainWindow.xaml.cs",
+              "RelativeToolTip": "jellybins\\Views\\MainWindow.xaml.cs",
+              "ViewState": "AgIAAEEAAAAAAAAAAAAAAE4AAAA2AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-10-11T11:47:30.656Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "BinaryHeaderPage.xaml",
+              "DocumentMoniker": "D:\\Projects\\cs\\jellybins\\jellybins\\Views\\BinaryHeaderPage.xaml",
+              "RelativeDocumentMoniker": "jellybins\\Views\\BinaryHeaderPage.xaml",
+              "ToolTip": "D:\\Projects\\cs\\jellybins\\jellybins\\Views\\BinaryHeaderPage.xaml",
+              "RelativeToolTip": "jellybins\\Views\\BinaryHeaderPage.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2024-10-11T11:45:48.041Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "BinaryHeaderPage.xaml.cs",
+              "DocumentMoniker": "D:\\Projects\\cs\\jellybins\\jellybins\\Views\\BinaryHeaderPage.xaml.cs",
+              "RelativeDocumentMoniker": "jellybins\\Views\\BinaryHeaderPage.xaml.cs",
+              "ToolTip": "D:\\Projects\\cs\\jellybins\\jellybins\\Views\\BinaryHeaderPage.xaml.cs",
+              "RelativeToolTip": "jellybins\\Views\\BinaryHeaderPage.xaml.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAAABkAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-10-11T11:45:20.479Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "GeneralPropertiesTable.cs",
+              "DocumentMoniker": "D:\\Projects\\cs\\jellybins\\jellybins\\Models\\GeneralPropertiesTable.cs",
+              "RelativeDocumentMoniker": "jellybins\\Models\\GeneralPropertiesTable.cs",
+              "ToolTip": "D:\\Projects\\cs\\jellybins\\jellybins\\Models\\GeneralPropertiesTable.cs",
+              "RelativeToolTip": "jellybins\\Models\\GeneralPropertiesTable.cs",
+              "ViewState": "AgIAABgAAAAAAAAAAAAqwCcAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-10-11T07:43:01.082Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "TODO.md",
+              "DocumentMoniker": "D:\\Projects\\cs\\jellybins\\jellybins\\Progress\\TODO.md",
+              "RelativeDocumentMoniker": "jellybins\\Progress\\TODO.md",
+              "ToolTip": "D:\\Projects\\cs\\jellybins\\jellybins\\Progress\\TODO.md",
+              "RelativeToolTip": "jellybins\\Progress\\TODO.md",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB8AAAADAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001818|",
+              "WhenOpened": "2024-10-11T07:36:09.374Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "MarkZbikowskyHeader.cs",
+              "DocumentMoniker": "D:\\Projects\\cs\\jellybins\\jellybins\\Models\\MarkZbikowskyHeader.cs",
+              "RelativeDocumentMoniker": "jellybins\\Models\\MarkZbikowskyHeader.cs",
+              "ToolTip": "D:\\Projects\\cs\\jellybins\\jellybins\\Models\\MarkZbikowskyHeader.cs",
+              "RelativeToolTip": "jellybins\\Models\\MarkZbikowskyHeader.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAAACcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-10-10T06:15:45.963Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
