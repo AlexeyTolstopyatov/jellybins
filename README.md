@@ -1,3 +1,5 @@
+![image](https://github.com/user-attachments/assets/8b47f847-db56-4ab3-8428-3dd67a44bf3b)
+
 # JellyBins
 JellyBins - Инструмент для анализа двоичных файлов. Это не ```dnSpy``` и не ```OleDbg```, 
 которые позволяют отлаживать или декомпилировать приложения. Это приложение
