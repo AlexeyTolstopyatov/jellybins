@@ -16,7 +16,7 @@ namespace jellybins.File.Headers
         public char[] SignatureWord;
 
         [MarshalAs(UnmanagedType.I1)] public byte ByteOrder;
-        [MarshalAs(UnmanagedType.U2)] public ushort WordOrder;
+        [MarshalAs(UnmanagedType.U1)] public byte WordOrder;
         [MarshalAs(UnmanagedType.U4)] public uint ExecutableFormatLevel;
         [MarshalAs(UnmanagedType.U2)] public ushort CPUType;
         [MarshalAs(UnmanagedType.U2)] public ushort TargetOperatingSystem;

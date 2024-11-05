@@ -12,8 +12,4 @@
       <ProjectReference Include="..\jellybins.Report.Sections\jellybins.Report.Sections.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Models\" />
-    </ItemGroup>
-
 </Project>

@@ -7,14 +7,14 @@ public enum Environment
     /// Это используется для определения анализатором
     /// Определение Win16 среды (Windows 3x...)
     /// </summary>
-    Win16GraphicalInterface = -1,
+    Win16GraphicalInterface = 101,
     /// <summary>
     /// Немного отсебя(тины)
     /// Я буду это использовать для определения
     /// необходимости NTVDM. В официальной документации Microsoft
     /// этого флага нет.
     /// </summary>
-    DosConsoleInterface = -2,
+    DosConsoleInterface = 102,
     
     
     /// <summary>

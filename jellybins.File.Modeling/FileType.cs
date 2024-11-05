@@ -22,7 +22,7 @@ namespace jellybins.File.Modeling
         Other               // Other binary file (unknown)
     }
 
-    internal static class FileTypeInformation
+    public static class FileTypeInformation
     {
         public static string GetTitle(FileType type)
         {

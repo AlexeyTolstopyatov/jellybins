@@ -1,4 +1,5 @@
 ﻿using System.Reflection.Metadata;
+using System.Runtime.CompilerServices;
 using jellybins.File.Headers;
 using jellybins.File.Modeling.Controls;
 using Section = jellybins.Report.Sections;
@@ -18,7 +19,12 @@ public class Analyser
     /// Требования файла для работы
     /// </summary>
     public FileChars Result { get; private set; } =
-        new ("", FileType.Other, 0, 0);
+        new (
+            "Неизвестно",
+            "Неизвестно",
+            FileType.Other, 
+            0, 
+            0);
 
     /// <summary>
     /// Внутренности файла, которые распознал анализатор
@@ -114,14 +120,19 @@ public class Analyser
                             // могу предположить, что разрядность определяется по слову (WordOrder).
                             (le.WordOrder > 0) ? "32-разрядный" : "16-разрядный"
                         }
-                    }
-                });
-                view.PushFlags(new Dictionary<string, string[]>()
-                {
+                    },
                     {
-                        "LE",
+                        "Флаги модуля",
                         LE.Information.ModuleFlagsToStrings(le.ModuleTypeFlags)
+                    },
+                    {
+                        "Подсистема",
+                        new []
+                        {
+                            "Нет подсистемы"
+                        }
                     }
+
                 });
                 view.PushSection(ref mzSection);
                 view.PushSection(ref lineSection);
@@ -129,19 +140,36 @@ public class Analyser
                 {
                     Result = new FileChars(
                         LE.Information.OperatingSystemFlagToString(le.TargetOperatingSystem),
+                        LE.Information.ProcessorFlagToString(le.CPUType),
                         FileType.Linear,
                         maj,
                         min)
                     {
                         Environment = PE.Environment.Native,
+                        EnvironmentString = PE.Information.EnvironmentFlagToString(1)
                     },
                     View = view
                 };
             case FileType.New:
                 NeHeader ne = new();
                 Searcher.Fill(ref path, ref ne, (int)mz.e_lfanew);
+                ushort subEnv = ne.os switch
+                {
+                    1 => 5,
+                    3 => 102,
+                    2 => 101,
+                    4 => 101,
+                    _ => 1
+                };
                 Dictionary<string, string[]> flags = new()
                 {
+                    {
+                        "Основные",
+                        new []
+                        {
+                            "16-разрядный"
+                        }
+                    },
                     {
                         "Программные флаги",
                         NE.Information.ProgramFlagsToStrings(ne.pflags)
@@ -153,6 +181,13 @@ public class Analyser
                     {
                         "Флаги OS/2",
                         NE.Information.OtherFlagsToStrings(ne.flagsothers)
+                    },
+                    {
+                        "Подсистема",
+                        new []
+                        {
+                            PE.Information.EnvironmentFlagToString(subEnv)
+                        }
                     }
                 };
                 Dictionary<string, string[]> neSection = Section.Information.SectionsToStrings(ref ne);
@@ -163,25 +198,11 @@ public class Analyser
                 {
                     Result = new FileChars(
                         NE.Information.OperatingSystemFlagToString(ne.os),
+                        NE.Information.ProcessorFlagToString(ne.pflags),
                         FileType.New,
                         ne.major,
                         ne.minor
-                        )
-                    {
-                        // FIXME: Флаги анализатора
-                        // Это немного плохое решение: запихивать
-                        // Выдуманные флаги среды и существующие в одно.
-                        // Но для определения подсистемы (для чужих) приложений
-                        // надо как-то сделать.
-                        Environment = (NE.OperatingSystem)ne.os switch
-                        {
-                            NE.OperatingSystem.OperatingSystem2 => PE.Environment.Os2ConsoleInterface,
-                            NE.OperatingSystem.EuropeanDos => PE.Environment.DosConsoleInterface,
-                            NE.OperatingSystem.Windows16 => PE.Environment.Win16GraphicalInterface,
-                            NE.OperatingSystem.Windows386 => PE.Environment.Win16GraphicalInterface,
-                            _ => PE.Environment.Native
-                        }
-                    },
+                        ),
                     View = view
                 };
             case FileType.Portable:
@@ -199,6 +220,13 @@ public class Analyser
                     {
                         "Характеристики",
                         PE.Information.CharacteristicsToStrings(nt.WinNtMain.Characteristics)
+                    },
+                    {
+                        "Подсистема",
+                        new[]
+                        {
+                            PE.Information.EnvironmentFlagToString(nt.WinNtOptional.Subsystem)
+                        }
                     }
                 };
                 Dictionary<string, string[]> winntSection = Section.Information.SectionsToStrings(ref nt);
@@ -214,6 +242,7 @@ public class Analyser
                 {
                     Result = new FileChars(
                         PE.Information.OperatingSystemToString(),
+                        PE.Information.ProcessorFlagToString(nt.WinNtMain.Machine),
                         FileType.Portable,
                         nt.WinNtOptional.MajorOsVersion,
                         nt.WinNtOptional.MinorOsVersion
@@ -240,6 +269,7 @@ public class Analyser
                 {
                     Result = new FileChars(
                         "Microsoft DOS",
+                        "Intel x86",
                         FileType.MarkZbykowski,
                         2,
                         0),
@@ -270,6 +300,7 @@ public class Analyser
         {
             Result = new FileChars(
                 PE.Information.OperatingSystemToString(),
+                PE.Information.ProcessorFlagToString(winnt.WinNtMain.Machine),
                 FileType.Portable,
                 winnt.WinNtOptional.MajorSubSystemVersion,
                 winnt.WinNtOptional.MinorSubSystemVersion

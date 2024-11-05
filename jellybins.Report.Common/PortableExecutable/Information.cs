@@ -64,12 +64,14 @@ public static class Information
         return (Environment)subEnv switch
         {
             Environment.Native => "Отсутствует подсистема",
-            Environment.ConsoleInterface => "Консольное приложение Windows",
-            Environment.GraphicalInterface => "Оконное приложение Windows",
+            Environment.ConsoleInterface => "Консольное приложение Win32",
+            Environment.GraphicalInterface => "Оконное приложение Win32",
             Environment.PosixConsoleInterface => "Консольное приложение POSIX",
             Environment.Os2ConsoleInterface => "Консольное Приложение OS/2",
-            Environment.WindowsNative => "Использует Windows Runtime (WinRT)",
+            Environment.WindowsNative => "Приложение WinRT",
             Environment.WindowsCeGraphicalInterface => "Оконное приложение Windows CE",
+            Environment.Win16GraphicalInterface => "Оконное приложение Win16",
+            Environment.DosConsoleInterface => "Использует NT-VDM",
             _ => ""
         };
     }

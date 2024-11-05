@@ -24,7 +24,6 @@ namespace jellybins.Views
         {
             InitializeComponent();
             //JbConfigReader.Read();
-            frame.Content = new AboutPage();
         }
         
         /// <summary>
@@ -80,26 +79,19 @@ namespace jellybins.Views
             Analyser reference  = Analyser.Set(@"C:\Windows\explorer.exe");
             
             // Главная таблица
+            hPage.bintype.Text = FileTypeInformation.GetTitle(analysing.Result.Type);
+            hPage.binprops.Text = FileTypeInformation.GetInformation(analysing.Result.Type);
             hPage.IsCompat.Text = Analyser.EqualsToString(analysing.Result, reference.Result);
             hPage.OsRequiredLabel.Text = analysing.Result.Os;
             hPage.ThisOsLabel.Text = reference.Result.Os;
             hPage.ThisOsVersionLabel.Text = reference.Result.MajorVersion + "." + reference.Result.MinorVersion;
             hPage.OsVerLabel.Text = analysing.Result.MajorVersion + "." + analysing.Result.MinorVersion;
-            
-            JbElement.SetFlags(analysing.View!.Flags, ref hPage, Brushes.Cyan);
+            hPage.ArchRequiredLabel.Text = analysing.Result.Cpu;
+            hPage.ThisArchLabel.Text = reference.Result.Cpu;
             
             // Характеристики
+            PageFiller.SetFlags(analysing.View!.Flags, ref hPage);
             
-            
-            CardAction common = new()
-            {
-                Content = "Сведения"
-            };
-            common.Click += void(object s, RoutedEventArgs e) =>
-            {
-                frame.Content = hPage;
-            };
-            MainPanel.Children.Add(common);
             frame.Content = hPage;
         }
 
