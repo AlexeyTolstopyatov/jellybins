@@ -1,4 +1,5 @@
-![image](https://github.com/user-attachments/assets/8b47f847-db56-4ab3-8428-3dd67a44bf3b)
+![image](![NE JBTEST](https://github.com/user-attachments/assets/5417f75f-562e-41b8-8024-48cb6f522cfc)
+)
 
 # JellyBins
 JellyBins - Инструмент для анализа двоичных файлов. Это не ```dnSpy``` и не ```OleDbg```, 
