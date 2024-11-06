@@ -1,4 +1,5 @@
 ﻿using System.Collections.Specialized;
+using System.ComponentModel;
 using System.IO;
 using System.Windows;
 using System.Windows.Media;
@@ -93,6 +94,7 @@ namespace jellybins.Views
             PageFiller.SetFlags(analysing.View!.Flags, ref hPage);
             
             frame.Content = hPage;
+            
         }
 
         
@@ -135,6 +137,13 @@ namespace jellybins.Views
             }.ShowDialogAsync();
             frame.Content = new AboutPage();
             #endif
+        }
+
+        private void MainWindow_OnClosing(object sender, CancelEventArgs e)
+        {
+            // Временное решение неувязок с памятью
+            // Обязательно будет исправлено
+            Application.Current.Shutdown();
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Effects;
 using jellybins.Views;
+using Wpf.Ui.Controls;
 using ListView = Wpf.Ui.Controls.ListView;
 using TextBlock = System.Windows.Controls.TextBlock;
 
@@ -38,18 +40,20 @@ public static class PageFiller
     public static void SetFlags(Dictionary<string, string[]> flags, ref BinaryHeaderPage hPage)
     {
         int brushCounter = 0;
-        SolidColorBrush[] brushes = new[]
+        SolidColorBrush[] brushes = 
         {
             Brushes.Goldenrod,
             Brushes.Yellow,
             Brushes.LimeGreen,
             Brushes.Cyan,
-            Brushes.CornflowerBlue
+            Brushes.CornflowerBlue,
+            Brushes.MediumPurple
         };
         
         foreach (var flag in flags)
         {
             hPage.FlagsNames.Items.Add(
+                
                 new TextBlock()
                 {
                     Foreground = brushes[brushCounter],
@@ -57,15 +61,21 @@ public static class PageFiller
                 });
             foreach (var section in flag.Value)
             {
-                hPage.LoaderFlags.Items.Add(
-                    new TextBlock()
+                hPage.FlagsView.Items.Add(
+                    new Card()
                     {
-                        Foreground = brushes[brushCounter],
-                        Text = section
+                        Content =
+                            new TextBlock()
+                            {
+                                Foreground = brushes[brushCounter],
+                                Text = section
+                            },
+                        Width = 300
                     });
             }
-
             ++brushCounter;
         }
+
+        hPage.FlagsView.SpacingMode = SpacingMode.StartAndEndOnly;
     }
 }

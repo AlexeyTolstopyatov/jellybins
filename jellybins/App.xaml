@@ -9,8 +9,8 @@
             <ResourceDictionary.MergedDictionaries>
                 <ui:ThemesDictionary Theme="Dark"/>
                 <ui:ControlsDictionary/>
-                <!--<ui:ContextMenuLoader/>
-                <ui:MenuLoader/>-->
+                <ui:ContextMenuLoader/>
+                <ui:MenuLoader/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

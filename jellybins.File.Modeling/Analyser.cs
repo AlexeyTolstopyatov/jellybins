@@ -89,9 +89,28 @@ public class Analyser
     public static Analyser Get(string path)
     {
         ushort mzSign = Searcher.GetUInt16(path, 0);
-        if (FileTypeInformation.DetectType(mzSign) == FileType.Other)
+        if (FileTypeInformation.DetectType(mzSign) != FileType.MarkZbykowski)
         {
-            return new Analyser();
+            FileType fType = FileTypeInformation.DetectType(mzSign);
+            return new Analyser()
+            {
+                Result = new FileChars("?", "?", FileType.Other, 0, 0),
+                View = new FileView(new FileInfo(path), new Dictionary<string, string[]>()
+                {
+                   
+                }, new Dictionary<string, string[]>()
+                {
+                    {
+                        "Что известно",
+                        new []
+                        {
+                            $"Начало файла: 0x{mzSign:x}",
+                            FileTypeInformation.GetType(fType),
+                            FileTypeInformation.GetTitle(fType),
+                        }
+                    }
+                })
+            };
         }
 
         MzHeader mz = new();
@@ -233,6 +252,14 @@ public class Analyser
                 view.PushSection(ref mzSection);
                 view.PushSection(ref winntSection);
                 view.PushFlags(peFlags);
+                //if (nt.WinNtOptional.DllCharacteristics != 0)
+                    view.PushFlags(new Dictionary<string, string[]>()
+                    {
+                        {
+                            "Характеристики DLL",
+                            PE.Information.DllCharacteristicsToStrings(nt.WinNtOptional.DllCharacteristics)
+                        }
+                    });
                 
                 // TODO: Распознавание CLR заголовка
                 // Смещение по реальному адресу работает неправильно

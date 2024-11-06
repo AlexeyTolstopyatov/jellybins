@@ -6,10 +6,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:jellybins"
         mc:Ignorable="d"
-        ui:Design.Background="Transparent"
         Background="#212121"
         SizeChanged="FluentWindow_SizeChanged"
-        Title="Jelly Bins" Height="700" Width="900">
+        Closing="MainWindow_OnClosing"
+        Title="Jelly Bins" Height="700" Width="930">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>

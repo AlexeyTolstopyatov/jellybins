@@ -35,23 +35,9 @@
                             <ui:Card
                                 Margin="0, 65,0 ,0">
                             <ui:ListView 
-                                x:Name="FlagsNames"
-                            /></ui:Card>
-                            <ui:CardExpander
-                                IsExpanded="False"
-                                Header="Характеристики">
-                                <ui:ListView
-                                    x:Name="LoaderFlags">
-                                </ui:ListView>    
-                            </ui:CardExpander>  
-                            <ui:Button
-                                x:Name="RelocTableButton"
-                                Content="Таблица перемещений"
-                                Margin="0, 5, 5 ,10"
-                                Click="RelocTableButton_OnClick"/>
+                                x:Name="FlagsNames"/>
+                            </ui:Card>
                         </StackPanel>
-                
-            
                 <StackPanel 
                     Grid.Column="0">
                     <ui:TextBlock TextWrapping="Wrap">
@@ -102,7 +88,9 @@
                         </ui:Card.Content>
                     </ui:Card>
                     
-                    <ui:Card>
+                    <ui:Card
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch">
                         <ui:Card.Content>
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -137,16 +125,16 @@
         </ui:Card>
         </Grid>
         <ui:Card 
-            x:Name="HeadersCard"
-            Grid.Row="1"
-            Grid.Column="0">
-            <StackPanel
-                Orientation="Horizontal"
-                VerticalAlignment="Top"
-                HorizontalAlignment="Left"
-                x:Name="bintable">
-            </StackPanel> 
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            Grid.Row="1">
+            <ui:Card.Content>
+                <ui:VirtualizingGridView 
+                    x:Name="FlagsView"
+                    StretchItems="True"
+                    Grid.Row="1">
+                </ui:VirtualizingGridView>
+            </ui:Card.Content>
         </ui:Card>
-        
     </Grid>
 </Page>

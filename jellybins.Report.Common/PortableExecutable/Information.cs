@@ -155,4 +155,63 @@ public static class Information
             .Distinct()
             .ToArray();
     }
+
+    public static string[] DllCharacteristicsToStrings(ushort dllc)
+    {
+        return new[]
+        {
+            //
+            // То, чего не было в документации Microsoft
+            //
+            ((dllc & (ushort)System.Reflection.PortableExecutable.DllCharacteristics.ProcessInit) != 0)
+                ? "По-процессная инициализацияя"
+                : "",
+            ((dllc & (ushort)System.Reflection.PortableExecutable.DllCharacteristics.ProcessTerm) != 0)
+                ? "По-процессное уничтожение"
+                : "",
+            ((dllc & (ushort)System.Reflection.PortableExecutable.DllCharacteristics.ThreadInit) != 0)
+                ? "Создает потоки"
+                : "",
+            ((dllc & (ushort)System.Reflection.PortableExecutable.DllCharacteristics.ThreadTerm) != 0)
+                ? "Удаляет потоки"
+                : "",
+
+            //
+            // То что указано в документации Microsoft
+            //
+            ((dllc & (ushort)DllCharacteristics.HighEntropyOfVirtualAddresses) != 0)
+                ? "Высокая энтрапия виртуальных адресов"
+                : "Стандартное распределение виртуальных адресов",
+            ((dllc & (ushort)DllCharacteristics.DynamicBase) != 0)
+                ? "Перемещаемая база"
+                : "Статическая база",
+            ((dllc & (ushort)DllCharacteristics.ForceIntegrity) != 0)
+                ? "Проверка целостности"
+                : "",
+            ((dllc & (ushort)DllCharacteristics.ImageNxCompat) != 0)
+                ? "NX-совместимый"
+                : "NX-несовместим",
+            ((dllc & (ushort)DllCharacteristics.NoIsolation) != 0)
+                ? "Не изолируется"
+                : "Изолируется",
+            ((dllc & (ushort)DllCharacteristics.NoBind) != 0)
+                ? "Не связывается"
+                : "Связывается",
+            ((dllc & (ushort)DllCharacteristics.NoSeh) != 0)
+                ? "Не использует SEH"
+                : "Использует SEH",
+            ((dllc & (ushort)DllCharacteristics.ApplicationContainer) != 0)
+                ? "Должен быть в контейнере"
+                : "",
+            ((dllc & (ushort)DllCharacteristics.WindowsDriverModel) != 0)
+                ? "Драйвер устройства"
+                : "",
+            ((dllc & (ushort)DllCharacteristics.ControlFlowGuard) != 0)
+                ? "Использует CF-Guard"
+                : "",
+            ((dllc & (ushort)DllCharacteristics.TerminalServerAware) != 0)
+                ? "Осведомляет Terminal Server"
+                : "Не работает с Terminal Server"
+        }.Where(flag => !string.IsNullOrEmpty(flag)).Distinct().ToArray();
+    }
 }
