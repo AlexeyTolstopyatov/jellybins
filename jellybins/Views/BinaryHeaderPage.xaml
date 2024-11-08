@@ -1,0 +1,140 @@
+﻿<Page x:Class="jellybins.Views.BinaryHeaderPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:local="clr-namespace:jellybins.Views"
+      mc:Ignorable="d"
+      ui:Design.Background="Transparent"
+      Background="#212121"
+      d:DesignHeight="600" d:DesignWidth="900"
+      Title="BinaryHeaderPage"
+      SizeChanged="BinaryHeaderPage_OnSizeChanged">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <Grid>
+            <ui:Card
+            x:Name="MainCard">
+            <ui:Card.Content>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="*"/> 
+                    </Grid.ColumnDefinitions>
+                
+                        <StackPanel 
+                            Grid.Column="1"
+                            Orientation="Vertical"
+                            VerticalAlignment="Top">
+                            <ui:Card
+                                Margin="0, 65,0 ,0">
+                            <ui:ListView 
+                                x:Name="FlagsNames"/>
+                            </ui:Card>
+                        </StackPanel>
+                <StackPanel 
+                    Grid.Column="0">
+                    <ui:TextBlock TextWrapping="Wrap">
+                        <Run x:Name="binname"
+                             FontSize="21"
+                             Text="Binary Name"/>
+                        <LineBreak/>
+                        <Run x:Name="binpath"
+                             Text="C:\Windows\SysWOW64\bin.exe"/>
+                        <LineBreak/>
+                    </ui:TextBlock>
+                    
+                    <ui:Card>
+                        <ui:Card.Content>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <ui:TextBlock>
+                                    <Run
+                                        Text="Требования"
+                                        FontSize="20"/>
+                                    <LineBreak/>
+                                    <Run x:Name="OsRequiredLabel"/>
+                                    <LineBreak/>
+                                    <Run x:Name="OsVerLabel"/>
+                                    <LineBreak/>
+                                    <Run x:Name="ArchRequiredLabel"/>
+                                    <LineBreak/>
+                                </ui:TextBlock>
+                                
+                                <ui:TextBlock Grid.Column="1">
+                                    <ui:TextBlock>
+                                        <Run
+                                            Text="Ваше устройство"
+                                            FontSize="20"/>
+                                        <LineBreak/>
+                                        <Run x:Name="ThisOsLabel"/>
+                                        <LineBreak/>
+                                        <Run x:Name="ThisOsVersionLabel"/>
+                                        <LineBreak/>
+                                        <Run x:Name="ThisArchLabel"/>
+                                    </ui:TextBlock>
+                                </ui:TextBlock>
+                            </Grid>
+                        </ui:Card.Content>
+                    </ui:Card>
+                    
+                    <ui:Card
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch">
+                        <ui:Card.Content>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="2*"/>
+                                    <ColumnDefinition Width="*"/> 
+                                    
+                                </Grid.ColumnDefinitions>
+                                <TextBlock 
+                                    TextWrapping="Wrap"
+                                           x:Name="binprops">
+                                    <Run Text="Дополнительная информация"
+                                         FontSize="21"/>
+                                    <LineBreak/>
+                                    <Run Text="Отсутствует"
+                                         x:Name="bintype"/>
+                                    <LineBreak/>
+                                    <LineBreak/>
+                                </TextBlock>
+                                <TextBlock
+                                    TextWrapping="Wrap"
+                                    Grid.Column="1">
+                                    <Run 
+                                        x:Name="IsCompat"
+                                        Foreground="Yellow"/>
+                                </TextBlock>
+                            </Grid>
+                        </ui:Card.Content>
+                    </ui:Card>
+                </StackPanel>
+                </Grid>
+            </ui:Card.Content>
+        </ui:Card>
+        </Grid>
+        <ui:Card 
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            Grid.Row="1">
+            <ui:Card.Content>
+                <ui:VirtualizingGridView 
+                    x:Name="FlagsView"
+                    StretchItems="True"
+                    Grid.Row="1">
+                </ui:VirtualizingGridView>
+            </ui:Card.Content>
+        </ui:Card>
+    </Grid>
+</Page>
