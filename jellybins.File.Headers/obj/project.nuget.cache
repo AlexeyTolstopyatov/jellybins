@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "Vikl6I2+XF9qBuzTHuSDMI4lVv7zezleGIe8CREvfHyOxhNcESfwNhgRArgtVzdLWutYf5voiqnm+XRexmJbXQ==",
+  "success": true,
+  "projectFilePath": "D:\\Projects\\cs\\jellybins\\jellybins.File.Headers\\jellybins.File.Headers.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\MagicBook\\.nuget\\packages\\microsoft.netcore.app.ref\\6.0.33\\microsoft.netcore.app.ref.6.0.33.nupkg.sha512",
+    "C:\\Users\\MagicBook\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\6.0.33\\microsoft.windowsdesktop.app.ref.6.0.33.nupkg.sha512",
+    "C:\\Users\\MagicBook\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\6.0.33\\microsoft.aspnetcore.app.ref.6.0.33.nupkg.sha512"
+  ],
+  "logs": []
+}

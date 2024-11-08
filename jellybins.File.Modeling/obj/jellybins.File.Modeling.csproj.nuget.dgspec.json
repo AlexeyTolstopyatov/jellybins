@@ -1,0 +1,290 @@
+{
+  "format": 1,
+  "restore": {
+    "D:\\Projects\\cs\\jellybins\\jellybins.File.Modeling\\jellybins.File.Modeling.csproj": {}
+  },
+  "projects": {
+    "D:\\Projects\\cs\\jellybins\\jellybins.File.Headers\\jellybins.File.Headers.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\Projects\\cs\\jellybins\\jellybins.File.Headers\\jellybins.File.Headers.csproj",
+        "projectName": "jellybins.File.Headers",
+        "projectPath": "D:\\Projects\\cs\\jellybins\\jellybins.File.Headers\\jellybins.File.Headers.csproj",
+        "packagesPath": "C:\\Users\\MagicBook\\.nuget\\packages\\",
+        "outputPath": "D:\\Projects\\cs\\jellybins\\jellybins.File.Headers\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\MagicBook\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[6.0.33, 6.0.33]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[6.0.33, 6.0.33]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[6.0.33, 6.0.33]"
+            }
+          ],
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.401\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "D:\\Projects\\cs\\jellybins\\jellybins.File.Modeling\\jellybins.File.Modeling.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\Projects\\cs\\jellybins\\jellybins.File.Modeling\\jellybins.File.Modeling.csproj",
+        "projectName": "jellybins.File.Modeling",
+        "projectPath": "D:\\Projects\\cs\\jellybins\\jellybins.File.Modeling\\jellybins.File.Modeling.csproj",
+        "packagesPath": "C:\\Users\\MagicBook\\.nuget\\packages\\",
+        "outputPath": "D:\\Projects\\cs\\jellybins\\jellybins.File.Modeling\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\MagicBook\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {
+              "D:\\Projects\\cs\\jellybins\\jellybins.File.Headers\\jellybins.File.Headers.csproj": {
+                "projectPath": "D:\\Projects\\cs\\jellybins\\jellybins.File.Headers\\jellybins.File.Headers.csproj"
+              },
+              "D:\\Projects\\cs\\jellybins\\jellybins.Report.Common\\jellybins.Report.Common.csproj": {
+                "projectPath": "D:\\Projects\\cs\\jellybins\\jellybins.Report.Common\\jellybins.Report.Common.csproj"
+              },
+              "D:\\Projects\\cs\\jellybins\\jellybins.Report.Sections\\jellybins.Report.Sections.csproj": {
+                "projectPath": "D:\\Projects\\cs\\jellybins\\jellybins.Report.Sections\\jellybins.Report.Sections.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[6.0.33, 6.0.33]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[6.0.33, 6.0.33]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[6.0.33, 6.0.33]"
+            }
+          ],
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.401\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "D:\\Projects\\cs\\jellybins\\jellybins.Report.Common\\jellybins.Report.Common.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\Projects\\cs\\jellybins\\jellybins.Report.Common\\jellybins.Report.Common.csproj",
+        "projectName": "jellybins.Report.Common",
+        "projectPath": "D:\\Projects\\cs\\jellybins\\jellybins.Report.Common\\jellybins.Report.Common.csproj",
+        "packagesPath": "C:\\Users\\MagicBook\\.nuget\\packages\\",
+        "outputPath": "D:\\Projects\\cs\\jellybins\\jellybins.Report.Common\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\MagicBook\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[6.0.33, 6.0.33]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[6.0.33, 6.0.33]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[6.0.33, 6.0.33]"
+            }
+          ],
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.401\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "D:\\Projects\\cs\\jellybins\\jellybins.Report.Sections\\jellybins.Report.Sections.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\Projects\\cs\\jellybins\\jellybins.Report.Sections\\jellybins.Report.Sections.csproj",
+        "projectName": "jellybins.Report.Sections",
+        "projectPath": "D:\\Projects\\cs\\jellybins\\jellybins.Report.Sections\\jellybins.Report.Sections.csproj",
+        "packagesPath": "C:\\Users\\MagicBook\\.nuget\\packages\\",
+        "outputPath": "D:\\Projects\\cs\\jellybins\\jellybins.Report.Sections\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\MagicBook\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {
+              "D:\\Projects\\cs\\jellybins\\jellybins.File.Headers\\jellybins.File.Headers.csproj": {
+                "projectPath": "D:\\Projects\\cs\\jellybins\\jellybins.File.Headers\\jellybins.File.Headers.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[6.0.33, 6.0.33]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[6.0.33, 6.0.33]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[6.0.33, 6.0.33]"
+            }
+          ],
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.401\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
