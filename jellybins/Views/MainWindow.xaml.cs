@@ -74,13 +74,13 @@ namespace jellybins.Views
                 }
             };
             
-            Analyser analysing  = Analyser.Instance().Get(path);
-            Analyser reference  = Analyser.Instance().Set(@"C:\Windows\explorer.exe");
+            ExecutableAnalyser analysing  = ExecutableAnalyser.Instance().Get(path);
+            ExecutableAnalyser reference  = ExecutableAnalyser.Instance().Set(@"C:\Windows\explorer.exe");
             
             // Главная таблица
             hPage.bintype.Text = FileTypeInformation.GetTitle(analysing.Chars.Type);
             hPage.binprops.Text = FileTypeInformation.GetInformation(analysing.Chars.Type);
-            hPage.IsCompat.Text = Analyser.EqualsToString(analysing.Chars, reference.Chars);
+            hPage.IsCompat.Text = ExecutableAnalyser.EqualsToString(analysing.Chars, reference.Chars);
             hPage.OsRequiredLabel.Text = analysing.Chars.Os;
             hPage.ThisOsLabel.Text = reference.Chars.Os;
             hPage.ThisOsVersionLabel.Text = reference.Chars.MajorVersion + "." + reference.Chars.MinorVersion;

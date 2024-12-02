@@ -1,6 +1,6 @@
 ﻿namespace jellybins.Report.Common.LinearExecutable;
 
-internal enum ModuleFlag : uint
+public enum ModuleFlag : uint
 {
     /// <summary>
     /// EXE

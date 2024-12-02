@@ -2,6 +2,7 @@
 using jellybins.File.Headers;
 using jellybins.File.Modeling.Base;
 using jellybins.File.Modeling.Controls;
+using jellybins.File.Modeling.Descriptions;
 using Environment = jellybins.Report.Common.PortableExecutable.Environment;
 using LE = jellybins.Report.Common.LinearExecutable;
 using PE = jellybins.Report.Common.PortableExecutable;
@@ -12,13 +13,19 @@ namespace jellybins.File.Modeling;
 public class LinearExecutableAnalyser : IExecutableAnalyser
 {
     private LeHeader _header;
-    
+    private IExecutableInformation _information;
     public LinearExecutableAnalyser(LeHeader header)
     {
         _header = header;
+        _information = new LinearExecutableInformation();
     }
 
 
+    /// <summary>
+    /// Заполняет структуру характеристик для
+    /// исследуемого исполняемого файла
+    /// </summary>
+    /// <param name="chars">Модель характеристик</param>
     public void ProcessChars(ref FileChars chars)
     {
         chars.Cpu = LE.Information.ProcessorFlagToString(_header.CPUType);
@@ -32,6 +39,11 @@ public class LinearExecutableAnalyser : IExecutableAnalyser
         chars.MinorVersion = (_header.WindowsDDKVersion != 0) ? (_header.WindowsDDKVersion - chars.MajorVersion) : 0;
     }
 
+    /// <summary>
+    /// Заполняет флаги процессора, ОС, архитектуры
+    /// и требования к запуску исследуемого файла
+    /// </summary>
+    /// <param name="view">Модель данных</param>
     public void ProcessFlags(ref FileView view)
     {
         view.PushFlags(new Dictionary<string, string[]>()
