@@ -1,19 +1,18 @@
 ﻿using System.Runtime.InteropServices;
+
 using jellybins.File.Headers;
 using jellybins.File.Modeling.Base;
 using jellybins.File.Modeling.Controls;
-using jellybins.File.Modeling.Descriptions;
+using jellybins.File.Modeling.Information;
 using Environment = jellybins.Report.Common.PortableExecutable.Environment;
-using LE = jellybins.Report.Common.LinearExecutable;
-using PE = jellybins.Report.Common.PortableExecutable;
 using HEAD = jellybins.Report.Sections;
 
-namespace jellybins.File.Modeling;
+namespace jellybins.File.Modeling.Analysers;
 
 public class LinearExecutableAnalyser : IExecutableAnalyser
 {
     private LeHeader _header;
-    private IExecutableInformation _information;
+    private readonly IExecutableInformation _information;
     public LinearExecutableAnalyser(LeHeader header)
     {
         _header = header;
@@ -28,13 +27,20 @@ public class LinearExecutableAnalyser : IExecutableAnalyser
     /// <param name="chars">Модель характеристик</param>
     public void ProcessChars(ref FileChars chars)
     {
-        chars.Cpu = LE.Information.ProcessorFlagToString(_header.CPUType);
-        chars.Os = LE.Information.OperatingSystemFlagToString(_header.TargetOperatingSystem);
+        chars.Cpu = _information.ProcessorFlagToString(_header.CPUType);
+        chars.Os = _information.OperatingSystemFlagToString(_header.TargetOperatingSystem);
         chars.Environment = Environment.Native;
         chars.Type = FileType.Linear;
-        chars.EnvironmentString = PE.Information.EnvironmentFlagToString(1);
+        chars.EnvironmentString = (_information as PortableExecutableInformation)!.EnvironmentFlagToString(1);
+        
+        // Линейные исполняемые файла (если это не модель виртуального драйвера)
+        // в Microsoft Windows не используются... Что же делать.
+        // Модель виртуальных драйверов в Windows существовала до NT 5.0
+        // (Новая модель драйверов - WDM)
         chars.MinimumMajorVersion = 4; 
         chars.MinimumMinorVersion = 0;
+        
+        // FIXME: Версия ОС рассчитана не верно
         chars.MajorVersion = (_header.WindowsDDKVersion != 0) ? _header.WindowsDDKVersion >> 4 : 2;
         chars.MinorVersion = (_header.WindowsDDKVersion != 0) ? (_header.WindowsDDKVersion - chars.MajorVersion) : 0;
     }
@@ -60,7 +66,7 @@ public class LinearExecutableAnalyser : IExecutableAnalyser
             },
             {
                 "Флаги модуля",
-                LE.Information.ModuleFlagsToStrings(_header.ModuleTypeFlags)
+                _information.FlagsToStrings(_header.ModuleTypeFlags)
             },
             {
                 "Подсистема",

@@ -1,27 +1,19 @@
-﻿
-namespace jellybins.Report.Common.PortableExecutable;
-/*
- * Jelly Bins (C) Толстопятов Алексей 2024
- *      Portable Executable Information Block
- * Класс предоставляющий возможность распознавания флагов
- * из линейного заголовка заголовка.
- * Члены класса:    OperatingSystemFlagToString(ushort):    Возвращает ОС для которой собран двоичный файл
- *                  ProcessorFlagToString(ushort):          Возвращает флаг архитектуры процессора, для которого был собран файл
- *                  CharacteristicsToStrings(uint):         Возвращает список расшифрованных флагов из таблицы определения файла
- *                  MagicFlagToString(ushort):              Возвращает разрядность двоичного файла
- *                  VersionFlagToString(ushort, ushort)     Возвращает версию в виде строки
- *                  EnvironmentFlagToString(ushort):        Возвращает тип подсистемы (окружения)
- */
-public static class Information
+﻿using jellybins.File.Modeling.Base;
+using jellybins.Report.Common.PortableExecutable;
+using Environment = jellybins.Report.Common.PortableExecutable.Environment;
+
+namespace jellybins.File.Modeling.Information;
+
+public class PortableExecutableInformation : IExecutableInformation
 {
     /// <summary>
     /// Определяет архитектуру процессора для двоичного файла
     /// </summary>
     /// <param name="machine"></param>
     /// <returns></returns>
-    public static string ProcessorFlagToString(ushort machine)
+    public string ProcessorFlagToString<T>(T machine) where T : IComparable
     {
-        return (Processor)machine switch
+        return machine switch
         {
             Processor.Ia32 => "Intel x86 (i386 или IA32)",
             Processor.Ia32E => "AMD64 (x86-64 или IA32e)",
@@ -34,15 +26,20 @@ public static class Information
     /// PE исполняемые файлы, используются только в Microsoft Windows
     /// </summary>
     /// <returns></returns>
-    public static string OperatingSystemToString() => 
+    public string OperatingSystemFlagToString<T>(T? flag) where T : IComparable => 
         "Microsoft Windows";
+
+    public string VersionFlagsToString<TVersion>(TVersion major, TVersion minor) where TVersion : IComparable
+    {
+        return $"{major}.{minor}";
+    }
 
     /// <summary>
     /// Определяет разрядность двоичного файла
     /// </summary>
     /// <param name="magic"></param>
     /// <returns></returns>
-    public static string MagicFlagToString(ushort magic)
+    public string MagicFlagToString(ushort magic)
     {
         return (Magic)magic switch
         {
@@ -59,7 +56,7 @@ public static class Information
     /// </summary>
     /// <param name="subEnv"></param>
     /// <returns></returns>
-    public static string EnvironmentFlagToString(ushort subEnv)
+    public string EnvironmentFlagToString(ushort subEnv)
     {
         return (Environment)subEnv switch
         {
@@ -74,17 +71,6 @@ public static class Information
             Environment.DosConsoleInterface => "Использует NT-VDM",
             _ => ""
         };
-    }
-
-    /// <summary>
-    /// Возвращает версию для исполняемого файла
-    /// </summary>
-    /// <param name="maj">Основная версия</param>
-    /// <param name="min">Дополнительная версия</param>
-    /// <returns></returns>
-    public static string VersionToString(ushort maj, ushort min)
-    {
-        return $"{maj}.{min}";
     }
     
     /*
@@ -101,62 +87,34 @@ public static class Information
     /// </summary>
     /// <param name="chars"></param>
     /// <returns></returns>
-    public static string[] CharacteristicsToStrings(uint chars)
+    public string[] FlagsToStrings(object chars)
     {
         return new[]
             {
-                ((chars & (uint)Characteristics.Executable) != 0) 
-                    ? "Запускается напрямую" : 
-                    string.Empty,
-                ((chars & (uint)Characteristics.RelocationsStripped) != 0)
-                    ? "Сведения о перемещениях в другом файле"
-                    : string.Empty,
-                ((chars & (uint)Characteristics.DynamicLibrary) != 0) 
-                    ? "Динамическая библиотека" 
-                    : string.Empty,
-                ((chars & (uint)Characteristics.CoffLinesNumbersRemoved) != 0)
-                    ? "Номера строк COFF в другом файле"
-                    : string.Empty,
-                ((chars & (uint)Characteristics.CoffSymbolTableRemoved) != 0)
-                    ? "Таблица символов COFF в другом файле"
-                    : string.Empty,
-                ((chars & (uint)Characteristics.AggressiveTrimWorkSet) != 0)
-                    ? "Агрессивно урезает рабочий набор"
-                    : string.Empty,
-                ((chars & (uint)Characteristics.LargeAddressAware) != 0)
-                    ? "Поддержка адресов больше 2Гб"
-                    : string.Empty,
-                ((chars & (uint)Characteristics.ByteWordReverseLow) != 0) 
-                    ? "Порядок байт 0x0001" 
-                    : string.Empty,
-                ((chars & (uint)Characteristics.ByteWordReverseHigh) != 0) 
-                    ? "Порядок байт 0x1000" 
-                    : string.Empty,
-                ((chars & (uint)Characteristics.Support32Words) != 0)
-                    ? "Машина поддерживает 32битные слова"
-                    : string.Empty,
-                ((chars & (uint)Characteristics.DebugInfoStripped) != 0)
-                    ? "Информация о отладке в другом файле"
-                    : string.Empty,
-                ((chars & (uint)Characteristics.ImageBaseOnRemovableMedia) != 0)
-                    ? "Копировать в SWAP раздел"
-                    : string.Empty,
-                ((chars & (uint)Characteristics.ImageBaseInNetworkResource) != 0)
-                    ? "Копировать из сети в SWAP раздел"
-                    : string.Empty,
-                ((chars & (uint)Characteristics.SystemFile) != 0) 
-                    ? "Системный файл" 
-                    : string.Empty,
-                ((chars & (uint)Characteristics.SingleCpuRequired) != 0) 
-                    ? "Только для одного ЦП" 
-                    : string.Empty
+                // Bit-operators for ENUM unsupported.
+                // Cast to U32
+                (((uint)chars & (uint)Characteristics.Executable) != 0) ? "Запускается напрямую" : string.Empty,
+                (((uint)chars & (uint)Characteristics.RelocationsStripped) != 0) ? "Сведения о перемещениях в другом файле" : string.Empty,
+                (((uint)chars & (uint)Characteristics.DynamicLibrary) != 0) ? "Динамическая библиотека" : string.Empty,
+                (((uint)chars & (uint)Characteristics.CoffLinesNumbersRemoved) != 0) ? "Номера строк COFF в другом файле" : string.Empty,
+                (((uint)chars & (uint)Characteristics.CoffSymbolTableRemoved) != 0) ? "Таблица символов COFF в другом файле" : string.Empty,
+                (((uint)chars & (uint)Characteristics.AggressiveTrimWorkSet) != 0) ? "Агрессивно урезает рабочий набор" : string.Empty,
+                (((uint)chars & (uint)Characteristics.LargeAddressAware) != 0) ? "Поддержка адресов больше 2Гб" : string.Empty,
+                (((uint)chars & (uint)Characteristics.ByteWordReverseLow) != 0) ? "Порядок байт 0x0001" : string.Empty,
+                (((uint)chars & (uint)Characteristics.ByteWordReverseHigh) != 0) ? "Порядок байт 0x1000" : string.Empty,
+                (((uint)chars & (uint)Characteristics.Support32Words) != 0) ? "Машина поддерживает 32битные слова" : string.Empty,
+                (((uint)chars & (uint)Characteristics.DebugInfoStripped) != 0) ? "Информация о отладке в другом файле" : string.Empty,
+                (((uint)chars & (uint)Characteristics.ImageBaseOnRemovableMedia) != 0) ? "Копировать в SWAP раздел" : string.Empty,
+                (((uint)chars & (uint)Characteristics.ImageBaseInNetworkResource) != 0) ? "Копировать из сети в SWAP раздел" : string.Empty,
+                (((uint)chars & (uint)Characteristics.SystemFile) != 0) ? "Системный файл" : string.Empty,
+                (((uint)chars & (uint)Characteristics.SingleCpuRequired) != 0) ? "Только для одного ЦП" : string.Empty
             }
             .Where(flag => !string.IsNullOrEmpty(flag))
             .Distinct()
             .ToArray();
     }
 
-    public static string[] DllCharacteristicsToStrings(ushort dllc)
+    public string[] DllCharacteristicsToStrings(ushort dllc)
     {
         return new[]
         {
@@ -180,8 +138,8 @@ public static class Information
             // То что указано в документации Microsoft
             //
             ((dllc & (ushort)DllCharacteristics.HighEntropyOfVirtualAddresses) != 0)
-                ? "Высокая энтрапия виртуальных адресов"
-                : "Стандартное распределение виртуальных адресов",
+                ? "Высокая энтрапия"
+                : "Стандартное распределение",
             ((dllc & (ushort)DllCharacteristics.DynamicBase) != 0)
                 ? "Перемещаемая база"
                 : "Статическая база",

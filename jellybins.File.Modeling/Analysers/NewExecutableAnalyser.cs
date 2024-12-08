@@ -1,17 +1,18 @@
 ﻿using jellybins.File.Headers;
 using jellybins.File.Modeling.Base;
 using jellybins.File.Modeling.Controls;
-using NE = jellybins.Report.Common.NewExecutable;
+using jellybins.File.Modeling.Information;
 using PE = jellybins.Report.Common.PortableExecutable;
 using HEAD = jellybins.Report.Sections;
 
-namespace jellybins.File.Modeling;
+namespace jellybins.File.Modeling.Analysers;
 
 public class NewExecutableAnalyser : IExecutableAnalyser
 {
     private NeHeader _header;
     private ushort? _subEnvironment;
-    
+    private readonly NewExecutableInformation _information = new();
+    private readonly PortableExecutableInformation _environment = new();
     public NewExecutableAnalyser(NeHeader header)
     {
         _header = header;
@@ -19,8 +20,8 @@ public class NewExecutableAnalyser : IExecutableAnalyser
     
     public void ProcessChars(ref FileChars chars)
     {
-        chars.Cpu = NE.Information.ProcessorFlagToString(_header.pflags);
-        chars.Os = NE.Information.OperatingSystemFlagToString(_header.os);
+        chars.Cpu = _information.ProcessorFlagToString(_header.pflags);
+        chars.Os = _information.OperatingSystemFlagToString(_header.os);
         chars.Type = FileType.New;
         ushort subEnv = _header.os switch
         {
@@ -32,7 +33,7 @@ public class NewExecutableAnalyser : IExecutableAnalyser
         };
         _subEnvironment = subEnv;
         chars.Environment = (PE.Environment)subEnv;
-        chars.EnvironmentString = PE.Information.EnvironmentFlagToString(subEnv);
+        chars.EnvironmentString = _environment.EnvironmentFlagToString(subEnv);
         chars.MajorVersion = _header.major;
         chars.MinorVersion = _header.minor;
         chars.MinimumMajorVersion = 5;
@@ -53,27 +54,31 @@ public class NewExecutableAnalyser : IExecutableAnalyser
             },
             {
                 "Программные флаги",
-                NE.Information.ProgramFlagsToStrings(_header.pflags)
+                _information.FlagsToStrings(_header.pflags)
             },
             {
                 "Флаги приложения",
-                NE.Information.ApplicationFlagsToStrings(_header.aflags)
+                _information.ApplicationFlagsToStrings(_header.aflags)
             },
             {
                 "Флаги OS/2",
-                NE.Information.OtherFlagsToStrings(_header.flagsothers)
+                _information.OtherFlagsToStrings(_header.flagsothers)
             },
             {
                 "Подсистема",
                 new []
                 {
-                    PE.Information.EnvironmentFlagToString(_subEnvironment!.Value)
+                    _environment.EnvironmentFlagToString(_subEnvironment!.Value)
                 }
             }
         };
         view.Flags = flags;
     }
 
+    /// <summary>
+    /// Создает словарь параметров/значений заголовка
+    /// </summary>
+    /// <param name="view"></param>
     public void ProcessHeaderSections(ref FileView view)
     {
         Dictionary<string, string[]> neSection =

@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Net.NetworkInformation;
+using System.Runtime.InteropServices;
 using System.Reflection.PortableExecutable;
 using jellybins.File.Modeling.Base;
 
@@ -66,6 +67,26 @@ public class ExecutableReader : IExecutableReader
         }
         // 0xFFAAEE11 => [FF AA EE 11] => 0xFF * 0x10000 => 0xFF0000 + 0xAA00 => 0xFFAA00 => 0xFFAA00 + 0x11 => 0xFFAAEE11 
         return destination[0];
+    }
+
+    public ulong GetUInt64(int offset)
+    {
+        byte[] destination = new byte[8]; // DWORD
+        using (var file = System.IO.File.Open(_fileName, FileMode.Open, FileAccess.Read))
+        {
+            file.Seek(offset, SeekOrigin.Begin); // mov ptr, offset
+            file.Read(destination, 0, destination.Length); // read 4 bytes
+        }
+        
+        return (ulong)(
+            destination[0] * 0x10000000 + 
+            destination[1] * 0x1000000 + 
+            destination[2] * 0x100000 + 
+            destination[3] * 0x10000 +
+            destination[4] * 0x1000 +
+            destination[5] * 0x100 +
+            destination[6] * 0x10 +
+            destination[7]); // i'm f_cking fine
     }
     
     /// <summary>

@@ -1,13 +1,15 @@
 ﻿using jellybins.File.Headers;
 using jellybins.File.Modeling.Base;
 using jellybins.File.Modeling.Controls;
+using jellybins.File.Modeling.Information;
 using HEAD = jellybins.Report.Sections;
 using PE = jellybins.Report.Common.PortableExecutable;
 
-namespace jellybins.File.Modeling;
+namespace jellybins.File.Modeling.Analysers;
 
 public class PortableExecutableAnalyser : IExecutableAnalyser
 {
+    private readonly PortableExecutableInformation _information = new();
     private NtHeader32 _header32;
     private NtHeader64 _header64;
     
@@ -26,29 +28,29 @@ public class PortableExecutableAnalyser : IExecutableAnalyser
     {
         if (_header64.Signature == 0)
         {
-            chars.Cpu = PE.Information.ProcessorFlagToString(_header32.WinNtMain.Machine);
-            chars.Os  = PE.Information.OperatingSystemToString();
+            chars.Cpu = _information.ProcessorFlagToString(_header32.WinNtMain.Machine);
+            chars.Os  = _information.OperatingSystemFlagToString(1);
             chars.Type = FileType.Portable;
             chars.MajorVersion = _header32.WinNtOptional.MajorOsVersion;
             chars.MinorVersion = _header32.WinNtOptional.MinorOsVersion;
             chars.MinimumMajorVersion = _header32.WinNtOptional.MajorSubSystemVersion;
             chars.MinimumMinorVersion = _header32.WinNtOptional.MinorSubSystemVersion;
             chars.Environment = (PE.Environment)_header32.WinNtOptional.Subsystem;
-            chars.EnvironmentString = PE.Information.EnvironmentFlagToString(_header32.WinNtOptional.Subsystem);
+            chars.EnvironmentString = _information.EnvironmentFlagToString(_header32.WinNtOptional.Subsystem);
             return;
         }
 
         if (_header32.Signature == 0)
         {
-            chars.Cpu = PE.Information.ProcessorFlagToString(_header64.WinNtMain.Machine);
-            chars.Os = PE.Information.OperatingSystemToString();
+            chars.Cpu = _information.ProcessorFlagToString(_header64.WinNtMain.Machine);
+            chars.Os = _information.OperatingSystemFlagToString(1);
             chars.Type = FileType.Portable;
             chars.MajorVersion = _header64.WinNtOptional.MajorOperatingSystemVersion;
             chars.MinorVersion = _header64.WinNtOptional.MinorOperatingSystemVersion;
             chars.MinimumMajorVersion = _header64.WinNtOptional.MajorSubsystemVersion;
             chars.MinimumMinorVersion = _header64.WinNtOptional.MinorSubsystemVersion;
             chars.Environment = (PE.Environment)_header64.WinNtOptional.Subsystem;
-            chars.EnvironmentString = PE.Information.EnvironmentFlagToString(_header64.WinNtOptional.Subsystem);
+            chars.EnvironmentString = _information.EnvironmentFlagToString(_header64.WinNtOptional.Subsystem);
         }
     }
 
@@ -63,22 +65,22 @@ public class PortableExecutableAnalyser : IExecutableAnalyser
                     "Основные",
                     new []
                     {
-                        PE.Information.MagicFlagToString(_header32.WinNtOptional.Magic),
+                        _information.MagicFlagToString(_header32.WinNtOptional.Magic),
                     }
                 },
                 {
                     "Характеристики",
-                    PE.Information.CharacteristicsToStrings(_header32.WinNtMain.Characteristics)
+                    _information.FlagsToStrings(_header32.WinNtMain.Characteristics)
                 },
                 {
                     "Характеристики DLL",
-                    PE.Information.DllCharacteristicsToStrings(_header32.WinNtOptional.DllCharacteristics)
+                    _information.DllCharacteristicsToStrings(_header32.WinNtOptional.DllCharacteristics)
                 },
                 {
                     "Подсистема",
                     new[]
                     {
-                        PE.Information.EnvironmentFlagToString(_header32.WinNtOptional.Subsystem)
+                        _information.EnvironmentFlagToString(_header32.WinNtOptional.Subsystem)
                     }
                 }
             };
@@ -93,22 +95,22 @@ public class PortableExecutableAnalyser : IExecutableAnalyser
                     "Основные",
                     new []
                     {
-                        PE.Information.MagicFlagToString(_header64.WinNtOptional.Magic),
+                        _information.MagicFlagToString(_header64.WinNtOptional.Magic),
                     }
                 },
                 {
                     "Характеристики",
-                    PE.Information.CharacteristicsToStrings(_header64.WinNtMain.Characteristics)
+                    _information.FlagsToStrings(_header64.WinNtMain.Characteristics)
                 },
                 {
                     "Характеристики DLL",
-                    PE.Information.DllCharacteristicsToStrings(_header64.WinNtOptional.DllCharacteristics)
+                    _information.DllCharacteristicsToStrings(_header64.WinNtOptional.DllCharacteristics)
                 },
                 {
                     "Подсистема",
                     new[]
                     {
-                        PE.Information.EnvironmentFlagToString(_header64.WinNtOptional.Subsystem)
+                        _information.EnvironmentFlagToString(_header64.WinNtOptional.Subsystem)
                     }
                 }
             };

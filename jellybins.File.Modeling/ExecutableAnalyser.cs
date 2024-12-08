@@ -1,10 +1,11 @@
 ﻿using jellybins.File.Headers;
+using jellybins.File.Modeling.Analysers;
 using jellybins.File.Modeling.Base;
 using jellybins.File.Modeling.Controls;
+using jellybins.File.Modeling.Information;
 using Section = jellybins.Report.Sections;
-using LE = jellybins.Report.Common.LinearExecutable;
-using NE = jellybins.Report.Common.NewExecutable;
 using PE = jellybins.Report.Common.PortableExecutable;
+
 namespace jellybins.File.Modeling;
 /*
  * JellyBins (C) Толстопятов Алексей А. 2024
@@ -112,83 +113,91 @@ public class ExecutableAnalyser
         _reader = new ExecutableReader(path);
         
         ushort word = _reader.GetUInt16(0);
+        
+        // Если IBM / Microsoft ~ moment ~
+        if (FileTypeInformation.DetectType(word) == FileType.MarkZbykowski) 
+            return GetFormatOsSegmentedExecutable(path);
 
-        // Пока что нет
-        if (FileTypeInformation.DetectType(word) == FileType.Other)
-            return GetUnknownSegmentedExecutable(word, path);
+        // Если двоичный файл из ОС-неформала (старые Unix-подобные ОС/РТОС)
+        if (FileTypeInformation.DetectType(word) == FileType.AOut) // false
+            return GetAssemblerOutputExecutable(path);
 
-        if (FileTypeInformation.DetectType(word) == FileType.MarkZbykowski)
-        {
-            MzHeader mz = new();
-            FileView view = new(new FileInfo(path));
-            FileChars chars = new("", "", FileType.Other, 0, 0);
-            _reader.Fill(ref mz);
-            Dictionary<string, string[]> mzSection = Section.Information.SectionsToStrings(ref mz);
-
-            view.PushSection(ref mzSection);
-            word = _reader.GetUInt16((int)mz.e_lfanew);
-
-            switch (FileTypeInformation.DetectType(word))
-            {
-                case FileType.New:
-                {
-                    NeHeader neHeader = new();
-                    _reader.Fill(ref neHeader, (int)mz.e_lfanew);
-                    _analyser = new NewExecutableAnalyser(neHeader);
-                    _analyser.ProcessChars(ref chars);
-                    _analyser.ProcessFlags(ref view);
-                    _analyser.ProcessHeaderSections(ref view);
-                    break;
-                }
-                case FileType.Linear:
-                {
-                    LeHeader leHeader = new();
-                    _reader.Fill(ref leHeader, (int)mz.e_lfanew);
-                    _analyser = new LinearExecutableAnalyser(leHeader);
-                    _analyser.ProcessChars(ref chars);
-                    _analyser.ProcessFlags(ref view);
-                    _analyser.ProcessHeaderSections(ref view);
-                    break;
-                }
-                case FileType.Portable:
-                {
-                    NtHeader32 ntHeader = new();
-                    NtHeader64 ntHeader64 = new();
-                    _reader.Fill(ref ntHeader, (int)mz.e_lfanew);
-                    
-                    switch (ntHeader.WinNtOptional.Magic)
-                    {
-                        case (ushort)PE.Magic.Application64Bit:
-                            _reader.Fill(ref ntHeader64, (int)mz.e_lfanew);
-                            _analyser = new PortableExecutableAnalyser(ntHeader64);
-                            _analyser.ProcessChars(ref chars);
-                            _analyser.ProcessFlags(ref view);
-                            _analyser.ProcessHeaderSections(ref view);
-                            break;
-                        
-                        case (ushort)PE.Magic.Application32Bit:
-                            _analyser = new PortableExecutableAnalyser(ntHeader);
-                            _analyser.ProcessChars(ref chars);
-                            _analyser.ProcessFlags(ref view);
-                            _analyser.ProcessHeaderSections(ref view);
-                            break;
-                    }
-
-                    break;
-                }
-                default:
-                    return GetMarkSegmentedExecutable(path);
-            }
-            return new ExecutableAnalyser()
-            {
-                Chars = chars,
-                View = view
-            };
-        }
-
-        return new ExecutableAnalyser();
+        return GetUnknownSegmentedExecutable(word, path);
     }
+    
+    #region Microsoft / IBM
+    private ExecutableAnalyser GetFormatOsSegmentedExecutable(string path)
+    {
+        _reader = new ExecutableReader(path);
+        
+        MzHeader mz = new();
+        FileView view = new(new FileInfo(path));
+        FileChars chars = new("", "", FileType.Other, 0, 0);
+        
+        _reader.Fill(ref mz);
+        Dictionary<string, string[]> mzSection = Section.Information.SectionsToStrings(ref mz);
 
+        view.PushSection(ref mzSection);
+        ushort word = _reader.GetUInt16((int)mz.e_lfanew);
+
+        switch (FileTypeInformation.DetectType(word))
+        {
+            case FileType.New:
+            {
+                NeHeader neHeader = new();
+                _reader.Fill(ref neHeader, (int)mz.e_lfanew);
+                _analyser = new NewExecutableAnalyser(neHeader);
+                _analyser.ProcessChars(ref chars);
+                _analyser.ProcessFlags(ref view);
+                _analyser.ProcessHeaderSections(ref view);
+                break;
+            }
+            case FileType.Linear:
+            {
+                LeHeader leHeader = new();
+                _reader.Fill(ref leHeader, (int)mz.e_lfanew);
+                _analyser = new LinearExecutableAnalyser(leHeader);
+                _analyser.ProcessChars(ref chars);
+                _analyser.ProcessFlags(ref view);
+                _analyser.ProcessHeaderSections(ref view);
+                break;
+            }
+            case FileType.Portable:
+            {
+                NtHeader32 ntHeader = new();
+                NtHeader64 ntHeader64 = new();
+                _reader.Fill(ref ntHeader, (int)mz.e_lfanew);
+                    
+                switch (ntHeader.WinNtOptional.Magic)
+                {
+                    case (ushort)PE.Magic.Application64Bit:
+                        _reader.Fill(ref ntHeader64, (int)mz.e_lfanew);
+                        _analyser = new PortableExecutableAnalyser(ntHeader64);
+                        _analyser.ProcessChars(ref chars);
+                        _analyser.ProcessFlags(ref view);
+                        _analyser.ProcessHeaderSections(ref view);
+                        break;
+                        
+                    case (ushort)PE.Magic.Application32Bit:
+                        _analyser = new PortableExecutableAnalyser(ntHeader);
+                        _analyser.ProcessChars(ref chars);
+                        _analyser.ProcessFlags(ref view);
+                        _analyser.ProcessHeaderSections(ref view);
+                        break;
+                }
+
+                break;
+            }
+            default:
+                return GetMarkSegmentedExecutable(path);
+        }
+        return new ExecutableAnalyser()
+        {
+            Chars = chars,
+            View = view
+        };
+
+    }
 
     private ExecutableAnalyser GetMarkSegmentedExecutable(string path)
     {
@@ -220,17 +229,63 @@ public class ExecutableAnalyser
             View = dosExecView
         };
     }
+    #endregion
+    
+    #region Unix
+    /// <summary>
+    /// Возвращает всю информацию о исполняемом двоичном файле, если это A-OUT
+    /// Сегментный двоичный файл
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns></returns>
+    private ExecutableAnalyser GetAssemblerOutputExecutable(string path)
+    {
+        AoutHeader header = new();
+        FileChars chars = new(path, "", FileType.AOut, 0, 0);
+        FileView view = new(new FileInfo(path));
+        
+        _reader = new ExecutableReader(path);
+        _reader.Fill(ref header);
+        _analyser = new AssemblerOutExecutableAnalyser(header);
+        
+        _analyser.ProcessChars(ref chars);
+        _analyser.ProcessFlags(ref view);
+        
+        // TODO: ProcessSections or ProcessSectionNames
+        // need to implement too
 
+        Chars = chars;
+        View = view;
+        return new ExecutableAnalyser()
+        {
+            Chars = chars,
+            View = view
+        };
+    }
+    
+    #endregion
+    
+    /// <summary>
+    /// Если ни один из вариантов начала файла не подходит под условие
+    /// Вызывается этот метод, как заглушка, чтобы заполнить страницу необходимыми
+    /// данными для дальнейшего анализа и поиска информации.
+    /// </summary>
+    /// <param name="address"></param>
+    /// <param name="path"></param>
+    /// <returns>
+    /// Полузаполненный объект, который содержит начало файла (по основанию 16)
+    /// Тип файла внутри jellybins (FileType) и описание к неизвестному типу файла.
+    /// </returns>
     private static ExecutableAnalyser GetUnknownSegmentedExecutable(ushort address, string path)
     {
         FileType fType = FileTypeInformation.DetectType(address);
         return new ExecutableAnalyser()
         {
-            Chars = new FileChars("?", "?", FileType.Other, 0, 0),
-            View = new FileView(new FileInfo(path), new Dictionary<string, string[]>()
-            {
-                   
-            }, new Dictionary<string, string[]>()
+            Chars = new FileChars("Неизвестно", "Неизвестно", FileType.Other, 0, 0),
+            View = new FileView(
+                new FileInfo(path), 
+                new Dictionary<string, string[]>(), 
+                new Dictionary<string, string[]>
             {
                 {
                     "Что известно",
@@ -243,6 +298,11 @@ public class ExecutableAnalyser
                 }
             })
         };
+    }
+
+    private ExecutableAnalyser GetExecutableLinkableSegmentedExecutable(string path)
+    {
+        return new();
     }
     
     /// <summary>
@@ -258,6 +318,7 @@ public class ExecutableAnalyser
     {
         MzHeader dos = new();
         NtHeader32 winnt = new();
+        PortableExecutableInformation information = new();
         
         _reader = new ExecutableReader(path);
         _reader.Fill(ref dos);
@@ -267,8 +328,8 @@ public class ExecutableAnalyser
         return new ExecutableAnalyser()
         {
             Chars = new FileChars(
-                PE.Information.OperatingSystemToString(),
-                PE.Information.ProcessorFlagToString(winnt.WinNtMain.Machine),
+                information.OperatingSystemFlagToString(-21435),
+                information.ProcessorFlagToString(winnt.WinNtMain.Machine),
                 FileType.Portable,
                 winnt.WinNtOptional.MajorSubSystemVersion,
                 winnt.WinNtOptional.MinorSubSystemVersion
