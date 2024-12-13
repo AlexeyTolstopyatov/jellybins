@@ -5,32 +5,69 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace jellybins.Models
+namespace jellybins.File.Headers
 {
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
-    internal struct ExecutableLinkableHeader32
+    [Flags]
+    public enum ElfData : ushort
     {
-        public ExecutableLinkableHeader32()
-        {
-            p_sign = new char[16];
-            p_offest = 0;
-            p_type = 0;
-            p_vaddress = 0;
-            p_paddress = 0;
-            p_memsz = 0;
-            p_flags = 0;
-            p_align = 0;
-            p_filesz = 0;
-        }
+        LittleEndian = 1,
+        BigEndian = 2  
+    }
+    
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct Elf32Hdr
+    {
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
+        public byte[] e_ident; // ELF magic number (16 bytes)
+        [MarshalAs(UnmanagedType.Struct)]
+        public ElfData e_type;    // Object file type
+        [MarshalAs(UnmanagedType.Struct)]
+        public ElfData e_machine; // Architecture
+        public UInt32 e_version;  // ELF file version
+        public UInt32 e_entry;    // Entry point address
+        public UInt32 e_phoff;    // Program header table file offset
+        public UInt32 e_shoff;    // Section header table file offset
+        public UInt32 e_flags;    // Processor-specific flags
+        [MarshalAs(UnmanagedType.Struct)]
+        public ElfData e_ehsize;  // ELF header size
+        [MarshalAs(UnmanagedType.Struct)]
+        public ElfData e_phentsize; // Program header entry size
+        [MarshalAs(UnmanagedType.Struct)]
+        public ElfData e_phnum;    // Number of program headers
+        [MarshalAs(UnmanagedType.Struct)]
+        public ElfData e_shentsize; // Section header entry size
+        [MarshalAs(UnmanagedType.Struct)]
+        public ElfData e_shnum;    // Number of section headers
+        [MarshalAs(UnmanagedType.Struct)]
+        public ElfData e_shstrndx; // Section header string table index
+    }
 
-        char[] p_sign;
-        public uint p_type;
-        public uint p_offest;
-        public uint p_vaddress;
-        public uint p_paddress;
-        public uint p_filesz;
-        public uint p_memsz;
-        public uint p_flags;
-        public uint p_align;
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct Elf64Hdr
+    {
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
+        public byte[] e_ident; // ELF magic number (16 bytes)
+        [MarshalAs(UnmanagedType.Struct)]
+        public ElfData e_type;    // Object file type
+        [MarshalAs(UnmanagedType.Struct)]
+        public ElfData e_machine; // Architecture
+        public UInt32 e_version;  // ELF file version
+        public UInt64 e_entry;    // Entry point address
+        public UInt64 e_phoff;    // Program header table file offset
+        public UInt64 e_shoff;    // Section header table file offset
+        public UInt32 e_flags;    // Processor-specific flags
+        [MarshalAs(UnmanagedType.Struct)]
+        public ElfData e_ehsize;  // ELF header size
+        [MarshalAs(UnmanagedType.Struct)]
+        public ElfData e_phentsize; // Program header entry size
+        [MarshalAs(UnmanagedType.Struct)]
+        public ElfData e_phnum;    // Number of program headers
+        [MarshalAs(UnmanagedType.Struct)]
+        public ElfData e_shentsize; // Section header entry size
+        [MarshalAs(UnmanagedType.Struct)]
+        public ElfData e_shnum;    // Number of section headers
+        [MarshalAs(UnmanagedType.Struct)]
+        public ElfData e_shstrndx; // Section header string table index
     }
 }

@@ -1,15 +1,13 @@
 ﻿using System.ComponentModel;
 using System.IO;
 using System.Windows;
-using System.Windows.Media;
-using jellybins.Config;
 using jellybins.File.Modeling;
 using jellybins.Middleware;
 
 using Microsoft.Win32;
 
 using Wpf.Ui.Controls;
-using Wpf.Ui.Extensions;
+using MessageBox = Wpf.Ui.Controls.MessageBox;
 
 
 namespace jellybins.Views
@@ -48,7 +46,7 @@ namespace jellybins.Views
             requirements.ShowDialog();
             
             if (!requirements.OnlyHeaderContentRequired)
-                CreateSectionsTable(dlg.FileName);
+                CreateSectionsTable(/*dlg.FileName*/);
             
             // По любому создастся окно основных свойств
             CreateHeaderContent(dlg.FileName);
@@ -74,13 +72,13 @@ namespace jellybins.Views
                 }
             };
             
-            Analyser analysing  = Analyser.Instance().Get(path);
-            Analyser reference  = Analyser.Instance().Set(@"C:\Windows\explorer.exe");
+            ExecutableAnalyser analysing  = ExecutableAnalyser.Instance().Get(path);
+            ExecutableAnalyser reference  = ExecutableAnalyser.Instance().Set(@"C:\Windows\explorer.exe");
             
             // Главная таблица
             hPage.bintype.Text = FileTypeInformation.GetTitle(analysing.Chars.Type);
             hPage.binprops.Text = FileTypeInformation.GetInformation(analysing.Chars.Type);
-            hPage.IsCompat.Text = Analyser.EqualsToString(analysing.Chars, reference.Chars);
+            hPage.IsCompat.Text = ExecutableAnalyser.EqualsToString(analysing.Chars, reference.Chars);
             hPage.OsRequiredLabel.Text = analysing.Chars.Os;
             hPage.ThisOsLabel.Text = reference.Chars.Os;
             hPage.ThisOsVersionLabel.Text = reference.Chars.MajorVersion + "." + reference.Chars.MinorVersion;
@@ -98,10 +96,13 @@ namespace jellybins.Views
         /// <summary>
         /// Создает страницу со списком функций
         /// </summary>
-        /// <param name="path"></param>
-        private void CreateSectionsTable(string path)
+        private static void CreateSectionsTable(/*string path*/)
         {
-            
+            new MessageBox()
+            {
+                Title = "Jellybins",
+                Content = "Страница с таблицей секций в разработке."
+            }.ShowDialogAsync();
         }
         #endregion
         private void FluentWindow_SizeChanged(object sender, SizeChangedEventArgs e) 
@@ -125,7 +126,7 @@ namespace jellybins.Views
                 GC.GetGCMemoryInfo().HeapSizeBytes;
             
             #if DEBUG
-            _ =  new Wpf.Ui.Controls.MessageBox()
+            _ =  new MessageBox()
             {
                 Title = "Jelly Bins",
                 Content = @$"Рассчет кучи: {

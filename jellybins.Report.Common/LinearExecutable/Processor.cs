@@ -1,6 +1,6 @@
 ﻿namespace jellybins.Report.Common.LinearExecutable;
 
-internal enum Processor
+public enum Processor
 {
     I286Instructions = 0x1,
     I386Instructions = 0x2,
