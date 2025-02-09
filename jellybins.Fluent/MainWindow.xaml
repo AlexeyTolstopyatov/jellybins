@@ -1,0 +1,106 @@
+﻿<mica:MicaWindow x:Class="jellybins.Fluent.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:jellybins.Fluent.ViewModels"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        xmlns:mica="clr-namespace:MicaWPF.Controls;assembly=MicaWPF"
+        xmlns:fluent="clr-namespace:jellybins.Fluent"
+        mc:Ignorable="d"
+        Title="jellybins (beta)" 
+        Height="750" Width="900">
+    <Window.DataContext>
+        <local:MainWindowViewModel/>
+    </Window.DataContext>
+    <Grid>
+        <!--| Menu | Workspace |-->
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        
+        <!-- Menu -->
+        <ui:Card
+            Margin="20">
+            <ui:Card.Content>
+                <StackPanel>
+                    <!--Menu->Open -->
+                    <ui:Card>
+                        <ui:Card.Content>
+                            <StackPanel 
+                                Orientation="Vertical">
+                                <TextBlock
+                                    TextWrapping="Wrap">
+                                    <Run Text="Open binary and get more information about it"/>
+                                    <LineBreak/>
+                                </TextBlock>
+                                <ui:Button
+                                    Content="Open"
+                                    Icon="{ui:SymbolIcon Open16}"
+                                    Command="{Binding Path=OpenFileCommand, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+                        </ui:Card.Content>
+                    </ui:Card>
+                    <!--Menu->Save-->
+                    <ui:Card>
+                        <ui:Card.Content>
+                            <StackPanel>
+                                <TextBlock
+                                    TextWrapping="Wrap">
+                                    <Run Text="Save information to structured file"/>
+                                    <LineBreak/>
+                                </TextBlock>
+                                <ui:Button Content="Save"/>
+                            </StackPanel>
+                        </ui:Card.Content>
+                    </ui:Card>
+                    <!--Menu->HeaderTable-->
+                    <ui:Card>
+                        <ui:Card.Content>
+                            <StackPanel>
+                                <TextBlock
+                                    TextWrapping="Wrap">
+                                    <Run Text="Get Hexadecimal table of file's header"/>
+                                    <LineBreak/>
+                                </TextBlock>
+                                <ui:Button Content="Header"/>
+                            </StackPanel>
+                        </ui:Card.Content>
+                    </ui:Card>
+                    <!--Menu->Imports-->
+                    <ui:Card>
+                        <StackPanel>
+                            <TextBlock
+                                TextWrapping="Wrap">
+                                <Run Text="Get more about binary importing functions and modules"/>
+                                <LineBreak/>
+                            </TextBlock>
+                            <ui:Button 
+                            IsEnabled="False"
+                            Content="Imports"/>
+                        </StackPanel>
+                    </ui:Card>
+                    <!--Menu->About-->
+                    <ui:Card>
+                        <ui:Card.Content>
+                            <StackPanel>
+                                <TextBlock 
+                                    TextWrapping="Wrap">
+                                    <Run Text="Call page with information about this app"/>
+                                    <LineBreak/>
+                                </TextBlock>
+                                <ui:Button Content="About"/>
+                            </StackPanel>
+                        </ui:Card.Content>
+                    </ui:Card>
+                </StackPanel>
+            </ui:Card.Content>
+        </ui:Card>
+        <!--Workspace (Frames)-->
+        <Frame 
+            Grid.Column="1"
+            Margin="0,50,30,50"
+            Content="{Binding UpdateSourceTrigger=PropertyChanged, Path=FrameContent}"/>
+    </Grid>
+</mica:MicaWindow>

@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "dgSpecHash": "hoOFa/XfGSDqQDBXPpD0lyEmRE94XHCBv/MLagIfObDud7Y5MVxwouI2WvHBMGyZW6KawZfJ9uFG6Ddj449Cvg==",
+  "success": true,
+  "projectFilePath": "D:\\Projects\\cs\\jellybins.Core\\jellybins.Fluent\\jellybins.Fluent.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\MagicBook\\.nuget\\packages\\micawpf\\6.2.10\\micawpf.6.2.10.nupkg.sha512",
+    "C:\\Users\\MagicBook\\.nuget\\packages\\micawpf.core\\6.2.10\\micawpf.core.6.2.10.nupkg.sha512",
+    "C:\\Users\\MagicBook\\.nuget\\packages\\micawpfruntimecomponent\\1.1.9\\micawpfruntimecomponent.1.1.9.nupkg.sha512",
+    "C:\\Users\\MagicBook\\.nuget\\packages\\wpf-ui\\4.0.0\\wpf-ui.4.0.0.nupkg.sha512",
+    "C:\\Users\\MagicBook\\.nuget\\packages\\wpf-ui.abstractions\\4.0.0\\wpf-ui.abstractions.4.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}

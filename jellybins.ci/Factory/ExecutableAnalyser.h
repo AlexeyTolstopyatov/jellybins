@@ -1,8 +1,0 @@
-//
-// Created by MagicBook on 12.11.2024.
-//
-
-#ifndef JBC_EXECUTABLEANALYSER_H
-#define JBC_EXECUTABLEANALYSER_H
-
-#endif //JBC_EXECUTABLEANALYSER_H
