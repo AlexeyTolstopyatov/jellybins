@@ -8,10 +8,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Utilities\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <PackageReference Include="MicaWPF" Version="6.2.10" />
       <PackageReference Include="WPF-UI" Version="4.0.0" />
     </ItemGroup>

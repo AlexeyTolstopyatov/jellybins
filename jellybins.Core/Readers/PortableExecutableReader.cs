@@ -207,9 +207,11 @@ public class PortableExecutableReader : IReader
         LinkerVersion = _strings.ImageVersionFlagsToString(_head64.WinNtOptional.MajorLinkerVersion, _head64.WinNtOptional.MinorLinkerVersion),
         Subsystem = _strings.SubsystemFromOperatingSystemFlagToString(_head64.WinNtOptional.Subsystem),
     };
+    
     [UnderConstruction]
     public void GetImports()
     {
-        throw new NotImplementedException();
+        // main task: return table of functions/ordinals
+        
     }
 }

@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using jellybins.Core.Attributes;
 using jellybins.Fluent.Models;
 using jellybins.Fluent.Views;
@@ -11,22 +13,98 @@ using Wpf.Ui.Input;
 
 namespace jellybins.Fluent.ViewModels;
 
-public class MainWindowViewModel : INotifyPropertyChanged
+public sealed class MainWindowViewModel : INotifyPropertyChanged
 {
+    private struct FilledPages
+    {
+        public Page ProgramGeneralPage;
+        public Page ProgramHeadersPage;
+        public Page ProgramImportsPage;
+    }
+
+    private FilledPages _pagesCollection;
+
     public event PropertyChangedEventHandler? PropertyChanged;
     private Page _frameContent;
+    private string? _programPath;
+
+    // Possibility Flags
+    private bool _allowProgramHeadersPage = true;
+    private bool _allowProgramImportsPage;
+    private bool _allowSaveResultsButton;
+    private bool _allowCommonResultsPage;
+
+    public bool AllowCommonResultsPage
+    {
+        get => _allowCommonResultsPage;
+        set => SetField(ref _allowCommonResultsPage, value);
+    }
+
+    public bool AllowProgramHeadersPage
+    {
+        get => _allowProgramHeadersPage;
+        set => SetField(ref _allowProgramHeadersPage, value);
+    }
+
+    public bool AllowProgramImportsPage
+    {
+        get => _allowProgramImportsPage;
+        set => SetField(ref _allowProgramImportsPage, value);
+    }
+
+    public bool AllowSaveResultsButton
+    {
+        get => _allowSaveResultsButton;
+        set => SetField(ref _allowSaveResultsButton, value);
+    }
+
     public MainWindowViewModel()
     {
         OpenFileCommand = new RelayCommand<string>(OpenFile!);
+        ProgramHeadersPageCommand = new RelayCommand<string>(s => ShowPage(PagesCollection.ProgramHeadersPage));
+        ProgramGeneralPageCommand = new RelayCommand<string>(s => ShowPage(PagesCollection.ProgramGeneralPage));
         _frameContent = new Page();
+        AllowProgramHeadersPage = 
+            AllowSaveResultsButton =
+                AllowProgramImportsPage = false;
     }
 
-    public RelayCommand<string> OpenFileCommand { get; }
+    private FilledPages PagesCollection
+    {
+        get => _pagesCollection;
+        set => SetField(ref _pagesCollection, value);
+    }
+
+    public ICommand OpenFileCommand { get; }
+    public ICommand ProgramHeadersPageCommand { get; set; }
+    public ICommand ProgramGeneralPageCommand { get; set; }
 
     public Page FrameContent
     {
         get => _frameContent;
         set => SetField(ref _frameContent, value);
+    }
+    
+    private void CreateProgramGeneralPage()
+    {
+        CommonPropertiesModel model = new(_programPath!);
+        _pagesCollection.ProgramGeneralPage = new CommonPropertiesPage
+        {
+            DataContext = new CommonPropertiesPageViewModel(model)
+        };
+    }
+    
+    private void CreateProgramHeadersPage()
+    {
+        _pagesCollection.ProgramHeadersPage = new ProgramHeadersPage
+        {
+            DataContext = new ProgramHeaderPageViewModel(new ProgramHeaderPageModel(_programPath!))
+        };
+    }
+    
+    private void ShowPage(Page page)
+    {
+        FrameContent = page;
     }
 
     [UnderConstruction("Cancellation throws exceptions.")]
@@ -46,12 +124,14 @@ public class MainWindowViewModel : INotifyPropertyChanged
         {
             // fixme: Cancel result throws exception.
             if (!ofd.ShowDialog().HasValue) return; // throws exception.
+            _programPath = ofd.FileName;
+            AllowProgramHeadersPage = true;
+            AllowSaveResultsButton = true;
             
-            CommonPropertiesModel model = new(ofd.FileName);
-            FrameContent = new CommonPropertiesPage
-            {
-                DataContext = new CommonPropertiesPageViewModel(model)
-            };
+            // create page -> call page
+            CreateProgramGeneralPage();
+            CreateProgramHeadersPage();
+            ShowPage(PagesCollection.ProgramGeneralPage);
         }
         catch (Exception e)
         {
@@ -62,7 +142,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
         }
     }
 
-    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }

@@ -62,8 +62,6 @@ public class NewExecutableReader : IReader
         { 0x02, "Multi-task application" },
         { 0x04, "Global initialization" },
         { 0x08, "Protected mode only" },
-        { 0x10, "OS/2 application" },
-        { 0x20, "Windows application" },
         { 0x80, "Fast-load area" }
     };
 
@@ -117,7 +115,22 @@ public class NewExecutableReader : IReader
         _result.CpuArchitecture = _strings.CpuArchitectureFlagToString(_head.pflags);
         _result.CpuWordLength = _strings.CpuWordLengthFlagToString(0);
         _result.OperatingSystem = _strings.OperatingSystemFlagToString(_head.os);
-        _result.OperatingSystemVersion = _strings.OperatingSystemVersionToString(_head.major, _head.minor);
+        
+        // гадание на кофейной гуще начинается здесь.
+        if (_head is { os: 0, major: > 0 })
+            _result.OperatingSystem = _strings.OperatingSystemFlagToString(2);
+        
+        if (_head.major > 0)
+            _result.OperatingSystemVersion = _strings.OperatingSystemVersionToString(_head.major, _head.minor);
+        else
+        {
+            _result.OperatingSystemVersion = _head.os switch
+            {
+                0x1 => _strings.OperatingSystemVersionToString(1, 1),
+                0x3 => _strings.OperatingSystemVersionToString(4, 0),
+                _ => _result.OperatingSystemVersion
+            };
+        }
         _result.Subsystem = _strings.SubsystemFromOperatingSystemFlagToString(_head.os);
         _result.ImageType = _strings.ImageTypeFlagToString(_head.os);
         _result.LinkerVersion = _strings.ImageVersionFlagsToString(_head.ver, _head.rev);

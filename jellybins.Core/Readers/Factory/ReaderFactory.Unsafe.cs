@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using jellybins.Core.Sections;
 
 namespace jellybins.Core.Readers.Factory;
 public partial class ReaderFactory
@@ -48,7 +49,8 @@ public partial class ReaderFactory
             file.Seek(offset, SeekOrigin.Begin); // mov ptr, offset
             file.Read(destination, 0, destination.Length); // read 4 bytes
         }
-        // 0xFFAAEE11 => [FF AA EE 11] => 0xFF * 0x10000 => 0xFF0000 + 0xAA00 => 0xFFAA00 => 0xFFAA00 + 0x11 => 0xFFAAEE11 
+        // 0xFFAAEE11 => [FF AA EE 11]
+        // => 0xFF * 0x10000 => 0xFF0000 + 0xAA00 => 0xFFAA00 => 0xFFAA00 + 0x11 => 0xFFAAEE11 
         return (uint)(destination[0] * 0x10000 + destination[1] + destination[2] * 0x100 + destination[3]);
     }
 
@@ -60,7 +62,9 @@ public partial class ReaderFactory
             file.Seek(offset, SeekOrigin.Begin); // mov ptr, offset
             file.Read(destination, 0, destination.Length); // read 4 bytes
         }
-        // 0xFFAAEE11 => [FF AA EE 11] => 0xFF * 0x10000 => 0xFF0000 + 0xAA00 => 0xFFAA00 => 0xFFAA00 + 0x11 => 0xFFAAEE11 
+        // 0xFFAAEE11 => [FF AA EE 11] =>
+        // 0xFF * 0x10000 => 0xFF0000 + 0xAA00 =>
+        // 0xFFAA00 => 0xFFAA00 + 0x11 => 0xFFAAEE11 
         return destination[0];
     }
 
@@ -107,5 +111,13 @@ public partial class ReaderFactory
 
         head = (TStruct)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(TStruct))!;
         handle.Free();
+    }
+    
+    // Portable Executable
+    public static uint RvaToFileOffset(Section section, UInt32 rva)
+    {
+        //offset = imageBase + text.RawOffset + (importDirectory.RVA−text.VA)
+
+        return 0 + section.PointerToRawData + (rva - section.VirtualAddress);
     }
 }

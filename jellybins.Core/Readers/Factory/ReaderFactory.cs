@@ -15,9 +15,6 @@ public partial class ReaderFactory
     private ulong  _signatureQWord = 0;
     private string _fileName;
 
-    public ulong SignatureQWordQWord => _signatureQWord;
-    public ushort SignatureWordWord =>  _signatureWord;
-    
     /// <summary>
     /// Creates ready IReader instance for your FILE's name
     /// and determines type of your binary.
@@ -52,7 +49,6 @@ public partial class ReaderFactory
                         Fill(ref le, (int)mz.e_lfanew);
                         if (le.WindowsDDKVersionMajor == 0) 
                             return new LinearExecutableReader(le);
-                        
                         return new WindowsDeviceDriverReader(le);
                     }
                     case 0x454e:
@@ -67,7 +63,7 @@ public partial class ReaderFactory
                     {
                         PortableExecutable32 pe32 = new();
                         Fill(ref pe32, (int)mz.e_lfanew);
-                        if (pe32.WinNtOptional.Magic == 0x10b) 
+                        if (pe32.WinNtOptional.Magic == 0x10b)
                             return new PortableExecutableReader(pe32);
                         
                         PortableExecutable64 pe64 = new();

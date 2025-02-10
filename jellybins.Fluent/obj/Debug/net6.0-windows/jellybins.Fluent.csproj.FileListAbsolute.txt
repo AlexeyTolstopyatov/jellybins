@@ -34,3 +34,5 @@ D:\Projects\cs\jellybins.Core\jellybins.Fluent\obj\Debug\net6.0-windows\Generate
 D:\Projects\cs\jellybins.Core\jellybins.Fluent\obj\Debug\net6.0-windows\Views\CommonPropertiesPage.baml
 D:\Projects\cs\jellybins.Core\jellybins.Fluent\obj\Debug\net6.0-windows\Views\ErrorPage.g.cs
 D:\Projects\cs\jellybins.Core\jellybins.Fluent\obj\Debug\net6.0-windows\Views\ErrorPage.baml
+D:\Projects\cs\jellybins.Core\jellybins.Fluent\obj\Debug\net6.0-windows\Views\ProgramHeadersPage.g.cs
+D:\Projects\cs\jellybins.Core\jellybins.Fluent\obj\Debug\net6.0-windows\Views\ProgramHeadersPage.baml

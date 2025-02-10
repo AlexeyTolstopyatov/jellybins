@@ -9,28 +9,53 @@
       Title="ProgramHeadersPage" 
       Height="Auto" Width="Auto">
     <!--Get ViewModel here-->
+    <Page.DataContext>
+        <local:ProgramHeaderPageViewModel/>
+    </Page.DataContext>
     <Grid>
         <ui:Card>
             <ui:Card.Content>
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="70"/>
+                        <RowDefinition Height="50"/>
                         <RowDefinition Height="70"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <TextBlock
                         TextWrapping="Wrap"
-                        FontSize="21"
-                        Text="Program Headers page"
-                        VerticalAlignment="Center"/>
+                        FontSize="30"
+                        Text="Program Headers page"/>
                     <TextBlock
                         Grid.Row="1"
                         TextWrapping="Wrap"
-                        MaxWidth="400"
+                        MaxWidth="600"
                         Text="This page represents you all recognized header views in researhing program module."/>
                     <StackPanel
                         Grid.Row="2">
                         <!--Here contains Expanders with Program headers-->
+                        <ui:CardExpander
+                            IsEnabled="{Binding AllowProgramHeader, UpdateSourceTrigger=PropertyChanged}"
+                            Header="{Binding ProgramHeaderExpanderHeader, UpdateSourceTrigger=PropertyChanged}">
+                            <ui:CardExpander.Content>
+                                <ui:DataGrid
+                                    FontFamily="Consolas"
+                                    ItemsSource="{Binding ProgramHeader, UpdateSourceTrigger=PropertyChanged}"
+                                    MaxWidth="600"
+                                    MaxHeight="400"/>
+                            </ui:CardExpander.Content>
+                        </ui:CardExpander>
+                        <ui:CardExpander
+                            IsEnabled="{Binding AllowRuntimeHeader, UpdateSourceTrigger=PropertyChanged}"
+                            Header="{Binding RuntimeHeaderExpanderHeader, UpdateSourceTrigger=PropertyChanged}">
+                            <ui:CardExpander.Content>
+                                <ui:DataGrid
+                                    FontFamily="Consolas"
+                                    ItemsSource="{Binding RuntimeHeader, UpdateSourceTrigger=PropertyChanged}"
+                                    MaxWidth="600"
+                                    MaxHeight="400">
+                                </ui:DataGrid>
+                            </ui:CardExpander.Content>
+                        </ui:CardExpander>
                     </StackPanel>
                 </Grid>
             </ui:Card.Content>

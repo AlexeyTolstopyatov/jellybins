@@ -12,9 +12,9 @@ TRACE;DEBUG;NET;NET6_0;NETCOREAPP
 D:\Projects\cs\jellybins.Core\jellybins.Fluent\App.xaml
 41156909219
 
-11-1623946265
+13-882440311
 200-683604578
 MainWindow.xaml;Views\CommonPropertiesPage.xaml;Views\ErrorPage.xaml;Views\ProgramHeadersPage.xaml;
 
-True
+False
 
