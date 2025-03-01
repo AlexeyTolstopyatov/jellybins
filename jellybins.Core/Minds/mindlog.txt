@@ -1,0 +1,38 @@
+﻿JellyBins.Core solution is reborn of old project's part
+Main: 
+    Restrict and rewrite all infrastructure, 
+    using SOLID as i can and know
+    My old notes and code seriously bad idea. 
+    
+    I give up and start all from zero
+
+Terms: 
+    Headers:
+        PortableExecutableHeader
+        NewExecutableHeader
+        LinearExecutableHeader
+        MarkExecutableHeader
+        CommonRuntimeHeader
+        VisualBasicHeader
+    
+    Infrastructure:
+        Headers/...Header.cs
+        Models/...Model.cs
+        Internal/{interfaces}
+        Strings/
+        Types/
+        Analysers/Header/...Head
+        Analysers/Import/...Import
+        Analysers/Runtime/...Runtime
+        
+    Old information files like IExecutableInformation which translates
+    Hex values to Human-Recognizable strings renamed to Strings
+        NewExecutableStrings
+        LinearExecutableStrings
+        PortableExecutableStrings
+        LinkableExecutableStrings
+        AssemblerOutExecutableStrings
+        etc
+    
+30.01.2025: How to make universal structure with custom flags
+avoiding Dictionaries

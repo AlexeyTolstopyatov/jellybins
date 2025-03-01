@@ -6,16 +6,6 @@ namespace jellybins.Core.Headers
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 1)]
     public struct MarkZbikowski
     {
-        public MarkZbikowski()
-        {
-            e_res0x1c = new ushort[4];
-            e_res_0x28 = new ushort[10];
-            e_sign = cs = ss = sp = ip = e_check = e_fbl = e_lastb = e_maxep = e_minep
-                = e_overnum = e_relc = e_reltableoff = e_pars = e_oeminfo = e_oemid = 0;
-
-            e_lfanew = 0;
-        }
-
         [MarshalAs(UnmanagedType.U2)] public ushort e_sign;
         [MarshalAs(UnmanagedType.U2)] public ushort e_lastb;
         [MarshalAs(UnmanagedType.U2)] public ushort e_fbl;

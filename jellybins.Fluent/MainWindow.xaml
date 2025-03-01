@@ -6,7 +6,6 @@
         xmlns:local="clr-namespace:jellybins.Fluent.ViewModels"
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         xmlns:mica="clr-namespace:MicaWPF.Controls;assembly=MicaWPF"
-        xmlns:fluent="clr-namespace:jellybins.Fluent"
         mc:Ignorable="d"
         Title="jellybins (beta)" 
         Height="750" Width="900">
@@ -20,11 +19,11 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         
-        <!-- Menu -->
+        <!--| Menu |-->
             <StackPanel
                 HorizontalAlignment="Center"
                 Margin="20">
-                <!--Menu->Open -->
+                <!--| Menu->Open |-->
                 <ui:Card>
                     <ui:Card.Content>
                         <StackPanel 
@@ -41,7 +40,7 @@
                         </StackPanel>
                     </ui:Card.Content>
                 </ui:Card>
-                <!--Menu->Save-->
+                <!--| Menu->Save |-->
                 <ui:Card>
                     <ui:Card.Content>
                         <StackPanel>
@@ -71,11 +70,12 @@
                                         <ui:Button
                                             Command="{Binding ProgramGeneralPageCommand, UpdateSourceTrigger=PropertyChanged}"
                                             Content="Common" 
+                                            IsEnabled="{Binding AllowProgramHeadersPage, UpdateSourceTrigger=PropertyChanged}"
                                             Icon="{ui:SymbolIcon Home16}"/>
                                     </StackPanel>
                                 </ui:Card.Content>
                             </ui:Card>
-                            <!--Menu->HeaderTable-->
+                            <!--| Menu->HeaderTable |-->
                             <ui:Card>
                                 <ui:Card.Content>
                                     <StackPanel>
@@ -84,7 +84,7 @@
                                             <Run Text="Get Hexadecimal table of file's header"/>
                                             <LineBreak/>
                                         </TextBlock>
-                                        <!--ICommand = reason-->
+                                        <!--| ICommand = reason |-->
                                         <ui:Button
                                             Content="Headers"
                                             Icon="{ui:SymbolIcon Settings16}"
@@ -94,7 +94,7 @@
                                     </StackPanel>
                                 </ui:Card.Content>
                             </ui:Card>
-                            <!--Menu->Imports-->
+                            <!--| Menu->Imports |-->
                             <ui:Card>
                                 <StackPanel>
                                     <TextBlock
@@ -107,11 +107,10 @@
                                         Content="Imports"/>
                                 </StackPanel>
                             </ui:Card>
-
                         </StackPanel>
                     </ui:CardExpander.Content>
                 </ui:CardExpander>
-                <!--Menu->About-->
+                <!--| Menu->About |-->
                 <ui:Card>
                     <ui:Card.Content>
                         <StackPanel>
@@ -126,10 +125,10 @@
                 </ui:Card>
             </StackPanel>
         
-        <!--Workspace (Frames)-->
-        <Frame 
+        <!--| Workspace (Frames) |-->
+        <Frame
             Grid.Column="1"
-            Margin="0,50,30,50"
+            Margin="0,20,30,50"
             Content="{Binding UpdateSourceTrigger=PropertyChanged, Path=FrameContent}"/>
     </Grid>
 </mica:MicaWindow>

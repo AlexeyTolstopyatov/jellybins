@@ -14,6 +14,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\jellybins.Core\jellybins.Core.csproj" />
+      <ProjectReference Include="..\jellybins.Java\jellybins.Java.csproj" />
     </ItemGroup>
 
 </Project>

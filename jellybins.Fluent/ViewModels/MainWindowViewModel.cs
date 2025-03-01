@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -8,6 +9,9 @@ using System.Windows.Input;
 using jellybins.Core.Attributes;
 using jellybins.Fluent.Models;
 using jellybins.Fluent.Views;
+using jellybins.Java.Exceptions;
+using jellybins.Java.Handlers;
+using jellybins.Java.Models;
 using Microsoft.Win32;
 using Wpf.Ui.Input;
 
@@ -84,7 +88,39 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
         get => _frameContent;
         set => SetField(ref _frameContent, value);
     }
-    
+
+    private void CreateJavaAppletPage()
+    {
+        ExtractedFileHandler hMod = new(_programPath!);
+        
+        if (hMod.LoaderType == MetadataType.Forge)
+        {
+            ForgeModel forge = new();
+            hMod.DeserializeLoaderManifest(ref forge);
+            McModificationProperties model = new(); 
+            model = McLoaderModelHandler.Normalize(forge);
+            model.Name = new FileInfo(_programPath!).Name;
+            model.Path = _programPath;
+            _pagesCollection.ProgramGeneralPage = new McModificationPage()
+            {
+                DataContext = new McModificationPageViewModel(model, hMod.ReadManifest(), hMod.ReadLoaderManifest())
+            };
+        }
+        else
+        {
+            FabricModel fabric = new();
+            hMod.DeserializeLoaderManifest(ref fabric);
+            McModificationProperties model = McLoaderModelHandler.Normalize(fabric);
+            model.LoaderId = hMod.LoaderType.ToString();
+            model.Name = new FileInfo(_programPath!).Name;
+            model.Path = _programPath;
+            _pagesCollection.ProgramGeneralPage = new McModificationPage()
+            {
+                DataContext = new McModificationPageViewModel(model, hMod.ReadManifest(), hMod.ReadLoaderManifest())
+            };
+            FrameContent = _pagesCollection.ProgramGeneralPage;
+        }
+    }
     private void CreateProgramGeneralPage()
     {
         CommonPropertiesModel model = new(_programPath!);
@@ -117,8 +153,8 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
                      "New-Format Modules (*.o *.so)|*.so;*.o;*.aout;*.a.out;*.out|" + 
                      "All files|*.*",
             Title = "Select object file",
-            DefaultExt = "All files|*.*",
-            Multiselect = false
+            DefaultExt = "All files",
+            Multiselect = false,
         };
         try
         {
@@ -127,6 +163,12 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
             _programPath = ofd.FileName;
             AllowProgramHeadersPage = true;
             AllowSaveResultsButton = true;
+
+            if (new FileInfo(ofd.FileName).Extension == ".jar")
+            {
+                CreateJavaAppletPage();
+                return;
+            }
             
             // create page -> call page
             CreateProgramGeneralPage();

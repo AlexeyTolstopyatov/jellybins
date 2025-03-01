@@ -7,10 +7,6 @@ using System.Threading.Tasks;
 
 namespace jellybins.Core.Headers
 {
-    /// <summary>
-    /// I'm so sorry. MINIX format specification != FreeBSD format specification
-    /// A-Out files in FreeBSD are 64 bit!!!
-    /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct AssemblerOutput
     {
