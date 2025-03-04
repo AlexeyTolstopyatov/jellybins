@@ -8,5 +8,5 @@
 *.cs linguist-detectable=true
 *.c linguist-detectable=true
 *.md linguist-detectable=true
-*.bas linguist-language=visual-basic-6-0
+*.bas linguist-language=Visual-Basic-6.0
 
