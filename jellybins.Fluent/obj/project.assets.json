@@ -45,6 +45,45 @@
           }
         }
       },
+      "SharpCompress/0.39.0": {
+        "type": "package",
+        "dependencies": {
+          "System.Buffers": "4.6.0",
+          "ZstdSharp.Port": "0.8.4"
+        },
+        "compile": {
+          "lib/net6.0/SharpCompress.dll": {
+            "related": ".pdb"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/SharpCompress.dll": {
+            "related": ".pdb"
+          }
+        }
+      },
+      "System.Buffers/4.6.0": {
+        "type": "package",
+        "compile": {
+          "lib/netcoreapp2.1/_._": {}
+        },
+        "runtime": {
+          "lib/netcoreapp2.1/_._": {}
+        }
+      },
+      "Tomlyn/0.18.0": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.0/Tomlyn.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.0/Tomlyn.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "WPF-UI/4.0.0": {
         "type": "package",
         "dependencies": {
@@ -77,6 +116,15 @@
           }
         }
       },
+      "ZstdSharp.Port/0.8.4": {
+        "type": "package",
+        "compile": {
+          "lib/net6.0/ZstdSharp.dll": {}
+        },
+        "runtime": {
+          "lib/net6.0/ZstdSharp.dll": {}
+        }
+      },
       "jellybins.Core/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v6.0",
@@ -85,6 +133,20 @@
         },
         "runtime": {
           "bin/placeholder/jellybins.Core.dll": {}
+        }
+      },
+      "jellybins.Java/1.2.3.1": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v6.0",
+        "dependencies": {
+          "SharpCompress": "0.39.0",
+          "Tomlyn": "0.18.0"
+        },
+        "compile": {
+          "bin/placeholder/jellybins.Java.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/jellybins.Java.dll": {}
         }
       }
     }
@@ -146,6 +208,65 @@
         "micawpfruntimecomponent.1.1.9.nupkg.sha512",
         "micawpfruntimecomponent.nuspec",
         "runtimes/win/native/MicaWPFRuntimeComponent.dll"
+      ]
+    },
+    "SharpCompress/0.39.0": {
+      "sha512": "0esqIUDlg68Z7+Weuge4QzEvNtawUO4obTJFL7xuf4DBHMxVRr+wbNgiX9arMrj3kGXQSvLe0zbZG3oxpkwJOA==",
+      "type": "package",
+      "path": "sharpcompress/0.39.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "lib/net48/SharpCompress.dll",
+        "lib/net48/SharpCompress.pdb",
+        "lib/net481/SharpCompress.dll",
+        "lib/net481/SharpCompress.pdb",
+        "lib/net6.0/SharpCompress.dll",
+        "lib/net6.0/SharpCompress.pdb",
+        "lib/net8.0/SharpCompress.dll",
+        "lib/net8.0/SharpCompress.pdb",
+        "lib/netstandard2.0/SharpCompress.dll",
+        "lib/netstandard2.0/SharpCompress.pdb",
+        "sharpcompress.0.39.0.nupkg.sha512",
+        "sharpcompress.nuspec"
+      ]
+    },
+    "System.Buffers/4.6.0": {
+      "sha512": "lN6tZi7Q46zFzAbRYXTIvfXcyvQQgxnY7Xm6C6xQ9784dEL1amjM6S6Iw4ZpsvesAKnRVsM4scrDQaDqSClkjA==",
+      "type": "package",
+      "path": "system.buffers/4.6.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "PACKAGE.md",
+        "buildTransitive/net461/System.Buffers.targets",
+        "buildTransitive/net462/_._",
+        "lib/net462/System.Buffers.dll",
+        "lib/net462/System.Buffers.xml",
+        "lib/netcoreapp2.1/_._",
+        "lib/netstandard2.0/System.Buffers.dll",
+        "lib/netstandard2.0/System.Buffers.xml",
+        "system.buffers.4.6.0.nupkg.sha512",
+        "system.buffers.nuspec"
+      ]
+    },
+    "Tomlyn/0.18.0": {
+      "sha512": "ZmVqI1l57i+xrdwhTC/oL8GqteyWNBaSZTwAmS4NdE4nokVpMBtpcnR7BUTWBMPG+HKsyjeNeRVitsfJtwErAA==",
+      "type": "package",
+      "path": "tomlyn/0.18.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net8.0/Tomlyn.dll",
+        "lib/net8.0/Tomlyn.xml",
+        "lib/netstandard2.0/Tomlyn.dll",
+        "lib/netstandard2.0/Tomlyn.xml",
+        "logo.png",
+        "readme.md",
+        "tomlyn.0.18.0.nupkg.sha512",
+        "tomlyn.nuspec"
       ]
     },
     "WPF-UI/4.0.0": {
@@ -219,24 +340,50 @@
         "wpf-ui.abstractions.nuspec"
       ]
     },
+    "ZstdSharp.Port/0.8.4": {
+      "sha512": "eieSXq3kakCUXbgdxkKaRqWS6hF0KBJcqok9LlDCs60GOyrynLvPOcQ0pRw7shdPF7lh/VepJ9cP9n9HHc759g==",
+      "type": "package",
+      "path": "zstdsharp.port/0.8.4",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net462/ZstdSharp.dll",
+        "lib/net5.0/ZstdSharp.dll",
+        "lib/net6.0/ZstdSharp.dll",
+        "lib/net7.0/ZstdSharp.dll",
+        "lib/net8.0/ZstdSharp.dll",
+        "lib/net9.0/ZstdSharp.dll",
+        "lib/netcoreapp3.1/ZstdSharp.dll",
+        "lib/netstandard2.0/ZstdSharp.dll",
+        "lib/netstandard2.1/ZstdSharp.dll",
+        "zstdsharp.port.0.8.4.nupkg.sha512",
+        "zstdsharp.port.nuspec"
+      ]
+    },
     "jellybins.Core/1.0.0": {
       "type": "project",
       "path": "../jellybins.Core/jellybins.Core.csproj",
       "msbuildProject": "../jellybins.Core/jellybins.Core.csproj"
+    },
+    "jellybins.Java/1.2.3.1": {
+      "type": "project",
+      "path": "../jellybins.Java/jellybins.Java.csproj",
+      "msbuildProject": "../jellybins.Java/jellybins.Java.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net6.0-windows7.0": [
       "MicaWPF >= 6.2.10",
       "WPF-UI >= 4.0.0",
-      "jellybins.Core >= 1.0.0"
+      "jellybins.Core >= 1.0.0",
+      "jellybins.Java >= 1.2.3.1"
     ]
   },
   "packageFolders": {
     "C:\\Users\\MagicBook\\.nuget\\packages\\": {}
   },
   "project": {
-    "version": "1.0.0",
+    "version": "1.2.3.1",
     "restore": {
       "projectUniqueName": "D:\\Projects\\cs\\jellybins.Core\\jellybins.Fluent\\jellybins.Fluent.csproj",
       "projectName": "jellybins.Fluent",
@@ -259,6 +406,9 @@
           "projectReferences": {
             "D:\\Projects\\cs\\jellybins.Core\\jellybins.Core\\jellybins.Core.csproj": {
               "projectPath": "D:\\Projects\\cs\\jellybins.Core\\jellybins.Core\\jellybins.Core.csproj"
+            },
+            "D:\\Projects\\cs\\jellybins.Core\\jellybins.Java\\jellybins.Java.csproj": {
+              "projectPath": "D:\\Projects\\cs\\jellybins.Core\\jellybins.Java\\jellybins.Java.csproj"
             }
           }
         }

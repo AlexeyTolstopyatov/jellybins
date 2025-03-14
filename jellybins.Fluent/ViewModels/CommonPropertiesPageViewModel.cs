@@ -1,21 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Accessibility;
-using jellybins.Core.Readers.Factory;
 using jellybins.Fluent.Models;
 
 namespace jellybins.Fluent.ViewModels;
 
-public class CommonPropertiesPageViewModel : INotifyPropertyChanged
+public sealed class CommonPropertiesPageViewModel : INotifyPropertyChanged
 {
-    private const string DEV_OS = "IBM OS/2";
-    private const string DEV_CPU = "Intel i286";
-    private const string DEV_OS_VER = "3.0";
-    private const string DEV_REF_OS = "Microsoft Windows";
-    private const string DEV_REF_OS_VER = "6.5"; // Windows 9
-    private const string DEV_REF_CPU = "Intel x86-64";
+    private const string DevOs = "IBM OS/2";
+    private const string DevCpu = "Intel i286";
+    private const string DevOsVer = "3.0";
+    private const string DevRefOs = "Microsoft Windows";
+    private const string DevRefOsVer = "6.5"; // Windows 9
+    private const string DevRefCpu = "Intel x86-64";
     public CommonPropertiesPageViewModel()
     {
         
@@ -37,22 +34,26 @@ public class CommonPropertiesPageViewModel : INotifyPropertyChanged
         _refImageOperatingSystemVersionString = model.ReferenceOperatingSystemVersionString;
         _refImageCpuArchitectureString = model.ReferenceCpuArchitecture;
         ApplicationFlagsArray = model.ApplicationFlagsArray;
+        SpecialRuntimeWord = model.ImageRuntime!;
     }
-
-    private string _refImageCpuArchitectureString = DEV_REF_CPU;
-    private string _refImageOperatingSystemVersionString = DEV_REF_OS_VER;
-    private string _refImageOperatingSystemString = DEV_REF_OS;
+    #region Information Storage
+    private string _refImageCpuArchitectureString = DevRefCpu;
+    private string _refImageOperatingSystemVersionString = DevRefOsVer;
+    private string _refImageOperatingSystemString = DevRefOs;
     
-    private string _imageName = nameof(ArgumentNullException);
-    private string _imagePath = nameof(ArgumentNullException);
-    private string _operatingSystemString = DEV_OS;
-    private string _operatingSystemVersionString = DEV_OS_VER;
-    private string _cpuArchitectureString = DEV_CPU;
-    private string _cpuWordLengthString = nameof(ArgumentNullException);
-    private string _imageVersionString = nameof(ArgumentNullException);
-    private string _imageTypeString = nameof(ArgumentNullException);
-    private string _imageSubsystemString = nameof(ArgumentNullException);
+    private string _imageName = "Image's Name";
+    private string _imagePath = "Image's Path";
+    private string _operatingSystemString = DevOs;
+    private string _operatingSystemVersionString = DevOsVer;
+    private string _cpuArchitectureString = DevCpu;
+    private string _cpuWordLengthString = "Maximum CPU Word";
+    private string _imageVersionString = "1.1.2.3";
+    private string _imageTypeString = "Dynamic Linked Library module";
+    private string _imageSubsystemString = "Windows CE";
+    private string _imageSpecialRuntimeWord = "Windows API";
+    #endregion
     
+    #region INotifyPropertyChanged
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public string ReferenceOperatingSystem => _refImageOperatingSystemString;
@@ -60,6 +61,11 @@ public class CommonPropertiesPageViewModel : INotifyPropertyChanged
     public string ReferenceOperatingSystemVersionString => _refImageOperatingSystemVersionString;
     public string[] ApplicationFlagsArray { get; }
 
+    public string SpecialRuntimeWord
+    {
+        get => _imageSpecialRuntimeWord;
+        set => SetField(ref _imageSpecialRuntimeWord, value);
+    }
     public string OperatingSystemString
     {
         get => _operatingSystemString;
@@ -113,7 +119,7 @@ public class CommonPropertiesPageViewModel : INotifyPropertyChanged
         get => _imagePath;
         set => SetField(ref _imagePath, value);
     }
-    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
@@ -125,4 +131,5 @@ public class CommonPropertiesPageViewModel : INotifyPropertyChanged
         OnPropertyChanged(propertyName);
         return true;
     }
+    #endregion
 }

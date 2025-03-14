@@ -5,5 +5,5 @@ public interface IReader
     Dictionary<string, string> GetHeader();
     Dictionary<string, string[]> GetFlags();
     CommonProperties GetProperties();
-    void GetImports();
+    Dictionary<string, string> GetImports();
 }

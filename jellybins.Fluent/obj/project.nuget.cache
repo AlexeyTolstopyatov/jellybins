@@ -1,14 +1,18 @@
 {
   "version": 2,
-  "dgSpecHash": "hoOFa/XfGSDqQDBXPpD0lyEmRE94XHCBv/MLagIfObDud7Y5MVxwouI2WvHBMGyZW6KawZfJ9uFG6Ddj449Cvg==",
+  "dgSpecHash": "q160dcbq8uAeMGgbNkm+hNaVZSM7VJ1IXuGg3Lt0tFgpJVW+hU4dTr87/Zkn3u31rYrCtgNJxosJF9sIftNbnA==",
   "success": true,
   "projectFilePath": "D:\\Projects\\cs\\jellybins.Core\\jellybins.Fluent\\jellybins.Fluent.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\MagicBook\\.nuget\\packages\\micawpf\\6.2.10\\micawpf.6.2.10.nupkg.sha512",
     "C:\\Users\\MagicBook\\.nuget\\packages\\micawpf.core\\6.2.10\\micawpf.core.6.2.10.nupkg.sha512",
     "C:\\Users\\MagicBook\\.nuget\\packages\\micawpfruntimecomponent\\1.1.9\\micawpfruntimecomponent.1.1.9.nupkg.sha512",
+    "C:\\Users\\MagicBook\\.nuget\\packages\\sharpcompress\\0.39.0\\sharpcompress.0.39.0.nupkg.sha512",
+    "C:\\Users\\MagicBook\\.nuget\\packages\\system.buffers\\4.6.0\\system.buffers.4.6.0.nupkg.sha512",
+    "C:\\Users\\MagicBook\\.nuget\\packages\\tomlyn\\0.18.0\\tomlyn.0.18.0.nupkg.sha512",
     "C:\\Users\\MagicBook\\.nuget\\packages\\wpf-ui\\4.0.0\\wpf-ui.4.0.0.nupkg.sha512",
-    "C:\\Users\\MagicBook\\.nuget\\packages\\wpf-ui.abstractions\\4.0.0\\wpf-ui.abstractions.4.0.0.nupkg.sha512"
+    "C:\\Users\\MagicBook\\.nuget\\packages\\wpf-ui.abstractions\\4.0.0\\wpf-ui.abstractions.4.0.0.nupkg.sha512",
+    "C:\\Users\\MagicBook\\.nuget\\packages\\zstdsharp.port\\0.8.4\\zstdsharp.port.0.8.4.nupkg.sha512"
   ],
   "logs": []
 }

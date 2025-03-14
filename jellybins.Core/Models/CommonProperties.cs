@@ -1,5 +1,4 @@
 ﻿using jellybins.Core.Strings;
-using Subsystem = jellybins.Core.Strings.Subsystem;
 
 namespace jellybins.Core.Models;
 
@@ -26,7 +25,7 @@ public struct CommonProperties
     /// </summary>
     public string OperatingSystem;
     /// <summary>
-    /// Name of Microsoft Windows Subsystem
+    /// Name of Microsoft Windows <see cref="PortableExecutableSubsystem"/>
     /// Microsoft binaries contain information
     /// about using layer of Operating System (Win32, POSIX compat, OS/2 compat etc...)
     /// </summary>
@@ -39,4 +38,8 @@ public struct CommonProperties
     /// Maximum CPU word length support. (output format is "16" or "64").
     /// </summary>
     public string CpuWordLength;
+    /// <summary>
+    /// Suggested runtime complex usage. (CLR/VB5/GO/... etc)
+    /// </summary>
+    public string? RuntimeWord;
 }

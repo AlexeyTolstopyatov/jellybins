@@ -1,0 +1,12 @@
+D:\Projects\cs\jellybins.Core\jellybins.Core\bin\Debug\net6.0\jellybins.Core.deps.json
+D:\Projects\cs\jellybins.Core\jellybins.Core\bin\Debug\net6.0\jellybins.Core.dll
+D:\Projects\cs\jellybins.Core\jellybins.Core\bin\Debug\net6.0\jellybins.Core.pdb
+D:\Projects\cs\jellybins.Core\jellybins.Core\obj\Debug\net6.0\jellybins.Core.csproj.AssemblyReference.cache
+D:\Projects\cs\jellybins.Core\jellybins.Core\obj\Debug\net6.0\jellybins.Core.GeneratedMSBuildEditorConfig.editorconfig
+D:\Projects\cs\jellybins.Core\jellybins.Core\obj\Debug\net6.0\jellybins.Core.AssemblyInfoInputs.cache
+D:\Projects\cs\jellybins.Core\jellybins.Core\obj\Debug\net6.0\jellybins.Core.AssemblyInfo.cs
+D:\Projects\cs\jellybins.Core\jellybins.Core\obj\Debug\net6.0\jellybins.Core.csproj.CoreCompileInputs.cache
+D:\Projects\cs\jellybins.Core\jellybins.Core\obj\Debug\net6.0\jellybins.Core.dll
+D:\Projects\cs\jellybins.Core\jellybins.Core\obj\Debug\net6.0\refint\jellybins.Core.dll
+D:\Projects\cs\jellybins.Core\jellybins.Core\obj\Debug\net6.0\jellybins.Core.pdb
+D:\Projects\cs\jellybins.Core\jellybins.Core\obj\Debug\net6.0\ref\jellybins.Core.dll

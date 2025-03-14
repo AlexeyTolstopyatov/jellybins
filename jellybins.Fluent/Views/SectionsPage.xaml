@@ -1,0 +1,123 @@
+﻿<Page x:Class="jellybins.Fluent.Views.SectionsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:local="clr-namespace:jellybins.Fluent.ViewModels"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      mc:Ignorable="d"
+      Title="SectionsPage" Height="Auto" Width="Auto">
+    <Page.DataContext>
+        <local:SectionsPageViewModel/>
+    </Page.DataContext>
+    <Grid>
+        <ui:Card>
+            <ui:Card.Content>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="50"/>
+                        <RowDefinition Height="70"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <!--JellyBins Page Header-->
+                    <TextBlock
+                        Grid.Row="0"
+                        Text="SECTIONS TABLE"
+                        FontSize="31"/>
+                    <TextBlock
+                        Grid.Row="1"
+                        Margin="0,0,0,10"
+                        Text="{Binding Description}"/>
+                    <!--Section Cards-->
+                    <ui:Card
+                        Grid.Row="2">
+                        <ui:Card.Content>
+                            <ui:VirtualizingItemsControl
+                                ItemsSource="{Binding Sections}"
+                                Margin="10"
+                                Grid.Row="2">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <WrapPanel 
+                                            Orientation="Horizontal">
+                                            <!--Section Card-->
+                                            <ui:Card 
+                                                MaxWidth="350"
+                                                MinWidth="350">
+                                                <ui:Card.Content>
+                                                    <Grid>
+                                                        <!--Name | Parameters -->
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="50"/>
+                                                            <RowDefinition Height="*"/>
+                                                        </Grid.RowDefinitions>
+                                                        <!--Key | Value -->
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <!--Section Name-->
+                                                        <TextBlock
+                                                            Text="{Binding Name}"
+                                                            FontFamily="Consolas"
+                                                            FontSize="16"/>
+                                                        <!--Vector Keys-->
+                                                        <StackPanel
+                                                            Grid.Row="1"
+                                                            Grid.Column="0">
+                                                            <TextBlock>
+                                                                <Run Text="Virtual Size"/>
+                                                                <LineBreak/>
+                                                                <Run Text="Virtual Address"/>
+                                                                <LineBreak/>
+                                                                <Run Text="Size of raw Data"/>
+                                                                <LineBreak/>
+                                                                <Run Text="Pointer to raw Data"/>
+                                                                <LineBreak/>
+                                                                <Run Text="Pointer to Relocations"/>
+                                                                <LineBreak/>
+                                                                <Run Text="Pointer to Line numbers"/>
+                                                                <LineBreak/>
+                                                                <Run Text="Number of Relocations"/>
+                                                                <LineBreak/>
+                                                                <Run Text="Number of Line numbers"/>
+                                                            </TextBlock>
+                                                            
+                                                        </StackPanel>
+                                                        <!--Vector Values-->
+                                                        <StackPanel
+                                                            Grid.Row="1"
+                                                            Grid.Column="1">
+                                                            <TextBlock
+                                                                FontFamily="Consolas">
+                                                                <Run Text="{Binding VirtualSize}"/>
+                                                                <LineBreak/>
+                                                                <Run Text="{Binding VirtualAddress, StringFormat='0x{0:x}'}"/>
+                                                                <LineBreak/>
+                                                                <Run Text="{Binding SizeOfRawData}"/>
+                                                                <LineBreak/>
+                                                                <Run Text="{Binding PointerToRawData, StringFormat='0x{0:x}'}"/>
+                                                                <LineBreak/>
+                                                                <Run Text="{Binding PointerToRelocations, StringFormat='0x{0:x}'}"/>
+                                                                <LineBreak/>
+                                                                <Run Text="{Binding PointerToLineNumbers, StringFormat='0x{0:x}'}"/>
+                                                                <LineBreak/>
+                                                                <Run Text="{Binding NumberOfRelocations}"/>
+                                                                <LineBreak/>
+                                                                <Run Text="{Binding NumberOfLineNumbers}"/>
+                                                            </TextBlock>
+                                                        </StackPanel>
+                                                    </Grid>
+                                                </ui:Card.Content>
+                                            </ui:Card>
+                                        </WrapPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ui:VirtualizingItemsControl>
+                        </ui:Card.Content>
+                    </ui:Card>
+                </Grid>
+            </ui:Card.Content>
+        </ui:Card>
+    </Grid>
+</Page>

@@ -10,13 +10,13 @@
 using System;
 using System.Reflection;
 
-[assembly: System.Reflection.AssemblyCompanyAttribute("jellybins.Fluent")]
+[assembly: System.Reflection.AssemblyCompanyAttribute("AlexeyTolstopyatov")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
-[assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyFileVersionAttribute("1.2.4.1")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.2.4.1")]
 [assembly: System.Reflection.AssemblyProductAttribute("jellybins.Fluent")]
 [assembly: System.Reflection.AssemblyTitleAttribute("jellybins.Fluent")]
-[assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
+[assembly: System.Reflection.AssemblyVersionAttribute("1.2.4.1")]
 [assembly: System.Runtime.Versioning.TargetPlatformAttribute("Windows7.0")]
 [assembly: System.Runtime.Versioning.SupportedOSPlatformAttribute("Windows7.0")]
 

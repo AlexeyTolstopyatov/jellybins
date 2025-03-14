@@ -39,11 +39,11 @@
                     <TextBlock
                         Grid.Row="2"
                         MaxWidth="600"
-                        TextWrapping="Wrap"
-                        Text="{Binding UpdateSourceTrigger=PropertyChanged, Path=Message}"/>
+                        TextWrapping="WrapWithOverflow"
+                        Text="{Binding Path=Message}"/>
         
                     <ui:Card Grid.Row="4">
-                        <TextBlock
+                        <ui:TextBlock
                             MaxWidth="600"
                             TextWrapping="Wrap"
                             FontFamily="Consolas"

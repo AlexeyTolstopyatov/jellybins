@@ -147,13 +147,14 @@ public class ExtractedFileHandler
         {
             Loader = model["modLoader"] as string,
             LoaderVersion = model["loaderVersion"] as string,
-            IssueTrackerUrl = model["issueTrackerURL"] as string,
+            // IssueTrackerUrl = model["issueTrackerURL"] as string,
             License = model["license"] as string
         };
 
         if (!model.TryGetValue("mods", out object modsTable) || modsTable is not TomlTableArray modsArray) 
             return this;
         
+        // parse [[mods]]
         foreach (TomlTable modTable in modsArray)
         {
             ForgeModsHeader mod = new()
@@ -161,32 +162,66 @@ public class ExtractedFileHandler
                 ModId = modTable["modId"] as string,
                 ModVersion = modTable["version"] as string,
                 ModDisplayName = modTable["displayName"] as string,
-                ModDisplayUrl = modTable["displayURL"] as string,
-                ModAuthors = modTable["authors"] as string,
-                ModLogoFile = modTable["logoFile"] as string
+                
+                // [Optional] values throws Null Reference exception.
+                
+                //ModDisplayUrl = modTable["displayURL"] as string,
+                //ModAuthors = modTable["authors"] as string,
+                //ModLogoFile = modTable["logoFile"] as string
             };
-            // [[dependencies.modId]] 2-3 items
-            // Why 0????
-            if (modTable.TryGetValue($"dependencies.{mod.ModId}", out object depsTable) && depsTable is TomlTableArray depsArray)
-            {
-                foreach (TomlTable depTable in depsArray)
-                {
-                    string depName = depTable.Keys.First();
-                    
-                    if (depTable[depName] is not TomlTableArray depItems) continue;
-                    var depList = depItems
-                        .Select(item => new ForgeDependency {
-                            ModId = item["modId"] as string, 
-                            VersionRange = item["versionRange"] as string, 
-                            Ordering = item["ordering"] as string, 
-                            Side = item["side"] as string
-                        })
-                        .ToList();
-                    metadata.Dependencies = depList.ToArray();
-                }
-            }
+            if (modTable.TryGetValue("displayURL", out object? displayUrl))
+                mod.ModDisplayUrl = displayUrl as string;
+            if (modTable.TryGetValue("authors", out object? authors))
+                mod.ModAuthors = authors.ToString();
+            if (modTable.TryGetValue("logoFile", out object? logoFile))
+                mod.ModLogoFile = logoFile.ToString();
+            
             metadata.Mods = mod;
         }
+        // parse [[dependencies]]
+        var dependencies = new List<ForgeDependency>();
+        if (model.TryGetValue("dependencies", out object depsObj) && depsObj is TomlTable depsTable)
+        {
+            foreach (var key in depsTable.Keys)
+            {
+                if (depsTable[key] is TomlTableArray) //depsTable.Keys exists VS key=null
+                {
+                    foreach (var item in (TomlTableArray)depsTable[key])
+                    {
+                        if (item is TomlTable dependencyTable)
+                        {
+                            var dependency = new ForgeDependency();
+                            if (dependencyTable.ContainsKey("modId"))
+                            {
+                                dependency.ModId = dependencyTable["modId"].ToString();
+                            }
+
+                            if (dependencyTable.ContainsKey("mandatory"))
+                            {
+                                dependency.Mandatory = (bool)dependencyTable["mandatory"];
+                            }
+
+                            if (dependencyTable.ContainsKey("versionRange"))
+                            {
+                                dependency.VersionRange = dependencyTable["versionRange"].ToString();
+                            }
+
+                            if (dependencyTable.ContainsKey("ordering"))
+                            {
+                                dependency.Ordering = dependencyTable["ordering"].ToString();
+                            }
+
+                            if (dependencyTable.ContainsKey("side"))
+                            {
+                                dependency.Side = dependencyTable["side"].ToString();
+                            }
+                            dependencies.Add(dependency);
+                        }
+                    }
+                }
+            }
+        }
+
         forge = metadata;
         return this;
     }

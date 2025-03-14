@@ -56,7 +56,7 @@ namespace jellybins.Fluent.Views {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/jellybins.Fluent;component/views/programheaderspage.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/jellybins.Fluent;V1.2.4.1;component/views/programheaderspage.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\..\Views\ProgramHeadersPage.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

@@ -43,6 +43,8 @@
                                         Text="{Binding OperatingSystemVersionString}"/>
                                     <TextBlock
                                         Text="{Binding CpuArchitectureString}"/>
+                                    <TextBlock
+                                        Text="{Binding SpecialRuntimeWord}"/>
                                 </StackPanel>
                                 <StackPanel Grid.Column="1">
                                     <TextBlock
@@ -69,10 +71,10 @@
                     <StackPanel Grid.Column="0">
                         <TextBlock
                             TextWrapping="Wrap"
-                            Text="CPU Word length"/>
+                            Text="Maximum CPU WORD"/>
                         <TextBlock
                             TextWrapping="Wrap"
-                            Text="Windows NT Subsystem"/>
+                            Text="Windows NT subsystem"/>
                         <TextBlock
                             TextWrapping="Wrap"
                             Text="Linker Version"/>
@@ -93,15 +95,14 @@
                         <TextBlock 
                             Text="{Binding ImageTypeString}"/>
                     </StackPanel>
-                    </Grid>
-                    <ui:VirtualizingGridView
-                        IsHitTestVisible="False"
-                        StretchItems="True"
-                        Margin="10,20,10,0"
-                        ItemsSource="{Binding UpdateSourceTrigger=PropertyChanged, Path=ApplicationFlagsArray}"
-                        FontSize="21"
-                        FontFamily="Consolas"/>
-                </StackPanel>
+                </Grid>
+                <ui:VirtualizingGridView
+                    StretchItems="True"
+                    Margin="10,20,10,0"
+                    ItemsSource="{Binding UpdateSourceTrigger=PropertyChanged, Path=ApplicationFlagsArray}"
+                    FontSize="21"
+                    FontFamily="Consolas"/>
+            </StackPanel>
             </ui:Card.Content>
         </ui:Card>
     </Grid>

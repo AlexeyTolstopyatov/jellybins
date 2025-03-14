@@ -36,3 +36,14 @@ D:\Projects\cs\jellybins.Core\jellybins.Fluent\obj\Debug\net6.0-windows\Views\Er
 D:\Projects\cs\jellybins.Core\jellybins.Fluent\obj\Debug\net6.0-windows\Views\ErrorPage.baml
 D:\Projects\cs\jellybins.Core\jellybins.Fluent\obj\Debug\net6.0-windows\Views\ProgramHeadersPage.g.cs
 D:\Projects\cs\jellybins.Core\jellybins.Fluent\obj\Debug\net6.0-windows\Views\ProgramHeadersPage.baml
+D:\Projects\cs\jellybins.Core\jellybins.Fluent\bin\Debug\net6.0-windows\jellybins.Java.dll
+D:\Projects\cs\jellybins.Core\jellybins.Fluent\bin\Debug\net6.0-windows\jellybins.Java.pdb
+D:\Projects\cs\jellybins.Core\jellybins.Fluent\obj\Debug\net6.0-windows\Views\McModificationPage.g.cs
+D:\Projects\cs\jellybins.Core\jellybins.Fluent\obj\Debug\net6.0-windows\Views\McModificationPage.baml
+D:\Projects\cs\jellybins.Core\jellybins.Fluent\bin\Debug\net6.0-windows\SharpCompress.dll
+D:\Projects\cs\jellybins.Core\jellybins.Fluent\bin\Debug\net6.0-windows\Tomlyn.dll
+D:\Projects\cs\jellybins.Core\jellybins.Fluent\bin\Debug\net6.0-windows\ZstdSharp.dll
+D:\Projects\cs\jellybins.Core\jellybins.Fluent\obj\Debug\net6.0-windows\Views\AboutPage.g.cs
+D:\Projects\cs\jellybins.Core\jellybins.Fluent\obj\Debug\net6.0-windows\Views\AboutPage.baml
+D:\Projects\cs\jellybins.Core\jellybins.Fluent\obj\Debug\net6.0-windows\Views\SectionsPage.g.cs
+D:\Projects\cs\jellybins.Core\jellybins.Fluent\obj\Debug\net6.0-windows\Views\SectionsPage.baml

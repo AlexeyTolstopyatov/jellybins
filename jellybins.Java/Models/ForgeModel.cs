@@ -10,9 +10,9 @@ public class ForgeModel
     
     [DataMember(Name = "loaderVersion")]
     public string? LoaderVersion { get; set; }
-    
-    [DataMember(Name = "issueTrackerURL")]
-    public string? IssueTrackerUrl { get; set; }
+
+    [DataMember(Name = "issueTrackerURL")] 
+    public string? IssueTrackerUrl { get; set; } = "not provided";
     
     [DataMember(Name = "license")]
     public string? License { get; set; }

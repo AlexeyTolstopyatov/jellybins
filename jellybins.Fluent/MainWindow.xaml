@@ -8,7 +8,7 @@
         xmlns:mica="clr-namespace:MicaWPF.Controls;assembly=MicaWPF"
         mc:Ignorable="d"
         Title="jellybins (beta)" 
-        Height="750" Width="900">
+        Height="800" Width="1000">
     <Window.DataContext>
         <local:MainWindowViewModel/>
     </Window.DataContext>
@@ -41,23 +41,9 @@
                     </ui:Card.Content>
                 </ui:Card>
                 <!--| Menu->Save |-->
-                <ui:Card>
-                    <ui:Card.Content>
-                        <StackPanel>
-                            <TextBlock
-                                TextWrapping="Wrap">
-                                <Run Text="Save information to structured file"/>
-                                <LineBreak/>
-                            </TextBlock>
-                            <ui:Button 
-                                Content="Save"
-                                IsEnabled="{Binding AllowSaveResultsButton, UpdateSourceTrigger=PropertyChanged}"/>
-                        </StackPanel>
-                    </ui:Card.Content>
-                </ui:Card>
                 <ui:CardExpander
                     Header="Module"
-                    IsExpanded="True">
+                    IsExpanded="{Binding ExpandOperatorsBlock}">
                     <ui:CardExpander.Content>
                         <StackPanel>
                             <ui:Card>
@@ -94,17 +80,18 @@
                                     </StackPanel>
                                 </ui:Card.Content>
                             </ui:Card>
-                            <!--| Menu->Imports |-->
+                            <!--| Menu->Sections |-->
                             <ui:Card>
                                 <StackPanel>
                                     <TextBlock
                                         TextWrapping="Wrap">
-                                        <Run Text="Get more about binary importing functions and modules"/>
+                                        <Run Text="Get more information about image and modules"/>
                                         <LineBreak/>
                                     </TextBlock>
                                     <ui:Button 
-                                        IsEnabled="False"
-                                        Content="Imports"/>
+                                        IsEnabled="{Binding AllowProgramSectionsPage}"
+                                        Command="{Binding OpenSectionsTablePageCommand}"
+                                        Content="Sections"/>
                                 </StackPanel>
                             </ui:Card>
                         </StackPanel>
@@ -119,7 +106,9 @@
                                 <Run Text="Call page with information about this app"/>
                                 <LineBreak/>
                             </TextBlock>
-                            <ui:Button Content="About"/>
+                            <ui:Button 
+                                Content="About"
+                                Command="{Binding OpenAboutPageCommand}"/>
                         </StackPanel>
                     </ui:Card.Content>
                 </ui:Card>
@@ -128,6 +117,8 @@
         <!--| Workspace (Frames) |-->
         <Frame
             Grid.Column="1"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Top"
             Margin="0,20,30,50"
             Content="{Binding UpdateSourceTrigger=PropertyChanged, Path=FrameContent}"/>
     </Grid>

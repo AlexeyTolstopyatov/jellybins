@@ -5,11 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using jellybins.Core.Interfaces;
 using jellybins.Core.Models;
 using jellybins.Core.Readers.Factory;
-using jellybins.Core.Strings;
-using jellybins.Fluent.ViewModels;
 
 namespace jellybins.Fluent.Models;
 
@@ -20,8 +17,23 @@ public sealed class CommonPropertiesModel : INotifyPropertyChanged
         ImagePath = path;
         ImageName = new FileInfo(path).Name;
         
-        BuildModelAsync();
-        BuildFlagsAsync();
+        // TIME TO TOTALLY READING
+        _ = BuildModelAsync();
+        _ = BuildFlagsAsync();
+        BuildImportsAsync();
+    }
+
+    private Task BuildImportsAsync()
+    {
+        Dictionary<string, string> result = new ReaderFactory(ImagePath)
+            .CreateReader()
+            .GetImports();
+
+        foreach (var i in result.Values)
+        {
+            Console.Write(i);
+        }
+        return Task.CompletedTask;
     }
 
     private Task BuildFlagsAsync()
@@ -32,7 +44,10 @@ public sealed class CommonPropertiesModel : INotifyPropertyChanged
                 .GetFlags()
                 .Values;
 
-        _flagList = result.SelectMany(category => category).ToArray();
+        // ignore keys.
+        _flagList = result
+            .SelectMany(category => category)
+            .ToArray();
         
         return Task.CompletedTask;
     }
@@ -50,6 +65,7 @@ public sealed class CommonPropertiesModel : INotifyPropertyChanged
         ImageSubsystemString = model.Subsystem;
         ImageVersionString = model.LinkerVersion;
         ImageTypeString = model.ImageType;
+        ImageRuntime = model.RuntimeWord;
         
         CommonProperties reference =
             new ReaderFactory(@"C:\Windows\explorer.exe")
@@ -62,16 +78,17 @@ public sealed class CommonPropertiesModel : INotifyPropertyChanged
         
         return Task.CompletedTask;
     }
-    private string _imageName = nameof(ArgumentNullException);
-    private string _imagePath = nameof(ArgumentNullException);
-    private string _operatingSystemString = nameof(ArgumentNullException);
-    private string _operatingSystemVersionString = nameof(ArgumentNullException);
-    private string _cpuArchitectureString = nameof(ArgumentNullException);
-    private string _cpuWordLengthString = nameof(ArgumentNullException);
-    private string _imageVersionString = nameof(ArgumentNullException);
-    private string _imageTypeString = nameof(ArgumentNullException);
-    private string _imageSubsystemString = nameof(ArgumentNullException);
+    private string? _imageName;
+    private string? _imagePath;
+    private string? _operatingSystemString;
+    private string? _operatingSystemVersionString;
+    private string? _cpuArchitectureString;
+    private string? _cpuWordLengthString;
+    private string? _imageVersionString;
+    private string? _imageTypeString;
+    private string? _imageSubsystemString;
     private string[] _flagList = new string[1];
+    private string? _imageRuntime;
     
     private string _refImageCpuArchitectureString = null!;
     private string _refImageOperatingSystemVersionString = null!;
@@ -87,6 +104,12 @@ public sealed class CommonPropertiesModel : INotifyPropertyChanged
 
     public string[] ApplicationFlagsArray 
         => _flagList;
+
+    public string? ImageRuntime
+    {
+        get => _imageRuntime;
+        set => SetField(ref _imageRuntime, value);
+    }
     
     public string OperatingSystemString
     {
@@ -141,7 +164,7 @@ public sealed class CommonPropertiesModel : INotifyPropertyChanged
         get => _imagePath;
         set => SetField(ref _imagePath, value);
     }
-
+    
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

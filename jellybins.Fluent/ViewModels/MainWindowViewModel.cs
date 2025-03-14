@@ -9,7 +9,6 @@ using System.Windows.Input;
 using jellybins.Core.Attributes;
 using jellybins.Fluent.Models;
 using jellybins.Fluent.Views;
-using jellybins.Java.Exceptions;
 using jellybins.Java.Handlers;
 using jellybins.Java.Models;
 using Microsoft.Win32;
@@ -23,7 +22,8 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
     {
         public Page ProgramGeneralPage;
         public Page ProgramHeadersPage;
-        public Page ProgramImportsPage;
+        public Page ProgramSectionsPage;
+        public Page AboutPage;
     }
 
     private FilledPages _pagesCollection;
@@ -34,10 +34,17 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
 
     // Possibility Flags
     private bool _allowProgramHeadersPage = true;
-    private bool _allowProgramImportsPage;
+    private bool _allowProgramSectionsPage;
     private bool _allowSaveResultsButton;
     private bool _allowCommonResultsPage;
+    private bool _expandOperatorsBlock;
 
+    public bool ExpandOperatorsBlock
+    {
+        get => _expandOperatorsBlock;
+        set => SetField(ref _expandOperatorsBlock, value);
+    }
+    
     public bool AllowCommonResultsPage
     {
         get => _allowCommonResultsPage;
@@ -50,10 +57,10 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
         set => SetField(ref _allowProgramHeadersPage, value);
     }
 
-    public bool AllowProgramImportsPage
+    public bool AllowProgramSectionsPage
     {
-        get => _allowProgramImportsPage;
-        set => SetField(ref _allowProgramImportsPage, value);
+        get => _allowProgramSectionsPage;
+        set => SetField(ref _allowProgramSectionsPage, value);
     }
 
     public bool AllowSaveResultsButton
@@ -64,13 +71,19 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
 
     public MainWindowViewModel()
     {
+        // frame startup bindings
+        _frameContent = new AboutPage { DataContext = new AboutPageViewModel(/*Automatically calls Model builder*/) };
+        _pagesCollection.AboutPage = FrameContent;
+        // command bindings
         OpenFileCommand = new RelayCommand<string>(OpenFile!);
         ProgramHeadersPageCommand = new RelayCommand<string>(s => ShowPage(PagesCollection.ProgramHeadersPage));
         ProgramGeneralPageCommand = new RelayCommand<string>(s => ShowPage(PagesCollection.ProgramGeneralPage));
-        _frameContent = new Page();
+        OpenAboutPageCommand = new RelayCommand<string>(x => ShowPage(PagesCollection.AboutPage));
+        OpenSectionsTablePageCommand = new RelayCommand<string>(x => ShowPage(PagesCollection.ProgramSectionsPage));
+        // toggles startup bindings
         AllowProgramHeadersPage = 
-            AllowSaveResultsButton =
-                AllowProgramImportsPage = false;
+        AllowSaveResultsButton =
+        AllowProgramSectionsPage = false;
     }
 
     private FilledPages PagesCollection
@@ -82,11 +95,13 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
     public ICommand OpenFileCommand { get; }
     public ICommand ProgramHeadersPageCommand { get; set; }
     public ICommand ProgramGeneralPageCommand { get; set; }
-
+    public ICommand OpenAboutPageCommand { get; set; }
+    public ICommand OpenSectionsTablePageCommand { get; set; }
+    
     public Page FrameContent
     {
         get => _frameContent;
-        set => SetField(ref _frameContent, value);
+        private set => SetField(ref _frameContent, value);
     }
 
     private void CreateJavaAppletPage()
@@ -97,14 +112,14 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
         {
             ForgeModel forge = new();
             hMod.DeserializeLoaderManifest(ref forge);
-            McModificationProperties model = new(); 
-            model = McLoaderModelHandler.Normalize(forge);
+            McModificationProperties model = McLoaderModelHandler.Normalize(forge);
             model.Name = new FileInfo(_programPath!).Name;
             model.Path = _programPath;
             _pagesCollection.ProgramGeneralPage = new McModificationPage()
             {
                 DataContext = new McModificationPageViewModel(model, hMod.ReadManifest(), hMod.ReadLoaderManifest())
             };
+            FrameContent = PagesCollection.ProgramGeneralPage;
         }
         else
         {
@@ -129,7 +144,6 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
             DataContext = new CommonPropertiesPageViewModel(model)
         };
     }
-    
     private void CreateProgramHeadersPage()
     {
         _pagesCollection.ProgramHeadersPage = new ProgramHeadersPage
@@ -137,7 +151,15 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
             DataContext = new ProgramHeaderPageViewModel(new ProgramHeaderPageModel(_programPath!))
         };
     }
-    
+    private void CreateProgramSectionsHeaderPage()
+    {
+        SectionsPageModel model = new(_programPath!);
+        _pagesCollection.ProgramSectionsPage = new SectionsPage()
+        {
+            DataContext = new SectionsPageViewModel(model)
+        };
+        AllowProgramSectionsPage = true;
+    }
     private void ShowPage(Page page)
     {
         FrameContent = page;
@@ -153,13 +175,16 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
                      "New-Format Modules (*.o *.so)|*.so;*.o;*.aout;*.a.out;*.out|" + 
                      "All files|*.*",
             Title = "Select object file",
-            DefaultExt = "All files",
+            DefaultExt = "*.*",
             Multiselect = false,
         };
         try
         {
-            // fixme: Cancel result throws exception.
-            if (!ofd.ShowDialog().HasValue) return; // throws exception.
+            ofd.ShowDialog();
+            
+            if (!File.Exists(ofd.FileName))
+                return;
+            
             _programPath = ofd.FileName;
             AllowProgramHeadersPage = true;
             AllowSaveResultsButton = true;
@@ -173,7 +198,9 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
             // create page -> call page
             CreateProgramGeneralPage();
             CreateProgramHeadersPage();
+            CreateProgramSectionsHeaderPage();
             ShowPage(PagesCollection.ProgramGeneralPage);
+            ExpandOperatorsBlock = true;
         }
         catch (Exception e)
         {
