@@ -1,7 +1,9 @@
 ﻿using System.Runtime.InteropServices;
 using jellybins.Core.Attributes;
 using jellybins.Core.Headers;
+using jellybins.Core.Interfaces;
 using jellybins.Core.Models;
+using jellybins.Core.Readers.MarkZbykowski;
 using FileStream = System.IO.FileStream;
 
 namespace jellybins.Core.Readers.PortableExecutable;
@@ -10,21 +12,34 @@ namespace jellybins.Core.Readers.PortableExecutable;
 /// My first try to read imports table from
 /// Microsoft Object (Portable) files
 /// </summary>
-public class PortableExecutableSectionsReader
+public class PortableExecutableSectionsReader : ISectionsReader
 {
     private readonly string _path;
-    private Dictionary<string, string> _imports;
     private MarkZbikowski _dosHeader;
     private PortableExecutable32 _portableHeader32;
     private PortableExecutable64 _portableHeader64;
     private SectionsProperties[]? _sections;
     private PortableExecutableDataDirectory[]? _directories;
-    private int _sectionNumber;
-    private long _sectionsTableOffset;
+    
+    #region ISectionReader
+    public void ProcessImports()
+    {
+        throw new NotImplementedException();
+    }
 
-    public SectionsProperties[]? Sections => _sections;
+    public void ProcessRuntime()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void ProcessExports()
+    {
+        throw new NotImplementedException();
+    }
+    #endregion
+    
+    public SectionsProperties[] Sections => _sections!;
     public PortableExecutableDataDirectory[]? Directories => _directories;
-    public Dictionary<string, string> TranslatedImports => _imports;
     
     /// <summary>
     /// Calls <see cref="ReadAsync"/> to fill common
@@ -33,28 +48,18 @@ public class PortableExecutableSectionsReader
     /// <param name="path"></param>
     public PortableExecutableSectionsReader(string path)
     {
-        // bad idea to read file again and again but first time it ok.
-        // i hope, ill change it in the future.
         _path = path;
-        _imports = new Dictionary<string, string>();
+        _dosHeader = new MarkZbikowski();
+        _directories = _portableHeader32.WinNtOptional.Directories;
         ReadAsync();
     }
-
-    /// <summary>
-    /// Returns Dictionary of translated Imports table
-    /// </summary>
-    /// <returns></returns>
-    public void GetTranslatedImports()
-    {
-        
-    }
-
+    
     /// <summary>
     /// Reads information about SectionTable and saves it
     /// </summary>
     /// <returns></returns>
     [UnderConstruction("Attempts to implement")]
-    private Task ReadAsync()
+    private void ReadAsync()
     {
         string filePath = _path;
 
@@ -68,7 +73,7 @@ public class PortableExecutableSectionsReader
         if (dosHeader.e_sign != 0x5A4D)
         {
             Console.WriteLine("Неверный DOS заголовок");
-            return Task.CompletedTask;
+            return;
         }
 
         // move to PE00
@@ -79,10 +84,8 @@ public class PortableExecutableSectionsReader
         if (peSignature != 0x4550 && peSignature != 0x5045)
         {
             Console.WriteLine("Неверный PE заголовок");
-            return Task.CompletedTask;
+            return;
         }
-
-        long position = fs.Position;
         
         // IMAGE_FILE_HEADER
         PortableFileHeader fileHeader = ReadStruct<PortableFileHeader>(reader);
@@ -99,10 +102,8 @@ public class PortableExecutableSectionsReader
             reader.BaseStream.Seek(dosHeader.e_lfanew, SeekOrigin.Begin);
             _portableHeader32 = ReadStruct<PortableExecutable32>(reader);
         }
-            
-        _sectionsTableOffset = fs.Position;
-            
-        // IMAGE_SECTION_HEADER sections[16]
+        
+        // IMAGE_SECTION_HEADER sections[16?]
         var sections = new List<SectionsProperties>();
         
         for (int i = 0; i < fileHeader.NumberOfSections; i++)
@@ -130,8 +131,6 @@ public class PortableExecutableSectionsReader
         }
             
         _sections = sections.ToArray();
-
-        return Task.CompletedTask;
     }
 
     static T ReadStruct<T>(BinaryReader reader)
@@ -170,7 +169,7 @@ public class PortableExecutableSectionsReader
         uint offset = Convert.ToUInt32(
             _dosHeader.e_lfanew +
             _portableHeader64.WinNtMain.SizeOfOptionalHeader +
-            sizeof(UInt32) +
+            sizeof(uint) +
             Marshal.SizeOf<PortableExecutable32>()
         );
         return offset;

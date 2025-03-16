@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using jellybins.Core.Interfaces;
 using jellybins.Core.Models;
 using jellybins.Core.Readers.Factory;
 
@@ -54,10 +55,12 @@ public sealed class CommonPropertiesModel : INotifyPropertyChanged
     
     private Task BuildModelAsync()
     {
-        CommonProperties model = 
-            new ReaderFactory(ImagePath)
-                .CreateReader()
-                .GetProperties();
+        var readerFactory = new ReaderFactory(ImagePath);
+        CommonProperties model = readerFactory
+            .CreateReader()
+            .GetProperties();
+        
+        ImageBoxedSign = readerFactory.SignatureWord.ToString();
         OperatingSystemString = model.OperatingSystem;
         OperatingSystemVersionString = model.OperatingSystemVersion;
         CpuArchitectureString = model.CpuArchitecture;
@@ -78,6 +81,8 @@ public sealed class CommonPropertiesModel : INotifyPropertyChanged
         
         return Task.CompletedTask;
     }
+
+    private string? _imageBoxedSign;
     private string? _imageName;
     private string? _imagePath;
     private string? _operatingSystemString;
@@ -94,7 +99,7 @@ public sealed class CommonPropertiesModel : INotifyPropertyChanged
     private string _refImageOperatingSystemVersionString = null!;
     private string _refImageOperatingSystemString = null!;
     public event PropertyChangedEventHandler? PropertyChanged;
-
+    
     public string ReferenceOperatingSystem 
         => _refImageOperatingSystemString;
     public string ReferenceCpuArchitecture => 
@@ -110,59 +115,64 @@ public sealed class CommonPropertiesModel : INotifyPropertyChanged
         get => _imageRuntime;
         set => SetField(ref _imageRuntime, value);
     }
-    
+
+    public string? ImageBoxedSign
+    {
+        get => _imageBoxedSign;
+        private set => SetField(ref _imageBoxedSign, value);
+    }
     public string OperatingSystemString
     {
         get => _operatingSystemString;
-        set => SetField(ref _operatingSystemString, value);
+        private set => SetField(ref _operatingSystemString, value);
     }
 
     public string OperatingSystemVersionString
     {
         get => _operatingSystemVersionString;
-        set => SetField(ref _operatingSystemVersionString, value);
+        private set => SetField(ref _operatingSystemVersionString, value);
     }
 
     public string CpuArchitectureString
     {
         get => _cpuArchitectureString;
-        set => SetField(ref _cpuArchitectureString, value);
+        private set => SetField(ref _cpuArchitectureString, value);
     }
 
     public string CpuWordLengthString
     {
         get => _cpuWordLengthString;
-        set => SetField(ref _cpuWordLengthString, value);
+        private set => SetField(ref _cpuWordLengthString, value);
     }
 
     public string ImageTypeString
     {
         get => _imageTypeString;
-        set => SetField(ref _imageTypeString, value);
+        private set => SetField(ref _imageTypeString, value);
     }
 
     public string ImageSubsystemString
     {
         get => _imageSubsystemString;
-        set => SetField(ref _imageSubsystemString, value);
+        private set => SetField(ref _imageSubsystemString, value);
     }
 
     public string ImageVersionString
     {
         get => _imageVersionString;
-        set => SetField(ref _imageVersionString, value);
+        private set => SetField(ref _imageVersionString, value);
     }
 
     public string ImageName
     {
         get => _imageName;
-        set => SetField(ref _imageName, value);
+        private set => SetField(ref _imageName, value);
     }
 
     public string ImagePath
     {
         get => _imagePath;
-        set => SetField(ref _imagePath, value);
+        private set => SetField(ref _imagePath, value);
     }
     
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)

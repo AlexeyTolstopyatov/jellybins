@@ -22,7 +22,7 @@
                     <!--JellyBins Page Header-->
                     <TextBlock
                         Grid.Row="0"
-                        Text="SECTIONS TABLE"
+                        Text="PROGRAM SECTIONS TABLE"
                         FontSize="31"/>
                     <TextBlock
                         Grid.Row="1"
@@ -80,7 +80,7 @@
                                                                 <LineBreak/>
                                                                 <Run Text="Number of Relocations"/>
                                                                 <LineBreak/>
-                                                                <Run Text="Number of Line numbers"/>
+                                                                <Run Text="Number of line numbers"/>
                                                             </TextBlock>
                                                             
                                                         </StackPanel>

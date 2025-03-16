@@ -19,6 +19,8 @@ public partial class ReaderFactory
     private ushort _signatureWord;
     private ulong  _signatureQWord;
     private readonly string _fileName;
+    public ushort SignatureWord => _signatureWord;
+    public ulong SignatureQWord => _signatureQWord;
     /// <summary>
     /// Prepares instance to next work
     /// </summary>

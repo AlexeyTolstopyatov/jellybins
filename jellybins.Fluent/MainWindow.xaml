@@ -40,7 +40,7 @@
                         </StackPanel>
                     </ui:Card.Content>
                 </ui:Card>
-                <!--| Menu->Save |-->
+                <!--| Menu->Module |-->
                 <ui:CardExpander
                     Header="Module"
                     IsExpanded="{Binding ExpandOperatorsBlock}">
@@ -70,7 +70,6 @@
                                             <Run Text="Get Hexadecimal table of file's header"/>
                                             <LineBreak/>
                                         </TextBlock>
-                                        <!--| ICommand = reason |-->
                                         <ui:Button
                                             Content="Headers"
                                             Icon="{ui:SymbolIcon Settings16}"
@@ -91,7 +90,8 @@
                                     <ui:Button 
                                         IsEnabled="{Binding AllowProgramSectionsPage}"
                                         Command="{Binding OpenSectionsTablePageCommand}"
-                                        Content="Sections"/>
+                                        Content="Sections"
+                                        Icon="{ui:SymbolIcon WindowApps16}"/>
                                 </StackPanel>
                             </ui:Card>
                         </StackPanel>

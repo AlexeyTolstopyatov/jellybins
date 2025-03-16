@@ -143,6 +143,7 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
         {
             DataContext = new CommonPropertiesPageViewModel(model)
         };
+        CreateProgramSectionsHeaderPage(model.ImageBoxedSign!);
     }
     private void CreateProgramHeadersPage()
     {
@@ -151,9 +152,9 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
             DataContext = new ProgramHeaderPageViewModel(new ProgramHeaderPageModel(_programPath!))
         };
     }
-    private void CreateProgramSectionsHeaderPage()
+    private void CreateProgramSectionsHeaderPage(string sign)
     {
-        SectionsPageModel model = new(_programPath!);
+        SectionsPageModel model = new(_programPath!, ushort.Parse(sign));
         _pagesCollection.ProgramSectionsPage = new SectionsPage()
         {
             DataContext = new SectionsPageViewModel(model)
@@ -198,7 +199,6 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
             // create page -> call page
             CreateProgramGeneralPage();
             CreateProgramHeadersPage();
-            CreateProgramSectionsHeaderPage();
             ShowPage(PagesCollection.ProgramGeneralPage);
             ExpandOperatorsBlock = true;
         }

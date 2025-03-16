@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace jellybins.Core.Headers
+namespace jellybins.Core.Readers.MarkZbykowski
 {
     [Serializable]
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 1)]
