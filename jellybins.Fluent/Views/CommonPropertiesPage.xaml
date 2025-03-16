@@ -43,8 +43,6 @@
                                         Text="{Binding OperatingSystemVersionString}"/>
                                     <TextBlock
                                         Text="{Binding CpuArchitectureString}"/>
-                                    <TextBlock
-                                        Text="{Binding SpecialRuntimeWord}"/>
                                 </StackPanel>
                                 <StackPanel Grid.Column="1">
                                     <TextBlock

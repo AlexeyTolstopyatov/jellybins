@@ -1,7 +1,7 @@
 ﻿using jellybins.Core.Exceptions;
-using jellybins.Core.Headers;
 using jellybins.Core.Interfaces;
 using jellybins.Core.Readers.AssemblerOutput;
+using jellybins.Core.Readers.COM;
 using jellybins.Core.Readers.LinearExecutable;
 using jellybins.Core.Readers.MarkZbykowski;
 using jellybins.Core.Readers.NewExecutable;
@@ -88,10 +88,12 @@ public partial class ReaderFactory
                         return new PortableExecutableReader(pe64, _fileName);
                     }
                     default:
+                    {
                         return new MarkZbykowskiExecutableReader(mz, _signatureWord);
+                    }
                 }
             // seek for Unix binaries
-            case 
+            case
                 0x103 or 0x301 or 
                 0x107 or 0x701 or
                 0x109 or 0x901 or 
@@ -102,12 +104,16 @@ public partial class ReaderFactory
                 reader.Fill(ref unix);
                 return new AssemblerOutExecutableReader(unix);
             default:
-                InternalDebugger.PrintInformation("seeking segment resize: WORD -> QWORD");
                 _signatureWord = firstWord;
                 break;
         }
         
+        // what if MS-DOS 1.x files?
+        if (IsComFile(_fileName))
+            return new DosCommandReader(_fileName);
+        
         ulong lastWord = reader.GetUInt64(0);
+        InternalDebugger.PrintInformation("seeking segment resize: WORD -> Q-WORD");
         _signatureWord = 0;                 // make analyser flag
         if ((lastWord & 0x464c457f) != 0)   // non-strong comparison
         {
@@ -115,5 +121,16 @@ public partial class ReaderFactory
             _signatureQWord = lastWord;
         }
         throw new ImageTypeException(_signatureQWord);
+    }
+    /// <summary>
+    /// Checks file's size. DOS .COM files less than 64K
+    /// </summary>
+    /// <param name="filePath"></param>
+    /// <returns></returns>
+    private bool IsComFile(string filePath)
+    {
+        var fileInfo = new FileInfo(filePath);
+        return fileInfo.Length <= 64 * 1024 || 
+               string.Equals(fileInfo.Extension, ".com", StringComparison.OrdinalIgnoreCase); // 64 КБ
     }
 }
