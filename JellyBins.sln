@@ -1,0 +1,56 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{27698092-EE73-4E22-8694-045CE004A708}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{DFF835DB-F1D9-456C-81AB-1FD2DFB90F64}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JellyBins.PortableExecutable", "JellyBins.PortableExecutable\JellyBins.PortableExecutable.csproj", "{0E02D7D6-E3AC-4199-AF71-27E08BCFA777}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JellyBins.HeadersTest", "JellyBins.HeadersTest\JellyBins.HeadersTest.csproj", "{8AC97B55-D621-47C0-B3D6-4E18E4C1274D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JellyBins.DosCommand", "JellyBins.DosCommand\JellyBins.DosCommand.csproj", "{0CEEAC75-31B0-4B2F-A92E-3799884FC7CF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JellyBins.Core", "JellyBins.Core\JellyBins.Core.csproj", "{F71C67A4-2A4E-4162-B4EB-23FC8ED57D2B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JellyBins.NewExecutable", "JellyBins.NewExecutable\JellyBins.NewExecutable.csproj", "{31F4A38C-802B-4D03-A444-983302AD1D08}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JellyBins.Abstractions", "JellyBins.Abstractions\JellyBins.Abstractions.csproj", "{7EFC4CC8-02A4-4EF9-81E1-32322F870F8D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0E02D7D6-E3AC-4199-AF71-27E08BCFA777} = {27698092-EE73-4E22-8694-045CE004A708}
+		{8AC97B55-D621-47C0-B3D6-4E18E4C1274D} = {DFF835DB-F1D9-456C-81AB-1FD2DFB90F64}
+		{0CEEAC75-31B0-4B2F-A92E-3799884FC7CF} = {27698092-EE73-4E22-8694-045CE004A708}
+		{F71C67A4-2A4E-4162-B4EB-23FC8ED57D2B} = {27698092-EE73-4E22-8694-045CE004A708}
+		{31F4A38C-802B-4D03-A444-983302AD1D08} = {27698092-EE73-4E22-8694-045CE004A708}
+		{7EFC4CC8-02A4-4EF9-81E1-32322F870F8D} = {27698092-EE73-4E22-8694-045CE004A708}
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8AC97B55-D621-47C0-B3D6-4E18E4C1274D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8AC97B55-D621-47C0-B3D6-4E18E4C1274D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8AC97B55-D621-47C0-B3D6-4E18E4C1274D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8AC97B55-D621-47C0-B3D6-4E18E4C1274D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0CEEAC75-31B0-4B2F-A92E-3799884FC7CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0CEEAC75-31B0-4B2F-A92E-3799884FC7CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0CEEAC75-31B0-4B2F-A92E-3799884FC7CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0CEEAC75-31B0-4B2F-A92E-3799884FC7CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F71C67A4-2A4E-4162-B4EB-23FC8ED57D2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F71C67A4-2A4E-4162-B4EB-23FC8ED57D2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F71C67A4-2A4E-4162-B4EB-23FC8ED57D2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F71C67A4-2A4E-4162-B4EB-23FC8ED57D2B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E02D7D6-E3AC-4199-AF71-27E08BCFA777}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E02D7D6-E3AC-4199-AF71-27E08BCFA777}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{31F4A38C-802B-4D03-A444-983302AD1D08}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{31F4A38C-802B-4D03-A444-983302AD1D08}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{31F4A38C-802B-4D03-A444-983302AD1D08}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{31F4A38C-802B-4D03-A444-983302AD1D08}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7EFC4CC8-02A4-4EF9-81E1-32322F870F8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7EFC4CC8-02A4-4EF9-81E1-32322F870F8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7EFC4CC8-02A4-4EF9-81E1-32322F870F8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7EFC4CC8-02A4-4EF9-81E1-32322F870F8D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
