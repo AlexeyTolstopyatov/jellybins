@@ -2,14 +2,30 @@
 
 namespace JellyBins.DosCommand.Models;
 
-public class ComReportMaker : IReportMaker
+public class ComFileDumper : IFileDumper
 {
+    public ComFileDumper(String path)
+    {
+        Path = path;
+        Name = new FileInfo(path).Name;
+        _extensionTypeId = 0;
+        _binaryTypeId = 0;
+    }
+    
     public ComReport? Report { get; private set; }
-
-    public Task MakeAsync(String fullName)
+    public String Name { get; init; }
+    public String Path { get; init; }
+    private UInt16 _extensionTypeId;
+    private UInt16 _binaryTypeId;
+    /// <summary>
+    /// Automatically (from constructor) makes structure
+    /// with file characteristics and information about.
+    /// </summary>
+    /// <returns></returns>
+    public Task DumpAsync()
     {
         ComReport instance = new();
-        Byte[] bytes = File.ReadAllBytes(fullName);
+        Byte[] bytes = File.ReadAllBytes(Path);
         
         instance.Flags =
         [
@@ -30,12 +46,12 @@ public class ComReportMaker : IReportMaker
         
         instance.Data = new ComData()
         {
+            Path = Path,
+            Name = Name,
             CpuArchitecture = arch,
             CpuWordLength = 16,
-            Name = new FileInfo(fullName).Name,
             OperatingSystem = os,
             OperatingSystemVersion = "1.0",
-            Path = fullName,
         };
 
         UInt32 addr = FindDataAddress(bytes);
@@ -51,7 +67,17 @@ public class ComReportMaker : IReportMaker
         Report = instance;
         return Task.CompletedTask;
     }
-    
+
+    public UInt16 GetExtensionTypeId()
+    {
+        return _extensionTypeId;
+    }
+
+    public UInt16 GetBinaryTypeId()
+    {
+        return _binaryTypeId;
+    }
+
     private static Boolean FindCPmSyscall(Byte[] bytes)
     {
         Int32 i = 0;

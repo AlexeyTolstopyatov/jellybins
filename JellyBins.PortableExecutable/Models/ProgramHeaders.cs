@@ -27,7 +27,7 @@ public class ProgramHeaders
     public Boolean ImportsFound { get; private set; }
     public Boolean RuntimeFound { get; private set; }
     public Boolean Is64Bit { get; private set; }
-    public Boolean IsWin32Null { get; private set; }
+    public Boolean IsWin32Zero { get; private set; }
     public Boolean IsRomImage { get; private set; }
 
     public ProgramHeaders(String path)

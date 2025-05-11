@@ -1,6 +1,6 @@
 ﻿namespace JellyBins.Core.Factories;
 
-public class FileReaderFactory
+public static class FileReaderFactory
 {
     
 }
