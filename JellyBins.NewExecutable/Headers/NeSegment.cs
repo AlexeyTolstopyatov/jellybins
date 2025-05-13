@@ -3,7 +3,7 @@
 namespace JellyBins.NewExecutable.Headers;
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct NeSegmentsHeader
+public struct NeSegment
 {
     [MarshalAs(UnmanagedType.U4)]
     public UInt32 LocalSectorOffset;

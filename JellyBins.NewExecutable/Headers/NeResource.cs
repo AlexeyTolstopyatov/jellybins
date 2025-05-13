@@ -3,7 +3,7 @@
 namespace JellyBins.NewExecutable.Headers;
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct NeResourceHeader
+public struct NeResource
 {
     public UInt32 ShiftsCount;
     [MarshalAs(UnmanagedType.Struct)]

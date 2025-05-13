@@ -3,8 +3,7 @@
 namespace JellyBins.NewExecutable.Headers;
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct NeImportsHeader
+public struct NeModuleReference
 {
-    public UInt16 NameLength;
-    [MarshalAs(UnmanagedType.LPStr)] public String Name;
+    public UInt32 ImportOffset;
 }

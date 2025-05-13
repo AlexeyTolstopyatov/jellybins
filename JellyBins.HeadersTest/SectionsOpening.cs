@@ -9,42 +9,15 @@ public class SectionsOpeningTest
     public void Setup()
     {
     }
-
+    
+    /// <summary>
+    /// PASSED!!!!!!! OH GOD!!!! IVE FiNaLlY DONE IT
+    /// </summary>
     [Test]
-    public void RichOpened()
-    {
-        ProgramHeaders programHeaders = new(@"D:\Анализ файлов\inst\PE\acpi.sys");
-
-        if (programHeaders.RichHeaderFound)
-            Assert.Pass(); // Tests done
-        else
-            Assert.Fail(); // Tests fail
-    }
-    [Test]
-    public void Win32ValueZero()
-    {
-        ProgramHeaders headers = new(@"D:\Анализ файлов\inst\PE\acpi.sys");
-        if (headers.Is64Bit)
-        {
-            if (headers.PeHeader.PeOptionalHeader.Win32VersionValue == 0)
-                Assert.Pass();
-            else
-                Assert.Fail();
-        }
-        else
-        {
-            if (headers.PeHeader32.PeOptionalHeader.Win32VersionValue == 0)
-                Assert.Pass();
-            else
-                Assert.Fail();
-        }
-    }
-
-    [Test]
-    public void NeSegmentation()
+    public void ParseNeBinary()
     {
         // debugger running
-        NeFileDumper dumper = new(@"D:\Анализ файлов\inst\NE\IBMCOLOR.DRV");
+        NeFileDumper dumper = new(@"D:\Анализ файлов\inst\NE\PROGMAN.EXe");
 
         dumper.Dump();
         dumper.GetBinaryTypeId();

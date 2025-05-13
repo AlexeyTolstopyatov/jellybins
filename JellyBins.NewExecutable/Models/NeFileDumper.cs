@@ -2,6 +2,8 @@
 using System.Security.Cryptography.X509Certificates;
 using JellyBins.Abstractions;
 using JellyBins.NewExecutable.Headers;
+using JellyBins.NewExecutable.Private;
+using JellyBins.NewExecutable.Private.Types;
 
 namespace JellyBins.NewExecutable.Models;
 
@@ -9,8 +11,9 @@ public class NeFileDumper : IFileDumper
 { 
     public NeInfo? Info { get; private set; }
     public BaseDump<MzHeader> MzHeaderDump { get; private set; }
-    public BaseDump<NeHeader> NeHeaderDump { get; private set; }
-    public BaseDump<NeSegmentInfo>[] SegmentsTableDump { get; private set; }
+    public NeDump NeHeaderDump { get; private set; }
+    public NeSegmentDump[] SegmentsTableDump { get; private set; }
+    public NeImportDump[] ImportsTableDump { get; private set; }
 
     private UInt16 _extensionTypeId;
     private UInt16 _binaryTypeId;
@@ -46,29 +49,81 @@ public class NeFileDumper : IFileDumper
         NeHeaderDump.Name = "NE Header (WinAPI: IMAGE_OS2_HEADER)";
         
         FindCharacteristics();
-
+        FindBinaryTypeId();
+        FindExtensionTypeId();
+        
         // NE binary segmentation construct
         Int64 segmentsOffset = (Int64)(NeHeaderDump.Address + NeHeaderDump.Segmentation.segtab);
 
         stream.Seek(segmentsOffset, 0);
 
-        List<BaseDump<NeSegmentInfo>> segTable = [];
+        List<NeSegmentDump> segTable = [];
 
         for (Int32 i = 0; i < NeHeaderDump.Segmentation.cseg; i++)
         {
-            BaseDump<NeSegmentInfo> segment = new();
-            segment.Address = (UInt64)stream.Position;
-            segment.Segmentation = Fill<NeSegmentInfo>(reader);
+            NeSegmentDump segment = new()
+            {
+                Address = (UInt64)stream.Position,
+                Segmentation = Fill<NeSegmentInfo>(reader)
+            };
             segment.Size = SizeOf(segment.Segmentation);
+            segment.Name = segment.Segmentation.Type;
+
+            FindSegmentCharacteristics(ref segment);
             
             segTable.Add(segment);
         }
-
         SegmentsTableDump = segTable.ToArray();
+
         
+        List<NeImportDump> imports = [];
+        UInt16[] modOffsets = new UInt16[NeHeaderDump.Segmentation.cmod];
         
+        stream.Seek((Int64)(NeHeaderDump.Address + NeHeaderDump.Segmentation.modtab), SeekOrigin.Begin);
+        
+        for (Int32 i = 0; i < NeHeaderDump.Segmentation.cmod; i++)
+        {
+            modOffsets[i] = reader.ReadUInt16();
+        }
+        foreach (UInt16 offset in modOffsets)
+        {
+            stream.Seek((Int64)(NeHeaderDump.Address + NeHeaderDump.Segmentation.imptab + offset), SeekOrigin.Begin);
+            Byte nameLength = reader.ReadByte();
+            String moduleName = new(reader.ReadChars(nameLength));
+
+            NeImportDump module = new()
+            {
+                Segmentation = new NeImport()
+                {
+                    Name = moduleName,
+                    NameLength = nameLength
+                },
+                Address = (UInt64)stream.Position,
+                Name = moduleName,
+                Characteristics = ["IMAGE_IMPORTED_MOD"]
+            };
+            
+            imports.Add(module);
+
+        }
+
+        ImportsTableDump = imports.ToArray();
+        reader.Close();
     }
 
+    private void FindSegmentCharacteristics(ref NeSegmentDump segment)
+    {
+        List<String> chars = [];
+        
+        if ((segment.Segmentation.Flags & (UInt16)NeSegmentType.WithinRelocations) != 0) chars.Add("SEG_WITHIN_RELOCS");
+        if ((segment.Segmentation.Flags & (UInt16)NeSegmentType.Mask) != 0) chars.Add("SEG_HASMASK");
+        if ((segment.Segmentation.Flags & (UInt16)NeSegmentType.DiscardPriority) != 0) chars.Add("SEG_DISCARDABLE");
+        if ((segment.Segmentation.Flags & (UInt16)NeSegmentType.Movable) != 0) chars.Add("SEG_MOVABLE_BASE");
+        if ((segment.Segmentation.Flags & (UInt16)NeSegmentType.Data) != 0) chars.Add("SEG_DATA");
+        if ((segment.Segmentation.Flags & (UInt16)NeSegmentType.Code) != 0) chars.Add("SEG_CODE");
+
+        segment.Characteristics = chars.ToArray();
+    }
     private void FindCharacteristics()
     {
         List<String> chars = [];
@@ -95,6 +150,25 @@ public class NeFileDumper : IFileDumper
         if ((NeHeaderDump.Segmentation.flagsothers & 0x10) != 0) chars.Add("OS2_2X_PROTECTED_MODE");
         
         NeHeaderDump.Characteristics = chars.ToArray();
+    }
+
+    private void FindBinaryTypeId()
+    {
+        if (NeHeaderDump.Segmentation.cseg == 0)
+            _binaryTypeId = (UInt16)FileType.DynamicLibrary;
+
+        _binaryTypeId = (UInt16)FileType.Application;
+    }
+
+    private void FindExtensionTypeId()
+    {
+        String ext = Path.GetExtension(Info!.Path!);
+        if (String.Equals(ext, "dll", StringComparison.OrdinalIgnoreCase))
+            _extensionTypeId = (UInt16)FileType.DynamicLibrary;
+        else if (String.Equals(ext, ".exe", StringComparison.OrdinalIgnoreCase))
+            _extensionTypeId = (UInt16)FileType.Application;
+        else if (String.Equals(ext, ".drv", StringComparison.OrdinalIgnoreCase))
+            _extensionTypeId = (UInt16)FileType.Driver;
     }
     
     private TStruct Fill<TStruct>(BinaryReader reader) where TStruct : struct
