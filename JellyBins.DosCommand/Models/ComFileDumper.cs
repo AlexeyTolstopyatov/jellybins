@@ -5,12 +5,13 @@ namespace JellyBins.DosCommand.Models;
 public class ComFileDumper(String path) : IFileDumper
 {
     public ComFileInfo Info { get; private set; } = new();
-    public ComDump? Dump { get; private set; } = new();
     private String Name { get; } = new FileInfo(path).Name;
     private String Path { get; } = path;
+
+    public ComSectionDump[]? Sections { get; private set; }
     
-    private UInt16 _extensionTypeId = 0;
-    private UInt16 _binaryTypeId = 0;
+    private UInt16 _extensionTypeId = (UInt16)FileType.Application;
+    private UInt16 _binaryTypeId = (UInt16)FileType.Application;
     
     /// <summary>
     /// Automatically (from constructor) makes structure
@@ -50,18 +51,42 @@ public class ComFileDumper(String path) : IFileDumper
         };
 
         UInt32 addr = FindDataAddress(bytes);
-        
-        dump.Sections =
+
+        Sections =
         [
-            new ComSection {Address = 0, Size = 0x0FF, Name = ".psp"},
-            new ComSection {Address = 0x100, Size = (addr - 0x100), Name = ".text"},
-            new ComSection {Address = addr, Size = ((UInt32)bytes.Length - addr), Name = ".data"},
-            // new ComSection {Address = (UInt32)bytes.Length, Size = 0, Name = ".overlay"}
+            new ComSectionDump()
+            {
+                Name = "COM Section",
+                Address = 0,
+                Characteristics = ["SEC_PSP", "SEC_RESERVED"],
+                Segmentation = new ComSection()
+                {
+                    Address = 0, Size = 0x0FF, Name = ".psp"
+                }
+            },
+            new ComSectionDump()
+            {
+                Name = "COM Section",
+                Address = 0x100,
+                Characteristics = ["SEC_TEXT"],
+                Segmentation = new ComSection()
+                {
+                    Address = 0x100, Size = (addr - 0x100), Name = ".text"
+                }
+            },
+            new ComSectionDump()
+            {
+                Name = "COM Section",
+                Address = addr - 0x100,
+                Characteristics = ["SEC_DATA"],
+                Segmentation = new ComSection()
+                {
+                    Address = addr, Size = ((UInt32)bytes.Length - addr), Name = ".data"
+                }
+            }
         ];
         
-        Dump = dump;
         Info = info;
-        return Task.CompletedTask;
     }
 
     public UInt16 GetExtensionTypeId()

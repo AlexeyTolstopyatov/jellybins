@@ -1,5 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using JellyBins.Abstractions;
 using JellyBins.NewExecutable.Headers;
 using JellyBins.NewExecutable.Private;
@@ -14,6 +15,8 @@ public class NeFileDumper : IFileDumper
     public NeDump NeHeaderDump { get; private set; }
     public NeSegmentDump[] SegmentsTableDump { get; private set; }
     public NeImportDump[] ImportsTableDump { get; private set; }
+    
+    public NeEntryDump[] EntriesDump { get; private set; }
 
     private UInt16 _extensionTypeId;
     private UInt16 _binaryTypeId;
@@ -106,11 +109,81 @@ public class NeFileDumper : IFileDumper
             imports.Add(module);
 
         }
-
+        
         ImportsTableDump = imports.ToArray();
+        
+        stream.Seek((Int64)(NeHeaderDump.Address + NeHeaderDump.Segmentation.enttab), SeekOrigin.Begin);
+        // FIXME: raw bytes instead ASCII FFI
+        // FindBinaryEntries(reader);
+        
         reader.Close();
     }
 
+    private void FindBinaryEntries(BinaryReader reader)
+    {
+        List<NeEntryDump> entries = [];
+
+        Int32 entByte = 0;
+        while (entByte < NeHeaderDump.Segmentation.cbenttab)
+        {
+            Byte bundleType = reader.ReadByte();
+            if (bundleType == 0) 
+                break; // Then -> EntryTable ends
+
+            Byte entriesCount = reader.ReadByte();
+            for (Int32 i = 0; i < entriesCount; i++)
+            {
+                UInt64 ordPosition = (UInt64)reader.BaseStream.Position;
+                UInt16 ordinal = reader.ReadUInt16();
+                // reader.BaseStream.Seek(importedNamesOffset + functionOffset, SeekOrigin.Begin);
+                // byte nameLength = br.ReadByte();
+                // return Encoding.ASCII.GetString(br.ReadBytes(nameLength));
+                if ((ordinal & 0x80) != 0)
+                {
+                    NeEntryDump entryDump = new()
+                    {
+                        Segmentation = new NeEntry()
+                        {
+                            IsByOrdinal = true,
+                            Ordinal = ordinal
+                        },
+                        Address = ordPosition,
+                        Name = "NE Entry",
+                        Size = 0,
+                        Characteristics = ["ENTTAB_ORDINAL"]
+                    };
+
+                    entries.Add(entryDump);
+                }
+                else
+                {
+                    UInt64 funPosition = (UInt64)reader.BaseStream.Position;
+                    Byte nameLength = reader.ReadByte();
+                    String name = Encoding.ASCII.GetString(reader.ReadBytes(nameLength));
+
+                    NeEntryDump entryDump = new()
+                    {
+                        Segmentation = new NeEntry
+                        {
+                            IsByOrdinal = false,
+                            Ordinal = ordinal,
+                            Name = name,
+                        },
+                        Address = funPosition,
+                        Name = "NE Entry",
+                        Size = 0,
+                        Characteristics = ["ENTTAB_FUNCTION"]
+                    };
+
+                    entries.Add(entryDump);
+                }
+            }
+            
+        }
+
+        EntriesDump = entries.ToArray();
+    }
+    
     private void FindSegmentCharacteristics(ref NeSegmentDump segment)
     {
         List<String> chars = [];

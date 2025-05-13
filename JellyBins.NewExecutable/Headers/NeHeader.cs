@@ -10,7 +10,7 @@ public struct NeHeader
     [MarshalAs(UnmanagedType.U1)] public Byte ver = 0; // "Номер версии"
     [MarshalAs(UnmanagedType.U1)] public Byte rev = 0; // "Номер ревизии"
     [MarshalAs(UnmanagedType.U2)] public UInt16 enttab = 0; // "Смещение таблицы входа"
-    [MarshalAs(UnmanagedType.U2)] public UInt16 cbenttab = 0; // "Количество байт в таблице входа"
+    [MarshalAs(UnmanagedType.U2)] public UInt16 cbenttab = 0; // "Количество байт в таблице сущностей"
     [MarshalAs(UnmanagedType.U4)] public UInt32 crc = 0; // "Контрольная сумма всего файла"
     [MarshalAs(UnmanagedType.U1)] public Byte pflags = 0; // Тип программы. (архитектура, требования к загрузчику)
     [MarshalAs(UnmanagedType.U1)] public Byte aflags = 0; // Тип приложения. (приложение/драйвер/библиотека)
