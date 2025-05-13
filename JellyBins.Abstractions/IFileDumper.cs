@@ -2,7 +2,7 @@
 
 public interface IFileDumper
 {
-    Task DumpAsync();
+    void Dump();
     UInt16 GetExtensionTypeId();
     UInt16 GetBinaryTypeId();
 }

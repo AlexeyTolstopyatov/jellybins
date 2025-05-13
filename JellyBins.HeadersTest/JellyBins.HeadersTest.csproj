@@ -23,6 +23,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\JellyBins.NewExecutable\JellyBins.NewExecutable.csproj" />
       <ProjectReference Include="..\JellyBins.PortableExecutable\JellyBins.PortableExecutable.csproj" />
     </ItemGroup>
 

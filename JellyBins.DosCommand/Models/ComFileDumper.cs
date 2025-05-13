@@ -2,32 +2,27 @@
 
 namespace JellyBins.DosCommand.Models;
 
-public class ComFileDumper : IFileDumper
+public class ComFileDumper(String path) : IFileDumper
 {
-    public ComFileDumper(String path)
-    {
-        Path = path;
-        Name = new FileInfo(path).Name;
-        _extensionTypeId = 0;
-        _binaryTypeId = 0;
-    }
+    public ComFileInfo Info { get; private set; } = new();
+    public ComDump? Dump { get; private set; } = new();
+    private String Name { get; } = new FileInfo(path).Name;
+    private String Path { get; } = path;
     
-    public ComReport? Report { get; private set; }
-    public String Name { get; init; }
-    public String Path { get; init; }
-    private UInt16 _extensionTypeId;
-    private UInt16 _binaryTypeId;
+    private UInt16 _extensionTypeId = 0;
+    private UInt16 _binaryTypeId = 0;
+    
     /// <summary>
     /// Automatically (from constructor) makes structure
     /// with file characteristics and information about.
     /// </summary>
     /// <returns></returns>
-    public Task DumpAsync()
+    public void Dump()
     {
-        ComReport instance = new();
+        ComDump dump = new();
         Byte[] bytes = File.ReadAllBytes(Path);
         
-        instance.Flags =
+        dump.Characteristics =
         [
             "image_file_no_sections".ToUpper(),
             "image_mem_tiny".ToUpper(),
@@ -44,7 +39,7 @@ public class ComFileDumper : IFileDumper
             arch = "I8080";
         }
         
-        instance.Data = new ComData()
+        ComFileInfo info = new()
         {
             Path = Path,
             Name = Name,
@@ -56,15 +51,16 @@ public class ComFileDumper : IFileDumper
 
         UInt32 addr = FindDataAddress(bytes);
         
-        instance.Sections =
+        dump.Sections =
         [
             new ComSection {Address = 0, Size = 0x0FF, Name = ".psp"},
             new ComSection {Address = 0x100, Size = (addr - 0x100), Name = ".text"},
             new ComSection {Address = addr, Size = ((UInt32)bytes.Length - addr), Name = ".data"},
-            new ComSection {Address = (UInt32)bytes.Length, Size = 0, Name = ".overlay"}
+            // new ComSection {Address = (UInt32)bytes.Length, Size = 0, Name = ".overlay"}
         ];
         
-        Report = instance;
+        Dump = dump;
+        Info = info;
         return Task.CompletedTask;
     }
 

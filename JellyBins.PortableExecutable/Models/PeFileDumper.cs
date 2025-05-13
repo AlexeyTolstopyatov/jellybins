@@ -16,7 +16,7 @@ public class PeFileDumper : IFileDumper
         Path = path;
         Name = new FileInfo(path).Name;
     }
-    public Task DumpAsync()
+    public void Dump()
     {
         throw new NotImplementedException();
     }

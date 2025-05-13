@@ -1,4 +1,5 @@
 using JellyBins.PortableExecutable.Models;
+using JellyBins.NewExecutable.Models;
 
 namespace HeadersTest;
 
@@ -37,6 +38,18 @@ public class SectionsOpeningTest
             else
                 Assert.Fail();
         }
-        
     }
+
+    [Test]
+    public void NeSegmentation()
+    {
+        // debugger running
+        NeFileDumper dumper = new(@"D:\Анализ файлов\inst\NE\IBMCOLOR.DRV");
+
+        dumper.Dump();
+        dumper.GetBinaryTypeId();
+        dumper.GetExtensionTypeId();
+        Assert.Pass();
+    }
+    
 }
