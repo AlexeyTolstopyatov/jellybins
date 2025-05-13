@@ -102,8 +102,8 @@ public class NeFileDumper : IFileDumper
                     NameLength = nameLength
                 },
                 Address = (UInt64)stream.Position,
-                Name = moduleName,
-                Characteristics = ["IMAGE_IMPORTED_MOD"]
+                Name = "NE Import",
+                Characteristics = ["IMAGE_IMPORT_MODULE"]
             };
             
             imports.Add(module);
@@ -113,8 +113,9 @@ public class NeFileDumper : IFileDumper
         ImportsTableDump = imports.ToArray();
         
         stream.Seek((Int64)(NeHeaderDump.Address + NeHeaderDump.Segmentation.enttab), SeekOrigin.Begin);
+        
         // FIXME: raw bytes instead ASCII FFI
-        // FindBinaryEntries(reader);
+        FindBinaryEntries(reader);
         
         reader.Close();
     }
@@ -122,63 +123,73 @@ public class NeFileDumper : IFileDumper
     private void FindBinaryEntries(BinaryReader reader)
     {
         List<NeEntryDump> entries = [];
-
-        Int32 entByte = 0;
-        while (entByte < NeHeaderDump.Segmentation.cbenttab)
+        
+        Int64 modOffset = (Int64)(NeHeaderDump.Address + NeHeaderDump.Segmentation.modtab)!;
+        reader.BaseStream.Seek(modOffset, SeekOrigin.Begin);
+        
+        UInt16[] moduleOffsets = new UInt16[NeHeaderDump.Segmentation.cmod];
+        for (Int32 i = 0; i < moduleOffsets.Length; i++)
         {
-            Byte bundleType = reader.ReadByte();
-            if (bundleType == 0) 
-                break; // Then -> EntryTable ends
+            moduleOffsets[i] = reader.ReadUInt16();
+        }
 
-            Byte entriesCount = reader.ReadByte();
-            for (Int32 i = 0; i < entriesCount; i++)
+        // Обработка каждого модуля
+        foreach (UInt16 offset in moduleOffsets)
+        {
+            Int64 importOffset = (Int64)(NeHeaderDump.Address + NeHeaderDump.Segmentation.imptab + offset)!;
+            reader.BaseStream.Seek(importOffset, SeekOrigin.Begin);
+
+            Byte modNameLength = reader.ReadByte();
+            String modName = Encoding.ASCII.GetString(reader.ReadBytes(modNameLength));
+
+            NeEntryDump entryDump = new()
             {
-                UInt64 ordPosition = (UInt64)reader.BaseStream.Position;
-                UInt16 ordinal = reader.ReadUInt16();
-                // reader.BaseStream.Seek(importedNamesOffset + functionOffset, SeekOrigin.Begin);
-                // byte nameLength = br.ReadByte();
-                // return Encoding.ASCII.GetString(br.ReadBytes(nameLength));
-                if ((ordinal & 0x80) != 0)
-                {
-                    NeEntryDump entryDump = new()
-                    {
-                        Segmentation = new NeEntry()
-                        {
-                            IsByOrdinal = true,
-                            Ordinal = ordinal
-                        },
-                        Address = ordPosition,
-                        Name = "NE Entry",
-                        Size = 0,
-                        Characteristics = ["ENTTAB_ORDINAL"]
-                    };
+                Name = "NE Entry",
+                Address = (UInt64)reader.BaseStream.Position,
+                Size = 0,
+            };
+            
+            while (true)
+            {
+                if (reader.BaseStream.Position >= reader.BaseStream.Length)
+                    break;
 
-                    entries.Add(entryDump);
+                Byte funcDescriptor = reader.ReadByte();
+                if (funcDescriptor == 0)
+                    break;
+
+                Boolean isOrdinal = (funcDescriptor & 0x80) != 0;
+                if (isOrdinal)
+                {
+                    Byte lowByte = reader.ReadByte();
+                    UInt16 ordinal = (UInt16)((funcDescriptor & 0x7F) << 8 | lowByte);
+
+                    entryDump.Segmentation = new NeEntry()
+                    {
+                        ModuleName = modName,
+                        IsByOrdinal = true,
+                        Ordinal = ordinal,
+                    };
+                    entryDump.Characteristics = ["MOD_IMPORT_ORDINAL"];
                 }
                 else
                 {
-                    UInt64 funPosition = (UInt64)reader.BaseStream.Position;
-                    Byte nameLength = reader.ReadByte();
-                    String name = Encoding.ASCII.GetString(reader.ReadBytes(nameLength));
-
-                    NeEntryDump entryDump = new()
+                    Byte funcNameLength = funcDescriptor;
+                    String funcName = Encoding.ASCII.GetString(reader.ReadBytes(funcNameLength))
+                        .Replace("\t", "\\t")
+                        .Replace("\r", "\\r")
+                        .Replace("\n", "\\n");
+                    entryDump.Segmentation = new()
                     {
-                        Segmentation = new NeEntry
-                        {
-                            IsByOrdinal = false,
-                            Ordinal = ordinal,
-                            Name = name,
-                        },
-                        Address = funPosition,
-                        Name = "NE Entry",
-                        Size = 0,
-                        Characteristics = ["ENTTAB_FUNCTION"]
+                        IsByOrdinal = false,
+                        ModuleName = modName,
+                        Name = funcName,
                     };
-
-                    entries.Add(entryDump);
+                    entryDump.Characteristics = ["MOD_IMPORT_FUNCTION"];
                 }
             }
-            
+
+            entries.Add(entryDump);
         }
 
         EntriesDump = entries.ToArray();
