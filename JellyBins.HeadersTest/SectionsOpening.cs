@@ -28,7 +28,7 @@ public class SectionsOpeningTest
     [Test]
     public void ParseLxBinary()
     {
-        LeFileDumper dumper = new(@"D:\Анализ файлов\inst\LE\ecsshell.exe");
+        LeFileDumper dumper = new(@"D:\Анализ файлов\inst\LE\WPDSINIT.EXE");
         dumper.Dump();
         Assert.Pass();
     }
