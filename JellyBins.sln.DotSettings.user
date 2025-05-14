@@ -1,10 +1,15 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=00352d41_002Dff04_002D422d_002D9ae3_002D2155e3e62772/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="NeSegmentation #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=00352d41_002Dff04_002D422d_002D9ae3_002D2155e3e62772/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="NeSegmentation #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
-    &lt;TestId&gt;NUnit3x::8AC97B55-D621-47C0-B3D6-4E18E4C1274D::net8.0::HeadersTest.SectionsOpeningTest.NeSegmentation&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::8AC97B55-D621-47C0-B3D6-4E18E4C1274D::net8.0::HeadersTest.SectionsOpeningTest.ParseNeBinary&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=01c63868_002Da2b0_002D4a6e_002D9515_002Dffa3a34f5f94/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="NeSegmentation" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=01c63868_002Da2b0_002D4a6e_002D9515_002Dffa3a34f5f94/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="NeSegmentation" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::8AC97B55-D621-47C0-B3D6-4E18E4C1274D::net8.0::HeadersTest.SectionsOpeningTest.ParseNeBinary&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=5649c99f_002De599_002D4dea_002D9775_002D367c67a5fa91/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="ParseNeBinary" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;NUnit3x::8AC97B55-D621-47C0-B3D6-4E18E4C1274D::net8.0::HeadersTest.SectionsOpeningTest.ParseNeBinary&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;

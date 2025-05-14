@@ -1,10 +1,9 @@
 ﻿using System.Runtime.InteropServices;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Text.RegularExpressions;
 using JellyBins.Abstractions;
 using JellyBins.NewExecutable.Headers;
 using JellyBins.NewExecutable.Private;
-using JellyBins.NewExecutable.Private.Types;
 
 namespace JellyBins.NewExecutable.Models;
 
@@ -51,9 +50,9 @@ public class NeFileDumper : IFileDumper
         NeHeaderDump.Size = SizeOf(NeHeaderDump.Segmentation);
         NeHeaderDump.Name = "NE Header (WinAPI: IMAGE_OS2_HEADER)";
         
-        FindCharacteristics();
         FindBinaryTypeId();
         FindExtensionTypeId();
+        FindCharacteristics();
         
         // NE binary segmentation construct
         Int64 segmentsOffset = (Int64)(NeHeaderDump.Address + NeHeaderDump.Segmentation.segtab);
@@ -102,7 +101,7 @@ public class NeFileDumper : IFileDumper
                     NameLength = nameLength
                 },
                 Address = (UInt64)stream.Position,
-                Name = "NE Import",
+                Name = "NE Import (JellyBins: IMAGE_IMPORT_MODULE)",
                 Characteristics = ["IMAGE_IMPORT_MODULE"]
             };
             
@@ -144,9 +143,10 @@ public class NeFileDumper : IFileDumper
 
             NeEntryDump entryDump = new()
             {
-                Name = "NE Entry",
+                Name = "NE Entry (JellyBins: IMAGE_MODULE_ENTRIES)",
                 Address = (UInt64)reader.BaseStream.Position,
                 Size = 0,
+                Segmentation = new List<NeEntry>()
             };
             
             while (true)
@@ -164,27 +164,25 @@ public class NeFileDumper : IFileDumper
                     Byte lowByte = reader.ReadByte();
                     UInt16 ordinal = (UInt16)((funcDescriptor & 0x7F) << 8 | lowByte);
 
-                    entryDump.Segmentation = new NeEntry()
+                    entryDump.Segmentation!.Add(new NeEntry()
                     {
                         ModuleName = modName,
                         IsByOrdinal = true,
                         Ordinal = ordinal,
-                    };
+                    });
                     entryDump.Characteristics = ["MOD_IMPORT_ORDINAL"];
                 }
                 else
                 {
                     Byte funcNameLength = funcDescriptor;
-                    String funcName = Encoding.ASCII.GetString(reader.ReadBytes(funcNameLength))
-                        .Replace("\t", "\\t")
-                        .Replace("\r", "\\r")
-                        .Replace("\n", "\\n");
-                    entryDump.Segmentation = new()
+                    String funcName = Encoding.ASCII.GetString(reader.ReadBytes(funcNameLength));
+                    
+                    entryDump.Segmentation!.Add(new NeEntry
                     {
                         IsByOrdinal = false,
                         ModuleName = modName,
                         Name = funcName,
-                    };
+                    });
                     entryDump.Characteristics = ["MOD_IMPORT_FUNCTION"];
                 }
             }
@@ -208,14 +206,31 @@ public class NeFileDumper : IFileDumper
 
         segment.Characteristics = chars.ToArray();
     }
+    
     private void FindCharacteristics()
     {
         List<String> chars = [];
-        if ((NeHeaderDump.Segmentation.pflags & 0x4) != 0) chars.Add("PROGRAM_IA_8086");
-        if ((NeHeaderDump.Segmentation.pflags & 0x5) != 0) chars.Add("PROGRAM_IA_80286");
-        if ((NeHeaderDump.Segmentation.pflags & 0x6) != 0) chars.Add("PROGRAM_IA_80386");
-        if ((NeHeaderDump.Segmentation.pflags & 0x7) != 0) chars.Add("PROGRAM_IA_8087");
-        
+        if ((NeHeaderDump.Segmentation.pflags & 0x4) != 0)
+        {
+            chars.Add("PROGRAM_IA_8086");
+            Info!.CpuArchitecture = "Intel 8086";
+        }
+
+        if ((NeHeaderDump.Segmentation.pflags & 0x5) != 0)
+        {
+            chars.Add("PROGRAM_IA_80286");
+            Info!.CpuArchitecture = "Intel i286";
+        }
+        if ((NeHeaderDump.Segmentation.pflags & 0x6) != 0)
+        {
+            chars.Add("PROGRAM_IA_80386");
+            Info!.CpuArchitecture = "Intel i386";
+        }
+        if ((NeHeaderDump.Segmentation.pflags & 0x7) != 0)
+        {
+            chars.Add("PROGRAM_IA_8087");
+            Info!.CpuArchitecture = "Intel 8087";
+        }
         if ((NeHeaderDump.Segmentation.pflags & 0x01) != 0) chars.Add("PROGRAM_SINGLE_TASK");
         if ((NeHeaderDump.Segmentation.pflags & 0x02) != 0) chars.Add("PROGRAM_MULTI_TASK");
         if ((NeHeaderDump.Segmentation.pflags & 0x08) != 0) chars.Add("PROGRAM_PROTECTED_MODE");
@@ -234,6 +249,35 @@ public class NeFileDumper : IFileDumper
         if ((NeHeaderDump.Segmentation.flagsothers & 0x10) != 0) chars.Add("OS2_2X_PROTECTED_MODE");
         
         NeHeaderDump.Characteristics = chars.ToArray();
+
+        String osVersion = $"{NeHeaderDump.Segmentation.major}.{NeHeaderDump.Segmentation.minor}";
+        // String binVersion = $"{NeHeaderDump.Segmentation.ver}.{NeHeaderDump.Segmentation.rev}";
+        Info!.OperatingSystemVersion = osVersion;
+        Info.BinaryType = _binaryTypeId;
+        Info.ExtensionType = _extensionTypeId;
+        Info.OperatingSystem = NeHeaderDump.Segmentation.os switch
+        {
+            0x1 => "IBM OS/2",
+            0x2 => "Microsoft Windows/286",
+            0x3 => "Microsoft DOS",
+            0x4 => "Microsoft Windows/386",
+            0x5 => "Borland OSServices",
+            _ => "Microsoft Windows/286"
+        };
+        if (NeHeaderDump.Segmentation is { major: 0, minor: 0 })
+        {
+            // мае любимае гадание на гуще кафея
+            Info.OperatingSystemVersion = NeHeaderDump.Segmentation.os switch
+            {
+                0x1 => "1.1",
+                0x2 => "2.1",
+                0x3 => "4.0",
+                0x4 => "3.1",
+                0x5 => "5.0",
+                _ => "1.0"
+            };
+        }
+        
     }
 
     private void FindBinaryTypeId()

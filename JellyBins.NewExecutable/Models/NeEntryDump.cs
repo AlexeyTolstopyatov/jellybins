@@ -3,7 +3,7 @@ using JellyBins.NewExecutable.Headers;
 
 namespace JellyBins.NewExecutable.Models;
 
-public class NeEntryDump : BaseDump<NeEntry>
+public class NeEntryDump : BaseDump<List<NeEntry>>
 {
     
 }

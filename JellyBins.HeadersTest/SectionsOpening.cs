@@ -24,5 +24,9 @@ public class SectionsOpeningTest
         dumper.GetExtensionTypeId();
         Assert.Pass();
     }
-    
+    [Test]
+    public void ParseLxBinary()
+    {
+        
+    }
 }
