@@ -171,29 +171,69 @@ public class LeFileDumper(String path) : IFileDumper
         LeExportsDump.Address = (UInt64)reader.BaseStream.Position;
         LeExportsDump.Name = "LX Exports (JellyBins: IMAGE_EXPORT_ENTRIES)";
         
-        reader.BaseStream.Seek(Lva.Offset(LeHeaderDump.Segmentation.EntryTableOffset), SeekOrigin.Begin);
+        reader.BaseStream.Seek(LeHeaderDump.Segmentation.EntryTableOffset, SeekOrigin.Begin);
+
         Byte bundleType;
-        
         while ((bundleType = reader.ReadByte()) != 0)
         {
             Byte count = reader.ReadByte();
+        
             // Пример для 32-битных записей (тип 0x03)
-            // if bundleType & 0x03 != 0
-            for (Int32 i = 0; i < count; i++)
+            if ((bundleType & 0x01) != 0) // Проверка флага экспорта
             {
-                UInt16 ordinal = reader.ReadUInt16();
-                UInt32 offset = reader.ReadUInt32();
-                
-                exports.Add(new LeExportEntry
+                for (Int32 i = 0; i < count; i++)
                 {
-                    Name = ResidentTable.GetValueOrDefault(ordinal),
-                    Ordinal = ordinal,
-                    Offset = offset
-                });
+                    UInt16 ordinal = reader.ReadUInt16();
+                    Byte flags = reader.ReadByte();
+                    UInt32 offset = reader.ReadUInt32();
+                
+                    exports.Add(new LeExportEntry
+                    {
+                        Name = ResidentTable.TryGetValue(ordinal, out var name) ? name : $"Ordinal_{ordinal}",
+                        Ordinal = ordinal,
+                        Offset = offset
+                    });
+                }
+            }
+            if (bundleType == 0x03)
+            {
+                for (Int32 i = 0; i < count; i++)
+                {
+                    UInt16 ordinal = reader.ReadUInt16();
+                    Byte flags = reader.ReadByte(); // Флаги записи
+                    UInt32 offset = reader.ReadUInt32();
+
+                    // флаг экспорта
+                    if ((flags & 0x01) != 0)
+                    {
+                        exports.Add(new LeExportEntry
+                        {
+                            Name = ResidentTable.TryGetValue(ordinal, out String? name) ? name : $"Ordinal_{ordinal}",
+                            Ordinal = ordinal,
+                            Offset = offset
+                        });
+                    }
+                }
+            }
+            else
+            {
+                // Пропускаем другие типы записей (16-битные, callgate и т.д.)
+                reader.BaseStream.Seek(count * GetBundleEntrySize(bundleType), SeekOrigin.Current);
             }
         }
+
         LeExportsDump.Segmentation = exports;
     }
+    private Int32 GetBundleEntrySize(Byte bundleType)
+    {
+        return bundleType switch
+        {
+            0x01 => 5,  // 16-битные записи (ordinal + offset)
+            0x03 => 7,  // 32-битные записи (ordinal + flags + offset)
+            _ => 0      // Другие типы (требуется доп. обработка)
+        };
+    }
+    
     private void FindIterateObjectEntries(BinaryReader reader)
     {
         reader.BaseStream.Seek(Lva.Offset(LeHeaderDump.Segmentation.ObjectTableOffset), SeekOrigin.Begin);
@@ -319,28 +359,39 @@ public class LeFileDumper(String path) : IFileDumper
 
     private List<String> ReadImportProcedureNames(BinaryReader reader)
     {
-        List<String> imports = [];
-        Int64 procedureTableStart = Lva.Offset(LeHeaderDump.Segmentation.ImportedProcedureNameTableOffset);
+        List<String> procNames = [];
+        Int64 procTableStart = Lva.Offset(LeHeaderDump.Segmentation.ImportedProcedureNameTableOffset);
 
-        Int64 procedureTableLength = Math.Abs(Lva.Offset(LeHeaderDump.Segmentation.FixupPageTableOffset) 
-                                     - Lva.Offset(LeHeaderDump.Segmentation.ImportedProcedureNameTableOffset));
+        reader.BaseStream.Seek(procTableStart, SeekOrigin.Begin);
 
-        reader.BaseStream.Seek(procedureTableStart, SeekOrigin.Begin);
-    
-        Byte[] procedureTableBytes = reader.ReadBytes((Int32)procedureTableLength); // ArgumentException
-        
-        Int32 pos = 0;
-        while (pos < procedureTableBytes.Length)
+        Byte len = reader.ReadByte();
+        // if (len != 0)
+        // {
+        //     throw new InvalidDataException("Первая запись таблицы процедур не нулевая!");
+        // }
+
+        while (true)
         {
-            Byte len = procedureTableBytes[pos];
-            if (len == 0) break;
+            // не вышли ли за пределы секции фиксаций
+            Int64 currentPos = reader.BaseStream.Position;
+            Int64 endOfFixupSection =
+                Lva.Offset(LeHeaderDump.Segmentation.FixupPageTableOffset) + LeHeaderDump.Segmentation.FixupSectionSize;
         
-            String name = Encoding.ASCII.GetString(procedureTableBytes, pos + 1, len);
-            imports.Add(name);
-            pos += len + 1;
-        }
+            if (currentPos >= endOfFixupSection)
+            {
+                break;
+            }
 
-        return imports;
+            len = reader.ReadByte();
+            if (len == 0) 
+                break; // Конец таблицы процедур
+
+            Byte[] nameBytes = reader.ReadBytes(len);
+            String name = Encoding.ASCII.GetString(nameBytes);
+            procNames.Add(name);
+        }
+        
+        return procNames;
     }
     
     private TStruct Fill<TStruct>(BinaryReader reader) where TStruct : struct
