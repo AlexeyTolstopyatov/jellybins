@@ -1,7 +1,9 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Drawing;
+using System.Runtime.InteropServices;
 using System.Text;
 using JellyBins.Abstractions;
 using JellyBins.LinearExecutable.Headers;
+using JellyBins.LinearExecutable.Headers.LeEntryHeaders;
 using JellyBins.LinearExecutable.Private;
 using JellyBins.LinearExecutable.Private.Types;
 
@@ -24,7 +26,14 @@ public class LeFileDumper(String path) : IFileDumper
     public LeDirectiveDump[] LeDirectiveDumps { get; private set; } = [];
     public LeExportsDump LeExportsDump { get; private set; } = new();
     public LeImportsDump LeImportsDump { get; private set; } = new();
-    private LeVirtualAddress Lva { get; set; } = new(0);
+    private VirtualAddress Lva { get; set; } = new(0);
+    public LeEntriesDumps EntriesDumps { get; private set; } = new()
+    {
+        Entries16Bit = new() {Segmentation = new() },
+        EntryCallGate = new() {Segmentation = new() },
+        Entries32Bit = new() { Segmentation = new() },
+        EntriesForwarder = new(){Segmentation = new()}
+    };
 
     /// <summary>
     /// Makes dumps of required binary (DOESN'T CHECK start of file).
@@ -47,16 +56,17 @@ public class LeFileDumper(String path) : IFileDumper
         LeHeaderDump.Segmentation = Fill<LeHeader>(reader);
         LeHeaderDump.Address = MzHeaderDump.Segmentation.e_lfanew;
         LeHeaderDump.Size = SizeOf(LeHeaderDump.Segmentation);
-        LeHeaderDump.Name = "LX Header (OS/2 API: LX_HEADER)";
+        LeHeaderDump.Name = "LE Header (OS/2 API: LE_HEADER)";
 
-        Lva = new LeVirtualAddress((UInt64)LeHeaderDump.Address);
+        Lva = new VirtualAddress((UInt64)LeHeaderDump.Address);
         
         // other details iteration (sources: os2.h)
         FindIterateObjectEntries(reader);
         FindIterateDirectives(reader);
         FindImports(reader);
-        FindExports(reader);
+        FindExports(reader); // empty
         FindResidentObjects(reader);
+        FindEntries(reader);
         
         reader.Close();
     }
@@ -82,70 +92,94 @@ public class LeFileDumper(String path) : IFileDumper
         }
     }
 
+    public void FindEntries(BinaryReader reader)
+    {
+        LeExportsDump.Address = (UInt64)reader.BaseStream.Position;
+        LeExportsDump.Name = "LE Entries (JellyBins: IMAGE_ENTRIES)";
+        
+        reader.BaseStream.Seek(Lva.Offset(LeHeaderDump.Segmentation.EntryTableOffset), SeekOrigin.Begin);
+        Byte bundleType;
+        
+        while ((bundleType = reader.ReadByte()) != 0)
+        {
+            if (bundleType == (Byte)LeEntryType.Entry16Bit)
+            {
+                Byte count = reader.ReadByte();
+                List<String> chars = [];
+                EntriesDumps.Entries16Bit.Size = count * SizeOf(new Le16BitEntryHeader());
+                for (Byte i = 0; i < count; i++)
+                {
+                    Le16BitEntryHeader entry16 = Fill<Le16BitEntryHeader>(reader);
+                    EntriesDumps.Entries16Bit.Segmentation!.Add(entry16);
+                }
+                chars.Add("ENTRY_WORD_OFFSET");
+                EntriesDumps.Entries16Bit.Characteristics = chars.ToArray();
+            }
+            else if (bundleType == (Byte)LeEntryType.Entry286CallGate)
+            {
+                Byte count = reader.ReadByte();
+                EntriesDumps.EntryCallGate.Size = count * SizeOf(new LeCallGateEntryHeader());
+                List<String> chars = [];
+                for (Byte i = 0; i < count; ++i)
+                {
+                    LeCallGateEntryHeader entry = Fill<LeCallGateEntryHeader>(reader);
+                    EntriesDumps.EntryCallGate.Segmentation!.Add(entry);
+                }
+                chars.Add("ENTRY_WORD_OFFSET");
+                chars.Add("ENTRY_286CALLGATE");
+                EntriesDumps.EntryCallGate.Characteristics = chars.ToArray();
+            }
+            else if (bundleType == (Byte)LeEntryType.Entry32Bit)
+            {
+                List<String> chars = [];
+                Byte count = reader.ReadByte();
+                EntriesDumps.Entries32Bit.Size = count * SizeOf(new Le32BitEntryHeader());
+                for (Byte i = 0; i < count; ++i)
+                {
+                    Le32BitEntryHeader entry32 = Fill<Le32BitEntryHeader>(reader);
+                    EntriesDumps.Entries32Bit.Segmentation!.Add(entry32);
+                }
+                EntriesDumps.Entries32Bit.Characteristics = chars.ToArray();
+                chars.Add("ENTRY_DWORD_OFFSET");
+            }
+            else if (bundleType == (Byte)LeEntryType.EntryForwarder)
+            {
+                List<String> chars = [];
+                Byte count = reader.ReadByte();
+                EntriesDumps.Entries32Bit.Size = count * SizeOf(new LeForwarderEntryHeader());
+                for (Byte i = 0; i < count; ++i)
+                {
+                    LeForwarderEntryHeader entryF = Fill<LeForwarderEntryHeader>(reader);
+                    if ((entryF.Flags & 0x1) != 0)
+                    {
+                        // import by ordinal
+                        // if ordinal -> offset = ordinal
+                        // else offset -> offset to ImportProcedureNamesTable for this one
+                    }
+                    EntriesDumps.EntriesForwarder.Segmentation!.Add(entryF);
+                }
+                EntriesDumps.EntriesForwarder.Characteristics = chars.ToArray();
+                chars.Add("ENTRY_FORWARDER");
+            }
+        }   
+    }
+    
     private void FindImports(BinaryReader reader)
     {
+        reader.BaseStream.Seek(Lva.Offset(LeHeaderDump.Segmentation.FixupPageTableOffset), SeekOrigin.Begin);
+        LeImportsDump.Name = "LE Imports (JellyBins: IMAGE_IMPORT_ENTRIES)";
+        LeImportsDump.Address = (UInt64)reader.BaseStream.Position;
+
         List<LeImportEntry> imports = [];
         
         Int64 fixupRecordTableOffset = 
-            Lva.Offset(LeHeaderDump.Segmentation.FixupPageTableOffset);
+            Lva.Offset(LeHeaderDump.Segmentation.FixupRecordTableOffset);
         
         List<String> moduleNames = ReadImportModuleNames(reader);
         List<String> procNames = ReadImportProcedureNames(reader);
         ImportedModules = moduleNames.ToArray();
         ImportedProcedures = procNames.ToArray();
         
-        Int64 fixupPageTableOffset = Lva.Offset(LeHeaderDump.Segmentation.FixupPageTableOffset);
-        
-        reader.BaseStream.Seek(fixupPageTableOffset, SeekOrigin.Begin);
-        LeImportsDump.Name = "LX Imports (JellyBins: IMAGE_IMPORT_ENTRIES)";
-        LeImportsDump.Address = (UInt64)reader.BaseStream.Position;
-        
-        List<UInt32> fixupPageOffsets = [];
-        while (true)
-        {
-            UInt32 offset = reader.ReadUInt32();
-            if (offset == 0) 
-                break;
-            fixupPageOffsets.Add(offset);
-        }
-        
-        // incorrect offset. May be prev time was the move +1 byte
-        foreach (UInt32 offset in fixupPageOffsets)
-        {
-            reader.BaseStream.Seek(fixupRecordTableOffset + offset, SeekOrigin.Begin);
-            
-            // Чтение Fixup Record (пока что упрощенно, реальные записи я не понимаю)
-            Byte srcType = reader.ReadByte(); // Это пиздец а не характеристики. Надо тоже учитывать
-            Byte flags = reader.ReadByte(); // Это характеристики
-
-            // Проверка типа импорта (0x01 = по ординалу)
-            Boolean isByOrdinal = (flags & 0x01) != 0;
-            UInt16 moduleOrdinal = reader.ReadUInt16();
-            
-            if (isByOrdinal)
-            {
-                UInt32 procOrdinal = reader.ReadUInt32();
-                imports.Add(new LeImportEntry
-                {
-                    ModuleName = moduleNames[moduleOrdinal - 1],
-                    Ordinal = procOrdinal,
-                    IsByOrdinal = true
-                });
-            }
-            else
-            {
-                UInt32 procNameOffset = reader.ReadUInt32();
-                String procName = procNames[(Int32)procNameOffset];
-                
-                imports.Add(new LeImportEntry
-                {
-                    ModuleName = moduleNames[moduleOrdinal - 1],
-                    ProcedureName = procName,
-                    IsByOrdinal = false
-                });
-            }
-        }
-
         LeImportsDump.Segmentation = imports;
     }
     private String[] FindNames(BinaryReader reader)
@@ -167,74 +201,8 @@ public class LeFileDumper(String path) : IFileDumper
     }
     private void FindExports(BinaryReader reader)
     {
-        List<LeExportEntry> exports = [];
-        LeExportsDump.Address = (UInt64)reader.BaseStream.Position;
-        LeExportsDump.Name = "LX Exports (JellyBins: IMAGE_EXPORT_ENTRIES)";
         
-        reader.BaseStream.Seek(LeHeaderDump.Segmentation.EntryTableOffset, SeekOrigin.Begin);
-
-        Byte bundleType;
-        while ((bundleType = reader.ReadByte()) != 0)
-        {
-            Byte count = reader.ReadByte();
-        
-            // Пример для 32-битных записей (тип 0x03)
-            if ((bundleType & 0x01) != 0) // Проверка флага экспорта
-            {
-                for (Int32 i = 0; i < count; i++)
-                {
-                    UInt16 ordinal = reader.ReadUInt16();
-                    UInt32 flags = reader.ReadUInt32();
-                    UInt32 offset = reader.ReadUInt32();
-                
-                    exports.Add(new LeExportEntry
-                    {
-                        Name = ResidentTable.TryGetValue(ordinal, out var name) ? name : $"Ordinal_{ordinal}",
-                        Ordinal = ordinal,
-                        Offset = offset,
-                        ObjectIndex = flags
-                    });
-                }
-            }
-            if (bundleType == 0x03)
-            {
-                for (Int32 i = 0; i < count; i++)
-                {
-                    UInt16 ordinal = reader.ReadUInt16();
-                    Byte flags = reader.ReadByte(); // Флаги записи
-                    UInt32 offset = reader.ReadUInt32();
-
-                    // флаг экспорта
-                    if ((flags & 0x01) != 0)
-                    {
-                        exports.Add(new LeExportEntry
-                        {
-                            Name = ResidentTable.TryGetValue(ordinal, out String? name) ? name : $"Ordinal_{ordinal}",
-                            Ordinal = ordinal,
-                            Offset = offset
-                        });
-                    }
-                }
-            }
-            else
-            {
-                // Пропускаем другие типы записей (16-битные, callgate и т.д.)
-                reader.BaseStream.Seek(count * GetBundleEntrySize(bundleType), SeekOrigin.Current);
-            }
-        }
-
-        LeExportsDump.Segmentation = exports;
     }
-    private Int32 GetBundleEntrySize(Byte bundleType)
-    {
-        return bundleType switch
-        {
-            0x01 => 5,  // 16-битные записи (ordinal + offset)
-            0x03 => 7,  // 32-битные записи (ordinal + flags + offset)
-            _ => 0      // Другие типы (требуется доп. обработка)
-        };
-    }
-    
     private void FindIterateObjectEntries(BinaryReader reader)
     {
         reader.BaseStream.Seek(Lva.Offset(LeHeaderDump.Segmentation.ObjectTableOffset), SeekOrigin.Begin);
@@ -245,7 +213,7 @@ public class LeFileDumper(String path) : IFileDumper
             List<String> chars = [];
             LeObjectDump dump = new()
             {
-                Name = "LX Entry (JellyBins: IMAGE_SEC)",
+                Name = "LE Entry (JellyBins: IMAGE_SEC)",
                 Address = (UInt64)reader.BaseStream.Position,
                 Segmentation = Fill<LeObjectHeader>(reader)
             };
@@ -307,7 +275,7 @@ public class LeFileDumper(String path) : IFileDumper
             LeDirective dir = Fill<LeDirective>(reader);
             LeDirectiveDump entry = new()
             {
-                Name = "LX Module Directive (JellyBins: IMAGE_MODDIR)",
+                Name = "LE Module Directive (JellyBins: IMAGE_MODDIR)",
                 Address = (UInt64)reader.BaseStream.Position,
                 Size = SizeOf(dir),
                 Segmentation = dir

@@ -10,7 +10,7 @@ public struct LeHeader
     [MarshalAs(UnmanagedType.U1)] public Byte WordOrder;
     [MarshalAs(UnmanagedType.U4)] public UInt32 ExecutableFormatLevel;
     [MarshalAs(UnmanagedType.U2)] public UInt16 CPUType;
-    [MarshalAs(UnmanagedType.U2)] public UInt16 TargetOperatingSystem;
+    [MarshalAs(UnmanagedType.U2)] public UInt16 OSType;
     [MarshalAs(UnmanagedType.U2)] public UInt16 ModuleVersionMajor;
     [MarshalAs(UnmanagedType.U2)] public UInt16 ModuleVersionMinor;
     [MarshalAs(UnmanagedType.U4)] public UInt32 ModuleTypeFlags;

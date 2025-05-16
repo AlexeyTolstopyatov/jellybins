@@ -2,7 +2,7 @@
 
 namespace JellyBins.LinearExecutable.Private;
 
-public class LeVirtualAddress(UInt64 headerPointer) : IVirtualAddress
+public class VirtualAddress(UInt64 headerPointer) : IVirtualAddress
 {
     /// <summary>
     /// Counts Offset from Linear header
