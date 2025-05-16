@@ -30,7 +30,7 @@ public class LeFileDumper(String path) : IFileDumper
     public LeEntriesDumps EntriesDumps { get; private set; } = new()
     {
         Entries16Bit = new() {Segmentation = new() },
-        EntryCallGate = new() {Segmentation = new() },
+        EntriesCallGate = new() {Segmentation = new() },
         Entries32Bit = new() { Segmentation = new() },
         EntriesForwarder = new(){Segmentation = new()}
     };
@@ -98,89 +98,56 @@ public class LeFileDumper(String path) : IFileDumper
         LeExportsDump.Name = "LE Entries (JellyBins: IMAGE_ENTRIES)";
         
         reader.BaseStream.Seek(Lva.Offset(LeHeaderDump.Segmentation.EntryTableOffset), SeekOrigin.Begin);
-        Byte bundleType;
         
-        while ((bundleType = reader.ReadByte()) != 0)
+        Byte count;
+        while ((count = reader.ReadByte()) != 0)
         {
-            if (bundleType == (Byte)LeEntryType.Entry16Bit)
+            // count of objects in bungle
+            Byte type = reader.ReadByte();
+            // UInt16 index = reader.ReadUInt16();
+            switch (type)
             {
-                Byte count = reader.ReadByte();
-                List<String> chars = [];
-                EntriesDumps.Entries16Bit.Size = count * SizeOf(new Le16BitEntryHeader());
-                for (Byte i = 0; i < count; i++)
+                case (Byte)LeEntryType.Entry16Bit:
                 {
-                    Le16BitEntryHeader entry16 = Fill<Le16BitEntryHeader>(reader);
-                    EntriesDumps.Entries16Bit.Segmentation!.Add(entry16);
+                    WriteEntriesInBungle(count, EntriesDumps.Entries16Bit.Segmentation!, reader);
+                    break;
                 }
-                chars.Add("ENTRY_WORD_OFFSET");
-                EntriesDumps.Entries16Bit.Characteristics = chars.ToArray();
-            }
-            else if (bundleType == (Byte)LeEntryType.Entry286CallGate)
-            {
-                Byte count = reader.ReadByte();
-                EntriesDumps.EntryCallGate.Size = count * SizeOf(new LeCallGateEntryHeader());
-                List<String> chars = [];
-                for (Byte i = 0; i < count; ++i)
+                case (Byte)LeEntryType.Entry32Bit:
                 {
-                    LeCallGateEntryHeader entry = Fill<LeCallGateEntryHeader>(reader);
-                    EntriesDumps.EntryCallGate.Segmentation!.Add(entry);
+                    WriteEntriesInBungle(count, EntriesDumps.Entries32Bit.Segmentation!, reader);
+                    break;
                 }
-                chars.Add("ENTRY_WORD_OFFSET");
-                chars.Add("ENTRY_286CALLGATE");
-                EntriesDumps.EntryCallGate.Characteristics = chars.ToArray();
-            }
-            else if (bundleType == (Byte)LeEntryType.Entry32Bit)
-            {
-                List<String> chars = [];
-                Byte count = reader.ReadByte();
-                EntriesDumps.Entries32Bit.Size = count * SizeOf(new Le32BitEntryHeader());
-                for (Byte i = 0; i < count; ++i)
+                case (Byte)LeEntryType.Entry286CallGate:
                 {
-                    Le32BitEntryHeader entry32 = Fill<Le32BitEntryHeader>(reader);
-                    EntriesDumps.Entries32Bit.Segmentation!.Add(entry32);
+                    WriteEntriesInBungle(count, EntriesDumps.EntriesCallGate.Segmentation!, reader);
+                    break;
                 }
-                EntriesDumps.Entries32Bit.Characteristics = chars.ToArray();
-                chars.Add("ENTRY_DWORD_OFFSET");
-            }
-            else if (bundleType == (Byte)LeEntryType.EntryForwarder)
-            {
-                List<String> chars = [];
-                Byte count = reader.ReadByte();
-                EntriesDumps.Entries32Bit.Size = count * SizeOf(new LeForwarderEntryHeader());
-                for (Byte i = 0; i < count; ++i)
+                case (Byte)LeEntryType.EntryForwarder:
                 {
-                    LeForwarderEntryHeader entryF = Fill<LeForwarderEntryHeader>(reader);
-                    if ((entryF.Flags & 0x1) != 0)
-                    {
-                        // import by ordinal
-                        // if ordinal -> offset = ordinal
-                        // else offset -> offset to ImportProcedureNamesTable for this one
-                    }
-                    EntriesDumps.EntriesForwarder.Segmentation!.Add(entryF);
+                    WriteEntriesInBungle(count, EntriesDumps.EntriesForwarder.Segmentation!, reader);
+                    break;
                 }
-                EntriesDumps.EntriesForwarder.Characteristics = chars.ToArray();
-                chars.Add("ENTRY_FORWARDER");
             }
-        }   
+        }
     }
-    
+
+    private void WriteEntriesInBungle<T>(Byte count, List<T> to, BinaryReader reader) where T : struct
+    {
+        for (Byte i = 0; i < count; ++i)
+        {
+            if (reader.ReadByte() != 0)
+                to.Add(Fill<T>(reader));
+        }
+        
+    }
     private void FindImports(BinaryReader reader)
     {
         reader.BaseStream.Seek(Lva.Offset(LeHeaderDump.Segmentation.FixupPageTableOffset), SeekOrigin.Begin);
         LeImportsDump.Name = "LE Imports (JellyBins: IMAGE_IMPORT_ENTRIES)";
         LeImportsDump.Address = (UInt64)reader.BaseStream.Position;
 
-        List<LeImportEntry> imports = [];
-        
-        Int64 fixupRecordTableOffset = 
-            Lva.Offset(LeHeaderDump.Segmentation.FixupRecordTableOffset);
-        
-        List<String> moduleNames = ReadImportModuleNames(reader);
-        List<String> procNames = ReadImportProcedureNames(reader);
-        ImportedModules = moduleNames.ToArray();
-        ImportedProcedures = procNames.ToArray();
-        
-        LeImportsDump.Segmentation = imports;
+        ImportedModules = ReadImportModuleNames(reader).ToArray();
+        ImportedProcedures = ReadImportProcedureNames(reader).ToArray();
     }
     private String[] FindNames(BinaryReader reader)
     {
@@ -201,7 +168,30 @@ public class LeFileDumper(String path) : IFileDumper
     }
     private void FindExports(BinaryReader reader)
     {
+        LeExportsDump.Segmentation = new();
+
+        if (LeHeaderDump.Segmentation.NonResidentNamesTableLength == 0 ||
+            LeHeaderDump.Segmentation.NonResidentNamesTableOffsetFromTopOfFile == 0)
+        {
+            // no names.
+            return;
+        }
         
+        reader.BaseStream.Seek(LeHeaderDump.Segmentation.NonResidentNamesTableOffsetFromTopOfFile,
+            SeekOrigin.Begin);
+
+        Byte count;
+        while ((count = reader.ReadByte()) != 0)
+        {
+            String name = Encoding.ASCII.GetString(reader.ReadBytes(count));
+            UInt16 ordinal = reader.ReadUInt16();
+            
+            LeExportsDump.Segmentation!.Add(new LeExportEntry()
+            {
+                Name = name,
+                Ordinal = ordinal
+            });
+        }
     }
     private void FindIterateObjectEntries(BinaryReader reader)
     {
@@ -328,39 +318,11 @@ public class LeFileDumper(String path) : IFileDumper
 
     private List<String> ReadImportProcedureNames(BinaryReader reader)
     {
-        List<String> procNames = [];
         Int64 procTableStart = Lva.Offset(LeHeaderDump.Segmentation.ImportedProcedureNameTableOffset);
 
         reader.BaseStream.Seek(procTableStart, SeekOrigin.Begin);
 
-        Byte len = reader.ReadByte();
-        // if (len != 0)
-        // {
-        //     throw new InvalidDataException("Первая запись таблицы процедур не нулевая!");
-        // }
-
-        while (true)
-        {
-            // не вышли ли за пределы секции фиксаций
-            Int64 currentPos = reader.BaseStream.Position;
-            Int64 endOfFixupSection =
-                Lva.Offset(LeHeaderDump.Segmentation.FixupPageTableOffset) + LeHeaderDump.Segmentation.FixupSectionSize;
-        
-            if (currentPos >= endOfFixupSection)
-            {
-                break;
-            }
-
-            len = reader.ReadByte();
-            if (len == 0) 
-                break; // Конец таблицы процедур
-
-            Byte[] nameBytes = reader.ReadBytes(len);
-            String name = Encoding.ASCII.GetString(nameBytes);
-            procNames.Add(name);
-        }
-        
-        return procNames;
+        return [];
     }
     
     private TStruct Fill<TStruct>(BinaryReader reader) where TStruct : struct

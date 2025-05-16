@@ -1,9 +1,9 @@
 ﻿using System.Runtime.InteropServices;
 using System.Text;
-using System.Text.RegularExpressions;
 using JellyBins.Abstractions;
 using JellyBins.NewExecutable.Headers;
 using JellyBins.NewExecutable.Private;
+
 
 namespace JellyBins.NewExecutable.Models;
 
@@ -14,7 +14,7 @@ public class NeFileDumper : IFileDumper
     public NeDump NeHeaderDump { get; private set; }
     public NeSegmentDump[] SegmentsTableDump { get; private set; }
     public NeImportDump[] ImportsTableDump { get; private set; }
-    
+    public NeExportDump[] ExportsTableDump { get; private set; }
     public NeEntryDump[] EntriesDump { get; private set; }
 
     private UInt16 _extensionTypeId;
@@ -115,7 +115,8 @@ public class NeFileDumper : IFileDumper
         
         // FIXME: raw bytes instead ASCII FFI
         FindBinaryEntries(reader);
-        
+        FindNonResidentNames(reader);
+
         reader.Close();
     }
 
@@ -297,6 +298,31 @@ public class NeFileDumper : IFileDumper
             _extensionTypeId = (UInt16)FileType.Application;
         else if (String.Equals(ext, ".drv", StringComparison.OrdinalIgnoreCase))
             _extensionTypeId = (UInt16)FileType.Driver;
+    }
+
+    private void FindNonResidentNames(BinaryReader reader)
+    {
+        List<NeExportDump> exports = new();
+        reader.BaseStream.Seek((Int64)(NeHeaderDump.Address + NeHeaderDump.Segmentation.nrestab)!, SeekOrigin.Begin);
+
+        Byte i;
+        while ((i = reader.ReadByte()) != 0)
+        {
+            String name = Encoding.ASCII.GetString(reader.ReadBytes(i));
+            UInt16 ordinal = reader.ReadUInt16();
+            exports.Add(new NeExportDump()
+            {
+                Name = "IMAGE_NONRESIDENT_TABLE_ENTRY",
+                Segmentation = new NeExport()
+                {
+                    Count = i,
+                    Name = name,
+                    Ordinal = ordinal
+                }
+            });
+        }
+
+        ExportsTableDump = exports.ToArray();
     }
     
     private TStruct Fill<TStruct>(BinaryReader reader) where TStruct : struct

@@ -2,5 +2,21 @@
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=15d77185_002Da764_002D4d69_002D9f8e_002Dc000c809e7e7/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="ParseLxBinary" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;NUnit3x::8AC97B55-D621-47C0-B3D6-4E18E4C1274D::net8.0::HeadersTest.SectionsOpeningTest.ParseLxBinary&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::8AC97B55-D621-47C0-B3D6-4E18E4C1274D::net8.0::HeadersTest.SectionsOpeningTest.ParseNeBinary&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=d47787fd_002Dbe08_002D4b3d_002D8f90_002D0169edd36820/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="ParseLxBinary #4" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::8AC97B55-D621-47C0-B3D6-4E18E4C1274D::net8.0::HeadersTest.SectionsOpeningTest.ParseLxBinary&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=eec597dd_002Dd689_002D4613_002Dac7f_002D12fa35778f20/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="ParseLxBinary #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::8AC97B55-D621-47C0-B3D6-4E18E4C1274D::net8.0::HeadersTest.SectionsOpeningTest.ParseLxBinary&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=f665a389_002D7f6a_002D4ce0_002D9dc8_002De59bf0c9bc58/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="ParseLxBinary #3" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::8AC97B55-D621-47C0-B3D6-4E18E4C1274D::net8.0::HeadersTest.SectionsOpeningTest.ParseLxBinary&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
