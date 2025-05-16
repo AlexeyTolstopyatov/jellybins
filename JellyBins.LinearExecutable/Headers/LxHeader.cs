@@ -3,24 +3,25 @@
 namespace JellyBins.LinearExecutable.Headers;
 
 [StructLayout(LayoutKind.Sequential)]
-public struct LeHeader
+public struct LxHeader
 {
     [MarshalAs(UnmanagedType.U2)] public UInt16 SignatureWord;
     [MarshalAs(UnmanagedType.I1)] public Byte ByteOrder;
     [MarshalAs(UnmanagedType.U1)] public Byte WordOrder;
     [MarshalAs(UnmanagedType.U4)] public UInt32 ExecutableFormatLevel;
     [MarshalAs(UnmanagedType.U2)] public UInt16 CPUType;
-    [MarshalAs(UnmanagedType.U2)] public UInt16 TargetOperatingSystem;
+    [MarshalAs(UnmanagedType.U2)] public UInt16 OSType;
     [MarshalAs(UnmanagedType.U2)] public UInt16 ModuleVersionMajor;
     [MarshalAs(UnmanagedType.U2)] public UInt16 ModuleVersionMinor;
     [MarshalAs(UnmanagedType.U4)] public UInt32 ModuleTypeFlags;
-    [MarshalAs(UnmanagedType.U4)] public UInt32 NumberOfMemoryPages;
-    [MarshalAs(UnmanagedType.U4)] public UInt32 InitialObjectCSNumber;
+    [MarshalAs(UnmanagedType.U4)] public UInt32 ModuleNumberOfPages;
+    [MarshalAs(UnmanagedType.U4)] public UInt32 InitialEIPObjectNumber;
     [MarshalAs(UnmanagedType.U4)] public UInt32 InitialEIP;
-    [MarshalAs(UnmanagedType.U4)] public UInt32 InitialSSObjectNumber;
+    [MarshalAs(UnmanagedType.U4)] public UInt32 InitialESPObjectNumber;
     [MarshalAs(UnmanagedType.U4)] public UInt32 InitialESP;
     [MarshalAs(UnmanagedType.U4)] public UInt32 MemoryPageSize;
-    [MarshalAs(UnmanagedType.U4)] public UInt32 BytesOnLastPage;
+    [MarshalAs(UnmanagedType.U4)] public UInt32 MemoryPageOffsetShift;
+    //[MarshalAs(UnmanagedType.U4)] public UInt32 BytesOnLastPage;
     [MarshalAs(UnmanagedType.U4)] public UInt32 FixupSectionSize;
     [MarshalAs(UnmanagedType.U4)] public UInt32 FixupSectionChecksum;
     [MarshalAs(UnmanagedType.U4)] public UInt32 LoaderSectionSize;
@@ -51,6 +52,7 @@ public struct LeHeader
     [MarshalAs(UnmanagedType.U4)] public UInt32 DebugInformationLength;
     [MarshalAs(UnmanagedType.U4)] public UInt32 PreloadInstancePagesNumber;
     [MarshalAs(UnmanagedType.U4)] public UInt32 DemandInstancePagesNumber;
-    [MarshalAs(UnmanagedType.U4)] public UInt32 ExtraHeapAlloc;
-    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)] public Byte[] Reserved;
+    [MarshalAs(UnmanagedType.U4)] public UInt32 HeapSize;
+    [MarshalAs(UnmanagedType.U4)] public UInt32 StackSize;
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 8)] public Byte[] Reserved;
 }

@@ -184,14 +184,15 @@ public class LeFileDumper(String path) : IFileDumper
                 for (Int32 i = 0; i < count; i++)
                 {
                     UInt16 ordinal = reader.ReadUInt16();
-                    Byte flags = reader.ReadByte();
+                    UInt32 flags = reader.ReadUInt32();
                     UInt32 offset = reader.ReadUInt32();
                 
                     exports.Add(new LeExportEntry
                     {
                         Name = ResidentTable.TryGetValue(ordinal, out var name) ? name : $"Ordinal_{ordinal}",
                         Ordinal = ordinal,
-                        Offset = offset
+                        Offset = offset,
+                        ObjectIndex = flags
                     });
                 }
             }
