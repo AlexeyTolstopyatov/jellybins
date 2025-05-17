@@ -1,6 +1,10 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Collections.Specialized;
+using System.Drawing;
+using System.Reflection.PortableExecutable;
+using System.Runtime.InteropServices;
 using JellyBins.Abstractions;
 using JellyBins.PortableExecutable.Headers;
+using Microsoft.VisualBasic;
 
 namespace JellyBins.PortableExecutable.Models;
 
@@ -25,10 +29,80 @@ public class PeFileDumper(String path) : IFileDumper
     
     private UInt16 _extensionTypeId = 0;
     private UInt16 _binaryTypeId = 0;
+    private UInt32 _numberOfRvaAndSizes;
+    private UInt32 _numberOfSections;
 
     public void Dump()
     {
+        using FileStream stream = new(Info.Path!, FileMode.Open, FileAccess.Read);
+        using BinaryReader reader = new(stream);
         
+        // IMAGE_DOS_HEADER construct
+        MzHeaderDump.Segmentation = Fill<MzHeader>(reader);
+        MzHeaderDump.Address = 0;
+        MzHeaderDump.Size = SizeOf(MzHeaderDump.Segmentation);
+        MzHeaderDump.Name = "MZ Header (WinAPI: IMAGE_DOS_HEADER)";
+
+        // PE Header/1 construct (sources: windows.h)
+        stream.Seek(MzHeaderDump.Segmentation.e_lfanew, SeekOrigin.Begin);
+        reader.ReadUInt32(); // skip signature.
+        FileHeaderDump.Segmentation = Fill<PeFileHeader>(reader);
+        FileHeaderDump.Address = MzHeaderDump.Segmentation.e_lfanew;
+        FileHeaderDump.Size = SizeOf(FileHeaderDump.Segmentation);
+        FileHeaderDump.Name = "PE File Header (WinAPI: IMAGE_FILE_HEADER)";
+        
+        _numberOfSections = FileHeaderDump.Segmentation.NumberOfSections;
+        
+        // PE header/2 construct
+        if (!Machine64Bit(FileHeaderDump.Segmentation.Characteristics))
+        {
+            OptionalHeader32Dump.Segmentation = Fill<PeOptionalHeader32>(reader);
+            OptionalHeader32Dump.Address = (UInt64)stream.Position;
+            OptionalHeader32Dump.Size = SizeOf(OptionalHeader32Dump.Segmentation);
+            OptionalHeader32Dump.Name = "PE Optional Header (WinAPI: IMAGE_OPTIONAL32_HEADER)";
+            _numberOfRvaAndSizes = OptionalHeader32Dump.Segmentation.NumberOfRvaAndSizes;
+        }
+        else
+        {
+            OptionalHeaderDump.Segmentation = Fill<PeOptionalHeader>(reader);
+            OptionalHeaderDump.Address = MzHeaderDump.Segmentation.e_lfanew;
+            OptionalHeaderDump.Size = SizeOf(FileHeaderDump.Segmentation);
+            OptionalHeaderDump.Name = "PE Optional Header (WinAPI: IMAGE_OPTIONAL_HEADER)";
+            _numberOfRvaAndSizes = OptionalHeaderDump.Segmentation.NumberOfRvaAndSizes;
+        }
+        // checking directories by offset
+        List<PeDirectoryDump> dirs = [];
+        for (Int32 i = 0; i < 16; ++i)
+        {
+            PeDirectoryDump dump = new()
+            {
+                Address = (UInt64)stream.Position,
+                Segmentation = Fill<PeDirectory>(reader)
+            };
+            dump.Size = SizeOf(dump.Segmentation);
+            dump.Name = "PE Directory (WinAPI: IMAGE_DIRECTORY)";
+            
+            dirs.Add(dump);
+        }
+
+        DirectoryDumps = dirs.ToArray();
+        List<PeSectionDump> sects = [];
+        // checking sections by offset
+        for (Int32 i = 0; i < _numberOfSections; ++i)
+        {
+            PeSectionDump dump = new()
+            {
+                Address = (UInt64)stream.Position,
+                Segmentation = Fill<PeSection>(reader),
+            };
+            dump.Size = SizeOf(dump.Segmentation);
+            dump.Name = "PE Section (WinAPI: IMAGE_SECTION)";
+            sects.Add(dump);
+        }
+
+        SectionDumps = sects.ToArray();
+        
+        reader.Close();
     }
 
     private TStruct Fill<TStruct>(BinaryReader reader) where TStruct : struct
