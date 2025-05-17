@@ -90,10 +90,11 @@ public class PeFileDumper(String path) : IFileDumper
         // checking sections by offset
         for (Int32 i = 0; i < _numberOfSections; ++i)
         {
+            PeSection section = Fill<PeSection>(reader);
             PeSectionDump dump = new()
             {
                 Address = (UInt64)stream.Position,
-                Segmentation = Fill<PeSection>(reader),
+                Segmentation = section
             };
             dump.Size = SizeOf(dump.Segmentation);
             dump.Name = "PE Section (WinAPI: IMAGE_SECTION)";

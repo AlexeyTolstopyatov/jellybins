@@ -32,4 +32,13 @@ public class SectionsOpeningTest
         dumper.Dump();
         Assert.Pass();
     }
+
+    [Test]
+    public void ParsePeBinary()
+    {
+        PeFileDumper dumper = new(@"D:\Анализ файлов\inst\PE\NTDLL.DLL");
+        
+        dumper.Dump();
+        Assert.Pass();
+    }
 }

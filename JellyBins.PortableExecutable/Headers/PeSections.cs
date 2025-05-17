@@ -2,11 +2,11 @@
 
 namespace JellyBins.PortableExecutable.Headers;
 
-[StructLayout(LayoutKind.Explicit, Pack = 1, CharSet = CharSet.Ansi)]
+[StructLayout(LayoutKind.Explicit)]
 public struct PeSection 
 {
-    [MarshalAs(UnmanagedType.LPStr, SizeConst = 8)] 
-    [FieldOffset(0)] public String Name;
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 8)] 
+    [FieldOffset(0)] public Byte[] Name;
     [FieldOffset(8)] public UInt32 VirtualSize;
     [FieldOffset(12)] public UInt32 VirtualAddress;
     [FieldOffset(16)] public UInt32 SizeOfRawData;
