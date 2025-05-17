@@ -119,7 +119,6 @@ public class NeFileDumper : IFileDumper
 
         reader.Close();
     }
-
     private void FindBinaryEntries(BinaryReader reader)
     {
         List<NeEntryDump> entries = [];
@@ -193,7 +192,6 @@ public class NeFileDumper : IFileDumper
 
         EntriesDump = entries.ToArray();
     }
-    
     private void FindSegmentCharacteristics(ref NeSegmentDump segment)
     {
         List<String> chars = [];
@@ -207,7 +205,6 @@ public class NeFileDumper : IFileDumper
 
         segment.Characteristics = chars.ToArray();
     }
-    
     private void FindCharacteristics()
     {
         List<String> chars = [];
@@ -280,7 +277,6 @@ public class NeFileDumper : IFileDumper
         }
         
     }
-
     private void FindBinaryTypeId()
     {
         if (NeHeaderDump.Segmentation.cseg == 0)
@@ -288,7 +284,6 @@ public class NeFileDumper : IFileDumper
 
         _binaryTypeId = (UInt16)FileType.Application;
     }
-
     private void FindExtensionTypeId()
     {
         String ext = Path.GetExtension(Info!.Path!);
@@ -299,7 +294,6 @@ public class NeFileDumper : IFileDumper
         else if (String.Equals(ext, ".drv", StringComparison.OrdinalIgnoreCase))
             _extensionTypeId = (UInt16)FileType.Driver;
     }
-
     private void FindNonResidentNames(BinaryReader reader)
     {
         List<NeExportDump> exports = new();
@@ -329,7 +323,6 @@ public class NeFileDumper : IFileDumper
         ExportsTableDump = exports.ToArray();
         Info!.ProjectDescription = exports[0].Name;
     }
-    
     private TStruct Fill<TStruct>(BinaryReader reader) where TStruct : struct
     {
         Byte[] bytes = reader.ReadBytes(Marshal.SizeOf(typeof(TStruct)));
@@ -338,17 +331,14 @@ public class NeFileDumper : IFileDumper
         handle.Free();
         return result;
     }
-
     private Int32 SizeOf<TStruct>(TStruct structure) where TStruct : struct
     {
         return Marshal.SizeOf(structure);
     }
-
     public UInt16 GetExtensionTypeId()
     {
         return _extensionTypeId;
     }
-
     public UInt16 GetBinaryTypeId()
     {
         return _binaryTypeId;

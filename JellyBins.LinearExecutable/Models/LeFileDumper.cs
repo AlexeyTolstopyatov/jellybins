@@ -1,9 +1,7 @@
-﻿using System.Drawing;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Text;
 using JellyBins.Abstractions;
 using JellyBins.LinearExecutable.Headers;
-using JellyBins.LinearExecutable.Headers.LeEntryHeaders;
 using JellyBins.LinearExecutable.Private;
 using JellyBins.LinearExecutable.Private.Types;
 
@@ -11,9 +9,10 @@ namespace JellyBins.LinearExecutable.Models;
 
 public class LeFileDumper(String path) : IFileDumper
 {
+    private UInt16 _extensionTypeId = 0, _binaryTypeId = 0;
     public Dictionary<UInt16, String> ResidentTable { get; private set; } = [];
-    public String[] ImportedModules { get; private set; } = [];
-    public String[] ImportedProcedures { get; private set; } = [];
+    public String[] ImportModulesTable { get; private set; } = [];
+    public String[] ImportProceduresTable { get; private set; } = [];
     public LeFileInfo Info { get; private set; } = new()
     {
         Name = new FileInfo(path).Name,
@@ -22,17 +21,17 @@ public class LeFileDumper(String path) : IFileDumper
     };
     public MzHeaderDump MzHeaderDump { get; private set; } = new();
     public LeHeaderDump LeHeaderDump { get; private set; } = new();
-    public LeObjectDump[] ObjectsDump { get; private set; } = [];
-    public LeDirectiveDump[] DirectiveDumps { get; private set; } = [];
+    public LeObjectDump[] ObjectsTableDump { get; private set; } = [];
+    public LeDirectiveDump[] DirectiveTableDumps { get; private set; } = [];
     public LeExportsDump ExportsDump { get; private set; } = new();
     public LeImportsDump ImportsDump { get; private set; } = new();
     private VirtualAddress Lva { get; set; } = new(0);
     public LeEntriesDumps EntriesDumps { get; private set; } = new()
     {
-        Entries16Bit = new() {Segmentation = new() },
-        EntriesCallGate = new() {Segmentation = new() },
+        Entries16Bit = new() { Segmentation = new() },
+        EntriesCallGate = new() { Segmentation = new() },
         Entries32Bit = new() { Segmentation = new() },
-        EntriesForwarder = new(){Segmentation = new()}
+        EntriesForwarder = new(){ Segmentation = new()}
     };
 
     /// <summary>
@@ -60,11 +59,15 @@ public class LeFileDumper(String path) : IFileDumper
 
         Lva = new VirtualAddress((UInt64)LeHeaderDump.Address);
         
+        // write addition module information
+        FindCharacteristics();
+        FindExtensionType();
+        
         // other details iteration (sources: os2.h)
         FindIterateObjectEntries(reader);
         FindIterateDirectives(reader);
         FindImports(reader);
-        FindNonResidentNames(reader); // empty
+        FindNonResidentNames(reader);
         FindResidentNames(reader);
         FindEntries(reader);
         
@@ -72,7 +75,78 @@ public class LeFileDumper(String path) : IFileDumper
     }
 
     #region Private methods
-    
+    private void FindCharacteristics()
+    {
+        UInt32 moduleFlags = LeHeaderDump.Segmentation.ModuleTypeFlags;
+        List<String> chars = [];
+        if ((moduleFlags & 0x00000000) != 0)
+            chars.Add("MODULE_EXECUTABLE");
+        if ((moduleFlags & 0x00008000) != 0)
+            chars.Add("MODULE_DLL");
+        if ((moduleFlags & 0x00010000) != 0)
+            chars.Add("MODULE_MEM_PROTECTED");
+        if ((moduleFlags & 0x00020000) != 0)
+            chars.Add("MODULE_DRIVER");
+        if ((moduleFlags & 0x00028000) != 0)
+            chars.Add("MODULE_DRIVER_VIRTUAL");
+        if ((moduleFlags & 0x00038000) != 0)
+            chars.Add("MODULE_MODMASK");
+        if ((moduleFlags & 0x00002000) != 0)
+            chars.Add("MODULE_LNKERR");
+        if ((moduleFlags & 0x00000010) != 0)
+            chars.Add("MODULE_FIXUPS_INTERNAL_STRIPPED");
+        if ((moduleFlags & 0x00000008) != 0)
+            chars.Add("MODULE_DLL_SYS");
+        if ((moduleFlags & 0x00000020) != 0)
+            chars.Add("MODULE_FIXUPS_EXTERNAL_STRIPPED");
+        if ((moduleFlags & 0x00000004) != 0)
+            chars.Add("MODULE_LIB_INIT");
+        if ((moduleFlags & 0x40000000) != 0)
+            chars.Add("MODULE_LIB_TERM");
+        if ((moduleFlags & 0x00008000) != 0)
+            chars.Add("MODULE_MULTICPU_UNSAFE");
+        if ((moduleFlags & 0x00000100) != 0)
+            chars.Add("MODULE_WND_FULLSCREEN");
+        if ((moduleFlags & 0x00000200) != 0)
+            chars.Add("MODULE_WND_OS2PM_COMPAT");
+        if ((moduleFlags & 0x00000300) != 0)
+            chars.Add("MODULE_WMD_OS2PM_REQUIRED");
+
+        LeHeaderDump.Characteristics = chars.ToArray();
+        
+        Info.OperatingSystem = LeHeaderDump.Segmentation.OSType switch
+        {
+            0x1 => "IBM OS/2",
+            0x2 => "Microsoft Windows/286",
+            0x3 => "DOS/4",
+            0x4 => "Microsoft Windows/386",
+            0x5 => "IBM Personality",
+            _ => "?"
+        };
+
+        Info.CpuArchitecture = LeHeaderDump.Segmentation.CPUType switch
+        {
+            0x01 => "Intel i286",
+            0x02 => "Intel i386",
+            0x03 => "Intel i486",
+            0x04 => "Intel i568",
+            0x20 => "Intel i860",
+            0x40 => "MIPS Mark I",
+            0x41 => "MIPS Mark II",
+            0x42 => "MIPS Mark III",
+            _ => "?"
+        };
+    }
+    private void FindExtensionType()
+    {
+        String ext = Path.GetExtension(Info!.Path!);
+        if (String.Equals(ext, "dll", StringComparison.OrdinalIgnoreCase))
+            _extensionTypeId = (UInt16)FileType.DynamicLibrary;
+        else if (String.Equals(ext, ".exe", StringComparison.OrdinalIgnoreCase))
+            _extensionTypeId = (UInt16)FileType.Application;
+        else if (String.Equals(ext, ".drv", StringComparison.OrdinalIgnoreCase))
+            _extensionTypeId = (UInt16)FileType.Driver;
+    }
     private void FindResidentNames(BinaryReader reader)
     {
         reader.BaseStream.Seek(
@@ -91,7 +165,6 @@ public class LeFileDumper(String path) : IFileDumper
             ResidentTable[ordinal] = Encoding.ASCII.GetString(nameBytes);
         }
     }
-
     private void FindEntries(BinaryReader reader)
     {
         ExportsDump.Address = (UInt64)reader.BaseStream.Position;
@@ -130,7 +203,6 @@ public class LeFileDumper(String path) : IFileDumper
             }
         }
     }
-
     private void WriteEntriesInBungle<T>(Byte count, List<T> to, BinaryReader reader) where T : struct
     {
         for (Byte i = 0; i < count; ++i)
@@ -142,12 +214,11 @@ public class LeFileDumper(String path) : IFileDumper
     }
     private void FindImports(BinaryReader reader)
     {
-        //reader.BaseStream.Seek(Lva.Offset(LeHeaderDump.Segmentation.FixupPageTableOffset), SeekOrigin.Begin);
         ImportsDump.Name = "LE Imports (JellyBins: IMAGE_IMPORT_ENTRIES)";
         ImportsDump.Address = (UInt64)reader.BaseStream.Position;
 
-        ImportedModules = ReadImportModuleNames(reader).ToArray();
-        ImportedProcedures = ReadImportProcedureNames(reader).ToArray();
+        ImportModulesTable = ReadImportModuleNames(reader).ToArray();
+        ImportProceduresTable = ReadImportProcedureNames(reader).ToArray();
     }
     private String[] FindNames(BinaryReader reader, Int64 offset)
     {
@@ -255,7 +326,7 @@ public class LeFileDumper(String path) : IFileDumper
             dumps.Add(dump);
         }
         
-        ObjectsDump = dumps.ToArray();
+        ObjectsTableDump = dumps.ToArray();
     }
     private void FindIterateDirectives(BinaryReader reader)
     {
@@ -295,9 +366,8 @@ public class LeFileDumper(String path) : IFileDumper
             entries.Add(entry);
         }
 
-        DirectiveDumps = entries.ToArray();
+        DirectiveTableDumps = entries.ToArray();
     }
-    
     private List<String> ReadImportModuleNames(BinaryReader reader)
     {
         List<String> imports = [];
@@ -313,7 +383,6 @@ public class LeFileDumper(String path) : IFileDumper
 
         return imports;
     }
-
     private List<String> ReadImportProcedureNames(BinaryReader reader)
     {
         reader.BaseStream.Seek(Lva.Offset(LeHeaderDump.Segmentation.ImportedProcedureNameTableOffset), SeekOrigin.Begin);
@@ -350,11 +419,11 @@ public class LeFileDumper(String path) : IFileDumper
 
     public UInt16 GetExtensionTypeId()
     {
-        throw new NotImplementedException();
+        return _extensionTypeId;
     }
 
     public UInt16 GetBinaryTypeId()
     {
-        throw new NotImplementedException();
+        return _binaryTypeId;
     }
 }
