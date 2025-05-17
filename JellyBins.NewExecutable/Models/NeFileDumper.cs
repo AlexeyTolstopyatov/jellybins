@@ -303,7 +303,11 @@ public class NeFileDumper : IFileDumper
     private void FindNonResidentNames(BinaryReader reader)
     {
         List<NeExportDump> exports = new();
-        reader.BaseStream.Seek((Int64)(NeHeaderDump.Address + NeHeaderDump.Segmentation.nrestab)!, SeekOrigin.Begin);
+        
+        if (NeHeaderDump.Segmentation.cbnrestab == 0)
+            return;
+        
+        reader.BaseStream.Seek(NeHeaderDump.Segmentation.nrestab, SeekOrigin.Begin);
 
         Byte i;
         while ((i = reader.ReadByte()) != 0)
