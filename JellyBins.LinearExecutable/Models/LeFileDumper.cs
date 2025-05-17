@@ -62,7 +62,7 @@ public class LeFileDumper(String path) : IFileDumper
         // write addition module information
         FindCharacteristics();
         FindExtensionType();
-        
+        FindBinaryType();
         // other details iteration (sources: os2.h)
         FindIterateObjectEntries(reader);
         FindIterateDirectives(reader);
@@ -146,6 +146,17 @@ public class LeFileDumper(String path) : IFileDumper
             _extensionTypeId = (UInt16)FileType.Application;
         else if (String.Equals(ext, ".drv", StringComparison.OrdinalIgnoreCase))
             _extensionTypeId = (UInt16)FileType.Driver;
+    }
+    private void FindBinaryType()
+    {
+        if ((LeHeaderDump.Segmentation.ModuleTypeFlags & 0x00000000) != 0)
+            _binaryTypeId = (UInt16)FileType.Application;
+        if ((LeHeaderDump.Segmentation.ModuleTypeFlags & 0x00008000) != 0)
+            _binaryTypeId = (UInt16)FileType.DynamicLibrary;
+        if ((LeHeaderDump.Segmentation.ModuleTypeFlags & 0x00020000) != 0)
+            _binaryTypeId = (UInt16)FileType.Driver;
+        if ((LeHeaderDump.Segmentation.ModuleTypeFlags & 0x00028000) != 0)
+            _binaryTypeId = (UInt16)FileType.Driver;
     }
     private void FindResidentNames(BinaryReader reader)
     {
