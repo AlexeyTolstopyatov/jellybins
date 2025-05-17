@@ -22,10 +22,10 @@ public class LeFileDumper(String path) : IFileDumper
     };
     public MzHeaderDump MzHeaderDump { get; private set; } = new();
     public LeHeaderDump LeHeaderDump { get; private set; } = new();
-    public LeObjectDump[] LeObjectsDump { get; private set; } = [];
-    public LeDirectiveDump[] LeDirectiveDumps { get; private set; } = [];
-    public LeExportsDump LeExportsDump { get; private set; } = new();
-    public LeImportsDump LeImportsDump { get; private set; } = new();
+    public LeObjectDump[] ObjectsDump { get; private set; } = [];
+    public LeDirectiveDump[] DirectiveDumps { get; private set; } = [];
+    public LeExportsDump ExportsDump { get; private set; } = new();
+    public LeImportsDump ImportsDump { get; private set; } = new();
     private VirtualAddress Lva { get; set; } = new(0);
     public LeEntriesDumps EntriesDumps { get; private set; } = new()
     {
@@ -64,8 +64,8 @@ public class LeFileDumper(String path) : IFileDumper
         FindIterateObjectEntries(reader);
         FindIterateDirectives(reader);
         FindImports(reader);
-        FindExports(reader); // empty
-        FindResidentObjects(reader);
+        FindNonResidentNames(reader); // empty
+        FindResidentNames(reader);
         FindEntries(reader);
         
         reader.Close();
@@ -73,7 +73,7 @@ public class LeFileDumper(String path) : IFileDumper
 
     #region Private methods
     
-    private void FindResidentObjects(BinaryReader reader)
+    private void FindResidentNames(BinaryReader reader)
     {
         reader.BaseStream.Seek(
             Lva.Offset(LeHeaderDump.Segmentation.ResidentNamesTableOffset), 
@@ -92,10 +92,10 @@ public class LeFileDumper(String path) : IFileDumper
         }
     }
 
-    public void FindEntries(BinaryReader reader)
+    private void FindEntries(BinaryReader reader)
     {
-        LeExportsDump.Address = (UInt64)reader.BaseStream.Position;
-        LeExportsDump.Name = "LE Entries (JellyBins: IMAGE_ENTRIES)";
+        ExportsDump.Address = (UInt64)reader.BaseStream.Position;
+        ExportsDump.Name = "LE Entries (JellyBins: IMAGE_ENTRIES)";
         
         reader.BaseStream.Seek(Lva.Offset(LeHeaderDump.Segmentation.EntryTableOffset), SeekOrigin.Begin);
         
@@ -142,17 +142,17 @@ public class LeFileDumper(String path) : IFileDumper
     }
     private void FindImports(BinaryReader reader)
     {
-        reader.BaseStream.Seek(Lva.Offset(LeHeaderDump.Segmentation.FixupPageTableOffset), SeekOrigin.Begin);
-        LeImportsDump.Name = "LE Imports (JellyBins: IMAGE_IMPORT_ENTRIES)";
-        LeImportsDump.Address = (UInt64)reader.BaseStream.Position;
+        //reader.BaseStream.Seek(Lva.Offset(LeHeaderDump.Segmentation.FixupPageTableOffset), SeekOrigin.Begin);
+        ImportsDump.Name = "LE Imports (JellyBins: IMAGE_IMPORT_ENTRIES)";
+        ImportsDump.Address = (UInt64)reader.BaseStream.Position;
 
         ImportedModules = ReadImportModuleNames(reader).ToArray();
         ImportedProcedures = ReadImportProcedureNames(reader).ToArray();
     }
-    private String[] FindNames(BinaryReader reader)
+    private String[] FindNames(BinaryReader reader, Int64 offset)
     {
         List<String> names = [];
-        reader.BaseStream.Seek(Lva.Offset(LeHeaderDump.Segmentation.ImportedModulesNameTableOffset), SeekOrigin.Begin);
+        reader.BaseStream.Seek(offset, SeekOrigin.Begin);
         
         while (true)
         {
@@ -166,9 +166,9 @@ public class LeFileDumper(String path) : IFileDumper
         
         return names.ToArray();
     }
-    private void FindExports(BinaryReader reader)
+    private void FindNonResidentNames(BinaryReader reader)
     {
-        LeExportsDump.Segmentation = new();
+        ExportsDump.Segmentation = new();
 
         if (LeHeaderDump.Segmentation.NonResidentNamesTableLength == 0 ||
             LeHeaderDump.Segmentation.NonResidentNamesTableOffsetFromTopOfFile == 0)
@@ -186,12 +186,14 @@ public class LeFileDumper(String path) : IFileDumper
             String name = Encoding.ASCII.GetString(reader.ReadBytes(count));
             UInt16 ordinal = reader.ReadUInt16();
             
-            LeExportsDump.Segmentation!.Add(new LeExportEntry()
+            ExportsDump.Segmentation!.Add(new LeExportEntry()
             {
                 Name = name,
                 Ordinal = ordinal
             });
         }
+
+        Info.ProjectDescription = ExportsDump.Segmentation[0].Name;
     }
     private void FindIterateObjectEntries(BinaryReader reader)
     {
@@ -253,7 +255,7 @@ public class LeFileDumper(String path) : IFileDumper
             dumps.Add(dump);
         }
         
-        LeObjectsDump = dumps.ToArray();
+        ObjectsDump = dumps.ToArray();
     }
     private void FindIterateDirectives(BinaryReader reader)
     {
@@ -293,13 +295,9 @@ public class LeFileDumper(String path) : IFileDumper
             entries.Add(entry);
         }
 
-        LeDirectiveDumps = entries.ToArray();
+        DirectiveDumps = entries.ToArray();
     }
     
-    /// <summary>
-    /// Reads and fills Imported library modules collection
-    /// </summary>
-    /// <param name="reader"><see cref="BinaryReader"/> instance</param>
     private List<String> ReadImportModuleNames(BinaryReader reader)
     {
         List<String> imports = [];
@@ -308,7 +306,7 @@ public class LeFileDumper(String path) : IFileDumper
             Byte len = reader.ReadByte();
             reader.ReadBytes(len);
             // garbage
-            String[] modNames = FindNames(reader);
+            String[] modNames = FindNames(reader, Lva.Offset(LeHeaderDump.Segmentation.ImportedModulesNameTableOffset));
             
             imports.Add(modNames[i]);
         }
@@ -318,11 +316,21 @@ public class LeFileDumper(String path) : IFileDumper
 
     private List<String> ReadImportProcedureNames(BinaryReader reader)
     {
-        Int64 procTableStart = Lva.Offset(LeHeaderDump.Segmentation.ImportedProcedureNameTableOffset);
+        reader.BaseStream.Seek(Lva.Offset(LeHeaderDump.Segmentation.ImportedProcedureNameTableOffset), SeekOrigin.Begin);
+        UInt32 importedProcedureNamesTableEnd =
+            LeHeaderDump.Segmentation.FixupPageTableOffset +
+            LeHeaderDump.Segmentation.FixupSectionSize - 
+            LeHeaderDump.Segmentation.ImportedProcedureNameTableOffset;
+        
+        List<String> procs = [];
+        
+        for (Int32 i = 0; i < importedProcedureNamesTableEnd; ++i)
+        {
+            String[] names = FindNames(reader, Lva.Offset(LeHeaderDump.Segmentation.ImportedProcedureNameTableOffset));
+            procs.Add(names[i]);
+        }
 
-        reader.BaseStream.Seek(procTableStart, SeekOrigin.Begin);
-
-        return [];
+        return procs;
     }
     
     private TStruct Fill<TStruct>(BinaryReader reader) where TStruct : struct

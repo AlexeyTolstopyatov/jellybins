@@ -327,6 +327,7 @@ public class NeFileDumper : IFileDumper
         }
 
         ExportsTableDump = exports.ToArray();
+        Info!.ProjectDescription = exports[0].Name;
     }
     
     private TStruct Fill<TStruct>(BinaryReader reader) where TStruct : struct
