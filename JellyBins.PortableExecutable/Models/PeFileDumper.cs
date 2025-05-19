@@ -70,30 +70,17 @@ public class PeFileDumper(String path) : IFileDumper
             OptionalHeaderDump.Name = "PE Optional Header (WinAPI: IMAGE_OPTIONAL_HEADER)";
             _numberOfRvaAndSizes = OptionalHeaderDump.Segmentation.NumberOfRvaAndSizes;
         }
-        // checking directories by offset
-        List<PeDirectoryDump> dirs = [];
-        for (Int32 i = 0; i < 16; ++i)
-        {
-            PeDirectoryDump dump = new()
-            {
-                Address = (UInt64)stream.Position,
-                Segmentation = Fill<PeDirectory>(reader)
-            };
-            dump.Size = SizeOf(dump.Segmentation);
-            dump.Name = "PE Directory (WinAPI: IMAGE_DIRECTORY)";
-            
-            dirs.Add(dump);
-        }
-
-        DirectoryDumps = dirs.ToArray();
+        
         List<PeSectionDump> sects = [];
         // checking sections by offset
         for (Int32 i = 0; i < _numberOfSections; ++i)
         {
+            UInt64 address = (UInt64)stream.Position;
             PeSection section = Fill<PeSection>(reader);
+            
             PeSectionDump dump = new()
             {
-                Address = (UInt64)stream.Position,
+                Address = address,
                 Segmentation = section
             };
             dump.Size = SizeOf(dump.Segmentation);
@@ -120,7 +107,7 @@ public class PeFileDumper(String path) : IFileDumper
     }
     private Boolean Machine64Bit(UInt16 characteristics)
     {
-        return (characteristics & 0x0100) == 0;
+        return (characteristics & 0x0100) == 0; // machine 32 bit flag
     }
     
     public UInt16 GetExtensionTypeId()

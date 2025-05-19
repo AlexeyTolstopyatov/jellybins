@@ -12,7 +12,13 @@ public class SectionsOpeningTest
     }
     
     /// <summary>
-    /// PASSED!!!!!!! OH GOD!!!! IVE FiNaLlY DONE IT
+    /// ImportProcedureNames [not supported]
+    /// Exports/NonResident names [done]
+    /// Sections [done]
+    /// Info [done]
+    /// ResidentNames [not implemented]
+    /// Resources [not implemented]
+    /// Characteristics [done]
     /// </summary>
     [Test]
     public void ParseNeBinary()
@@ -25,6 +31,17 @@ public class SectionsOpeningTest
         dumper.GetExtensionTypeId();
         Assert.Pass();
     }
+    /// <summary>
+    /// EntryTable [not supported].
+    /// ImportProcedureNamesTable [supported?]
+    /// ImportModules [done]
+    /// Info [done]
+    /// ObjectSections [done]
+    /// ResidentNames [done as Dictionary not ...Dump]
+    /// Exports/NonResidentNames [done]
+    /// Resources [not implemented]
+    /// Characteristics [done]
+    /// </summary>
     [Test]
     public void ParseLxBinary()
     {
@@ -33,10 +50,17 @@ public class SectionsOpeningTest
         Assert.Pass();
     }
 
+    /// <summary>
+    /// Characteristics [not implemented]
+    /// Sections [done]
+    /// Directories [done]
+    /// Imports/Exports [not implemented]
+    /// Runtime Word [not implemented]
+    /// </summary>
     [Test]
     public void ParsePeBinary()
     {
-        PeFileDumper dumper = new(@"D:\Анализ файлов\inst\PE\NTDLL.DLL");
+        PeFileDumper dumper = new(@"D:\Анализ файлов\inst\PE\condrv.sys");
         
         dumper.Dump();
         Assert.Pass();

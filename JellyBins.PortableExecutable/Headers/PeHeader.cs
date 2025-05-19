@@ -108,6 +108,8 @@ public struct PeOptionalHeader
     public UInt64 SizeOfHeapCommit;
     public UInt32 LoaderFlags;
     public UInt32 NumberOfRvaAndSizes;
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
+    public PeDirectory[] Directories;
 }
 [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
 public struct PeOptionalHeader32
@@ -142,4 +144,6 @@ public struct PeOptionalHeader32
     public UInt32 SizeOfHeapCommit;
     public UInt32 LoaderFlags;
     public UInt32 NumberOfRvaAndSizes;
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
+    public PeDirectory[] Directories;
 }
