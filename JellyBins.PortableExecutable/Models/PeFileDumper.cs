@@ -1,10 +1,6 @@
-﻿using System.Collections.Specialized;
-using System.Drawing;
-using System.Reflection.PortableExecutable;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using JellyBins.Abstractions;
 using JellyBins.PortableExecutable.Headers;
-using Microsoft.VisualBasic;
 
 namespace JellyBins.PortableExecutable.Models;
 
@@ -84,11 +80,12 @@ public class PeFileDumper(String path) : IFileDumper
                 Segmentation = section
             };
             dump.Size = SizeOf(dump.Segmentation);
-            dump.Name = "PE Section (WinAPI: IMAGE_SECTION)";
+            dump.Name = "PE Section (WinAPI: IMAGE_SECTION_HEADER)";
             sects.Add(dump);
         }
 
         SectionDumps = sects.ToArray();
+        FindDirectoriesCharacteristics();
         
         reader.Close();
     }
@@ -104,6 +101,49 @@ public class PeFileDumper(String path) : IFileDumper
     private Int32 SizeOf<TStruct>(TStruct structure) where TStruct : struct
     {
         return Marshal.SizeOf(structure);
+    }
+
+    private void FindDirectoriesCharacteristics()
+    {
+        String[] names =
+        [
+            "image_export_directory".ToUpper(),
+            "image_import_directory".ToUpper(),
+            "image_resource_directory".ToUpper(),
+            "image_exception_directory".ToUpper(),
+            "image_certification_directory".ToUpper(),
+            "image_baserelocs_directory".ToUpper(),
+            "image_debug_directory".ToUpper(),
+            "image_architecture_directory".ToUpper(),
+            "image_globalptr_directory".ToUpper(),
+            "image_tls_directory".ToUpper(),
+            "image_loadconfig_directory".ToUpper(),
+            "image_boundimport_directory".ToUpper(),
+            "image_iat_directory".ToUpper(),
+            "image_delay_import_descriptors_directory".ToUpper(),
+            "image_com_directory".ToUpper(),
+            "image_reserved_directory".ToUpper()
+        ];
+        PeDirectory[] directories = Machine64Bit(FileHeaderDump.Segmentation.Characteristics)
+            ? OptionalHeaderDump.Segmentation.Directories
+            : OptionalHeader32Dump.Segmentation.Directories;
+        
+        List<PeDirectoryDump> directoryDumps = [];
+        for (Int32 i = 0; i < _numberOfRvaAndSizes; ++i)
+        {
+            String name = $"PE Data Directory (JellyBins: {names[i]})";
+            Int32 size = 8;
+            PeDirectoryDump dump = new()
+            {
+                Name = name,
+                Characteristics = ["DATA_OFFSET_RVA"],
+                Size = size,
+                Segmentation = directories[i]
+            };
+            directoryDumps.Add(dump);
+        }
+
+        DirectoryDumps = directoryDumps.ToArray();
     }
     private Boolean Machine64Bit(UInt16 characteristics)
     {

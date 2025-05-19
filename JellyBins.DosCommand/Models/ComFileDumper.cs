@@ -4,10 +4,11 @@ namespace JellyBins.DosCommand.Models;
 
 public class ComFileDumper(String path) : IFileDumper
 {
-    public ComFileInfo Info { get; private set; } = new();
-    private String Name { get; } = new FileInfo(path).Name;
-    private String Path { get; } = path;
-
+    public ComFileInfo Info { get; private set; } = new()
+    {
+        Name = new FileInfo(path).Name,
+        Path = path
+    };
     public ComSectionDump[]? Sections { get; private set; }
     
     private UInt16 _extensionTypeId = (UInt16)FileType.Application;
@@ -21,7 +22,7 @@ public class ComFileDumper(String path) : IFileDumper
     public void Dump()
     {
         ComDump dump = new();
-        Byte[] bytes = File.ReadAllBytes(Path);
+        Byte[] bytes = File.ReadAllBytes(Info.Path!);
         
         dump.Characteristics =
         [
@@ -32,24 +33,19 @@ public class ComFileDumper(String path) : IFileDumper
             "image_mem_stack".ToUpper()
         ];
 
-        String os = "MS-DOS", arch = "I8086";
+        String os = "MS-DOS", arch = "Intel 8086";
 
-        if (FindCPmSyscall(bytes))
-        {
-            os = "CP/M";
-            arch = "I8080";
-        }
+        // if (FindCPmSyscall(bytes))
+        // {
+        //     os = "CP/M";
+        //     arch = "Intel 8080";
+        // }
+
+        Info.CpuArchitecture = arch;
+        Info.CpuWordLength = 16;
+        Info.OperatingSystem = os;
+        Info.OperatingSystemVersion = "1.0";
         
-        ComFileInfo info = new()
-        {
-            Path = Path,
-            Name = Name,
-            CpuArchitecture = arch,
-            CpuWordLength = 16,
-            OperatingSystem = os,
-            OperatingSystemVersion = "1.0",
-        };
-
         UInt32 addr = FindDataAddress(bytes);
 
         Sections =
@@ -85,8 +81,6 @@ public class ComFileDumper(String path) : IFileDumper
                 }
             }
         ];
-        
-        Info = info;
     }
 
     public UInt16 GetExtensionTypeId()

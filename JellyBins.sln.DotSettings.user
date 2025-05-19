@@ -1,11 +1,14 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=8e35175b_002D5ea0_002D46b5_002D84f9_002D7a0222f35aa4/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="ParsePeBinary #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;TestAncestor&gt;&#xD;
-    &lt;TestId&gt;NUnit3x::8AC97B55-D621-47C0-B3D6-4E18E4C1274D::net8.0::HeadersTest.SectionsOpeningTest.ParsePeBinary&lt;/TestId&gt;&#xD;
-  &lt;/TestAncestor&gt;&#xD;
-&lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=f60c1e82_002D8d37_002D4fc1_002Db60f_002D20da8885dec9/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="ParsePeBinary" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;TestAncestor&gt;&#xD;
-    &lt;TestId&gt;NUnit3x::8AC97B55-D621-47C0-B3D6-4E18E4C1274D::net8.0::HeadersTest.SectionsOpeningTest.ParsePeBinary&lt;/TestId&gt;&#xD;
-  &lt;/TestAncestor&gt;&#xD;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=4ced6d3f_002D02ce_002D444f_002Daa50_002Dc2374e271c43/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="ParsePeBinary" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;And&gt;&#xD;
+    &lt;TestAncestor&gt;&#xD;
+      &lt;TestId&gt;NUnit3x::8AC97B55-D621-47C0-B3D6-4E18E4C1274D::net8.0::HeadersTest.SectionsOpeningTest.ParsePeBinary&lt;/TestId&gt;&#xD;
+      &lt;TestId&gt;NUnit3x::8AC97B55-D621-47C0-B3D6-4E18E4C1274D::net8.0::HeadersTest.SectionsOpeningTest.ParseCommand&lt;/TestId&gt;&#xD;
+    &lt;/TestAncestor&gt;&#xD;
+    &lt;Not&gt;&#xD;
+      &lt;TestAncestor&gt;&#xD;
+        &lt;TestId&gt;NUnit3x::8AC97B55-D621-47C0-B3D6-4E18E4C1274D::net8.0::HeadersTest.SectionsOpeningTest.ParseCommand&lt;/TestId&gt;&#xD;
+      &lt;/TestAncestor&gt;&#xD;
+    &lt;/Not&gt;&#xD;
+  &lt;/And&gt;&#xD;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

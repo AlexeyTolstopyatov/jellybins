@@ -1,6 +1,7 @@
 using JellyBins.LinearExecutable.Models;
 using JellyBins.PortableExecutable.Models;
 using JellyBins.NewExecutable.Models;
+using JellyBins.DosCommand.Models;
 
 namespace HeadersTest;
 
@@ -61,6 +62,14 @@ public class SectionsOpeningTest
     public void ParsePeBinary()
     {
         PeFileDumper dumper = new(@"D:\Анализ файлов\inst\PE\condrv.sys");
+        
+        dumper.Dump();
+        Assert.Pass();
+    }
+    [Test]
+    public void ParseCommand()
+    {
+        ComFileDumper dumper = new(@"D:\Анализ файлов\inst\COM\EDIT.COM");
         
         dumper.Dump();
         Assert.Pass();
