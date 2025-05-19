@@ -5,5 +5,5 @@ namespace JellyBins.PortableExecutable.Models;
 
 public class PeFileHeaderDump : BaseDump<PeFileHeader>
 {
-    
+    public DateTime TimeStamp { get; set; }
 }

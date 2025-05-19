@@ -1,6 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using JellyBins.Abstractions;
 using JellyBins.PortableExecutable.Headers;
+using static System.TimeZone;
 
 namespace JellyBins.PortableExecutable.Models;
 
@@ -23,11 +24,14 @@ public class PeFileDumper(String path) : IFileDumper
     public PeCor20HeaderDump Cor20HeaderDump { get; private set; } = new();
     public PeVb5HeaderDump Vb5HeaderDump { get; private set; } = new();
     
+    // C++ crt/imptab/exptab
+    
     private UInt16 _extensionTypeId = 0;
     private UInt16 _binaryTypeId = 0;
     private UInt32 _numberOfRvaAndSizes;
     private UInt32 _numberOfSections;
-
+    private Boolean _machine64Bit;
+    
     public void Dump()
     {
         using FileStream stream = new(Info.Path!, FileMode.Open, FileAccess.Read);
@@ -57,6 +61,7 @@ public class PeFileDumper(String path) : IFileDumper
             OptionalHeader32Dump.Size = SizeOf(OptionalHeader32Dump.Segmentation);
             OptionalHeader32Dump.Name = "PE Optional Header (WinAPI: IMAGE_OPTIONAL32_HEADER)";
             _numberOfRvaAndSizes = OptionalHeader32Dump.Segmentation.NumberOfRvaAndSizes;
+            _machine64Bit = false;
         }
         else
         {
@@ -65,6 +70,7 @@ public class PeFileDumper(String path) : IFileDumper
             OptionalHeaderDump.Size = SizeOf(FileHeaderDump.Segmentation);
             OptionalHeaderDump.Name = "PE Optional Header (WinAPI: IMAGE_OPTIONAL_HEADER)";
             _numberOfRvaAndSizes = OptionalHeaderDump.Segmentation.NumberOfRvaAndSizes;
+            _machine64Bit = true;
         }
         
         List<PeSectionDump> sects = [];
@@ -81,11 +87,17 @@ public class PeFileDumper(String path) : IFileDumper
             };
             dump.Size = SizeOf(dump.Segmentation);
             dump.Name = "PE Section (WinAPI: IMAGE_SECTION_HEADER)";
+            FindSectionCharacteristics(ref dump);
+            
             sects.Add(dump);
         }
 
         SectionDumps = sects.ToArray();
+        
         FindDirectoriesCharacteristics();
+        FindCharacteristics();
+        FindDllCharacteristics();
+        FindTimeStamp();
         
         reader.Close();
     }
@@ -124,7 +136,7 @@ public class PeFileDumper(String path) : IFileDumper
             "image_com_directory".ToUpper(),
             "image_reserved_directory".ToUpper()
         ];
-        PeDirectory[] directories = Machine64Bit(FileHeaderDump.Segmentation.Characteristics)
+        PeDirectory[] directories = _machine64Bit
             ? OptionalHeaderDump.Segmentation.Directories
             : OptionalHeader32Dump.Segmentation.Directories;
         
@@ -144,6 +156,31 @@ public class PeFileDumper(String path) : IFileDumper
         }
 
         DirectoryDumps = directoryDumps.ToArray();
+    }
+
+    private void FindCharacteristics()
+    {
+        // make FileHeader characteristics array
+    }
+
+    private void FindDllCharacteristics()
+    {
+        // make OptionalHeader characteristics array
+    }
+
+    private void FindSectionCharacteristics(ref PeSectionDump dump)
+    {
+        // change instance. make characteristics
+        
+    }
+    private void FindTimeStamp()
+    {
+        DateTime stamp = new(1970, 1, 1, 0, 0, 0);
+
+        stamp = stamp.AddSeconds(FileHeaderDump.Segmentation.TimeDateStamp);
+        stamp += CurrentTimeZone.GetUtcOffset(stamp);
+        
+        FileHeaderDump.TimeStamp = stamp;
     }
     private Boolean Machine64Bit(UInt16 characteristics)
     {
