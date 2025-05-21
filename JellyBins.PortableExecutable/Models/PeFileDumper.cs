@@ -1,6 +1,8 @@
 ﻿using System.Runtime.InteropServices;
 using JellyBins.Abstractions;
 using JellyBins.PortableExecutable.Headers;
+using System.Reflection;
+using System.Text.RegularExpressions;
 using static System.TimeZone;
 
 namespace JellyBins.PortableExecutable.Models;
@@ -20,11 +22,10 @@ public class PeFileDumper(String path) : IFileDumper
     public PeOptionalHeader32Dump OptionalHeader32Dump { get; private set; } = new();
     public PeOptionalHeaderRomDump OptionalHeaderRomDump { get; private set; } = new();
     public PeSectionDump[] SectionDumps { get; private set; } = [];
+    public PeImportsDump ImportsDump { get; private set; } = new();
     public PeDirectoryDump[] DirectoryDumps { get; private set; } = [];
     public PeCor20HeaderDump Cor20HeaderDump { get; private set; } = new();
     public PeVb5HeaderDump Vb5HeaderDump { get; private set; } = new();
-    
-    // C++ crt/imptab/exptab
     
     private UInt16 _extensionTypeId = 0;
     private UInt16 _binaryTypeId = 0;
@@ -98,10 +99,26 @@ public class PeFileDumper(String path) : IFileDumper
         FindCharacteristics();
         FindDllCharacteristics();
         FindTimeStamp();
+
+        PeSectionDumper dumper = new 
+        (
+            ExtractDirectoriesFromDump(),
+            ExtractSectionsFromDump()
+        );
+
+        ImportsDump = dumper.ImportsDump(reader);
         
         reader.Close();
     }
 
+    private PeDirectory[] ExtractDirectoriesFromDump()
+    {
+        return DirectoryDumps.Select(x => x.Segmentation).ToArray();
+    }
+    private PeSection[] ExtractSectionsFromDump()
+    {
+        return SectionDumps.Select(x => x.Segmentation).ToArray();
+    }
     private TStruct Fill<TStruct>(BinaryReader reader) where TStruct : struct
     {
         Byte[] bytes = reader.ReadBytes(Marshal.SizeOf(typeof(TStruct)));

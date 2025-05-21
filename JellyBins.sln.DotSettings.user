@@ -11,4 +11,17 @@
       &lt;/TestAncestor&gt;&#xD;
     &lt;/Not&gt;&#xD;
   &lt;/And&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=d4b3714d_002D2ff9_002D49eb_002Da1f0_002D3b5daada2e39/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="Session" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;And&gt;&#xD;
+    &lt;TestAncestor&gt;&#xD;
+      &lt;TestId&gt;NUnit3x::8AC97B55-D621-47C0-B3D6-4E18E4C1274D::net8.0::HeadersTest.SectionsOpeningTest.ParsePeBinary&lt;/TestId&gt;&#xD;
+      &lt;TestId&gt;NUnit3x::8AC97B55-D621-47C0-B3D6-4E18E4C1274D::net8.0::HeadersTest.SectionsOpeningTest.ParseCommand&lt;/TestId&gt;&#xD;
+    &lt;/TestAncestor&gt;&#xD;
+    &lt;Not&gt;&#xD;
+      &lt;TestAncestor&gt;&#xD;
+        &lt;TestId&gt;NUnit3x::8AC97B55-D621-47C0-B3D6-4E18E4C1274D::net8.0::HeadersTest.SectionsOpeningTest.ParseCommand&lt;/TestId&gt;&#xD;
+      &lt;/TestAncestor&gt;&#xD;
+    &lt;/Not&gt;&#xD;
+  &lt;/And&gt;&#xD;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
