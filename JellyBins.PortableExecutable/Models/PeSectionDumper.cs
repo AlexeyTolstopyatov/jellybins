@@ -44,14 +44,22 @@ public class PeSectionDumper(PeDirectory[] directories, PeSection[] sections)
                     Byte b = Fill<Byte>(reader);
                     if (b == 0) break;
 
-                    Byte[] newname = new Byte[name.Length + 1];
-                    name.CopyTo(newname, 0);
-                    newname[name.Length] = b;
-                    name = newname;
-                }
+                    Byte[] dllName = new Byte[name.Length + 1];
+                    name.CopyTo(dllName, 0);
+                    dllName[name.Length] = b;
+                    name = dllName;
+                } // читает правильно
 
                 Debug.WriteLine(Encoding.ASCII.GetString(name));
             }
+
+            List<ImportDll> modules = [];
+            foreach (PeImportDescriptor descriptor in items)
+            {
+                modules.Add(ReadImportDll(reader, descriptor)); // читает правильно но функция везде только одна
+            }
+
+            dump.FoundImports = modules;
         }
         catch
         {
@@ -59,74 +67,76 @@ public class PeSectionDumper(PeDirectory[] directories, PeSection[] sections)
         }
         
         dump.Size = Marshal.SizeOf<PeImportDescriptor>() * dump.Segmentation.Count;
-        //dump.FoundImports = imports;
+        
         return dump;
     }
-    
     /// <param name="reader"> Current instance of <see cref="BinaryReader"/> </param>
     /// <param name="descriptor"> Seeking <see cref="PeImportDescriptor"/> table </param>
     /// <returns> Filled <see cref="ImportDll"/> instance full of module information </returns>
     private ImportDll ReadImportDll(BinaryReader reader, PeImportDescriptor descriptor)
     {
         Int64 nameOffset = Offset(descriptor.Name);
-        
         reader.BaseStream.Seek(nameOffset, SeekOrigin.Begin);
-        
         String dllName = ReadTStr(reader);
+        Debug.WriteLine($"Processing DLL: {dllName}");
 
-        List<ImportedFunction> functions = [];
-        
-        UInt32 thunkRva = descriptor.OriginalFirstThunk != 0 
-            ? descriptor.OriginalFirstThunk 
-            : descriptor.FirstThunk;
-        
-        Int64 thunkOffset = Offset(thunkRva);
-        
-        while (true)
+        List<ImportedFunction> functions = ReadThunk(reader, descriptor.OriginalFirstThunk, "OFT");
+
+        if (functions.Count == 0)
         {
-            reader.BaseStream.Seek(thunkOffset, SeekOrigin.Begin);
-            UInt32 thunkData = reader.ReadUInt32();
-            
-            if (thunkData == 0) 
-                break;
-
-            if ((thunkData & 0x80000000) != 0)
-            {
-                functions.Add(new ImportedFunction
-                {
-                    Ordinal = thunkData & 0xFFFF,
-                    Name = $"@{thunkData & 0xFFFF}"
-                });
-            }
-            else
-            {
-                Int64 nameAddr = Offset(thunkData);
-                reader.BaseStream.Position = nameAddr;
-                
-                UInt16 hint = reader.ReadUInt16(); // Подсказка (как в PE Anatomist)
-                functions.Add(new ImportedFunction
-                {
-                    Name = ReadTStr(reader)
-                });
-            }
-
-            thunkOffset += 4;
+            functions = ReadThunk(reader, descriptor.FirstThunk, "FirstThunk");
         }
 
-        return new ImportDll
-        {
-            DllName = dllName, 
-            Functions = functions
-        };
+        return new ImportDll { DllName = dllName, Functions = functions };
     }
-    private Boolean IsNullDescriptor(PeImportDescriptor descriptor)
+    /// <param name="reader"></param>
+    /// <param name="thunkRva"></param>
+    /// <param name="tag"></param>
+    /// <returns></returns>
+    private List<ImportedFunction> ReadThunk(BinaryReader reader, UInt32 thunkRva, String tag)
     {
-        return descriptor is
+        List<ImportedFunction> result = [];
+        if (thunkRva == 0) 
+            return result;
+
+        try
         {
-            OriginalFirstThunk: 0, 
-            FirstThunk: 0, 
-            Name: 0
-        };
+            Int64 thunkOffset = Offset(thunkRva);
+            while (true)
+            {
+                reader.BaseStream.Seek(thunkOffset, SeekOrigin.Begin);
+                UInt32 thunkData = reader.ReadUInt32();
+                if (thunkData == 0) 
+                    break;
+
+                Int64 nameAddr = Offset(thunkData);
+                reader.BaseStream.Position = nameAddr;
+                UInt16 hint = reader.ReadUInt16();
+
+                if ((thunkData & 0x80000000) != 0)
+                {
+                    result.Add(new ImportedFunction()
+                    {
+                        Name = $"@{reader.ReadUInt32()}"  // ?
+                    });
+                }
+                else
+                {
+                    result.Add(new ImportedFunction
+                    {
+                        Name = ReadTStr(reader)
+                    });
+                }
+                
+                thunkOffset += 4;
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"{tag} error: {ex.Message}");
+        }
+        
+        return result;
     }
     /// <param name="rva"> Required RVA </param>
     /// <returns> File offset from RVA of selected section </returns>

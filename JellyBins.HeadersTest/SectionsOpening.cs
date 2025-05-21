@@ -61,7 +61,7 @@ public class SectionsOpeningTest
     [Test]
     public void ParsePeBinary()
     {
-        PeFileDumper dumper = new(@"D:\Анализ файлов\inst\PE\acpi.sys");
+        PeFileDumper dumper = new(@"D:\Анализ файлов\inst\PE\advapi32.dll");
         
         dumper.Dump();
         Assert.Pass();

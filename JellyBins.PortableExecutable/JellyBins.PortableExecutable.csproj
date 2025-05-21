@@ -10,4 +10,8 @@
       <ProjectReference Include="..\JellyBins.Abstractions\JellyBins.Abstractions.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ClCompile Include="Models\importsArticle.cpp" />
+    </ItemGroup>
+
 </Project>
