@@ -23,6 +23,7 @@ public class PeFileDumper(String path) : IFileDumper
     public PeOptionalHeaderRomDump OptionalHeaderRomDump { get; private set; } = new();
     public PeSectionDump[] SectionDumps { get; private set; } = [];
     public PeImportsDump ImportsDump { get; private set; } = new();
+    public PeExportsDump ExportsDump { get; private set; } = new();
     public PeDirectoryDump[] DirectoryDumps { get; private set; } = [];
     public PeCor20HeaderDump Cor20HeaderDump { get; private set; } = new();
     public PeVb5HeaderDump Vb5HeaderDump { get; private set; } = new();
@@ -107,7 +108,8 @@ public class PeFileDumper(String path) : IFileDumper
             _machine64Bit
         );
         
-        ImportsDump = dumper.Imports32Dump(reader);
+        ImportsDump = dumper.ImportsDump(reader);
+        ExportsDump = dumper.ExportsDump(reader);
         
         reader.Close();
     }

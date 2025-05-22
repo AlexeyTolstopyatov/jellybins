@@ -61,7 +61,7 @@ public class SectionsOpeningTest
     [Test]
     public void ParsePeBinary()
     {
-        PeFileDumper dumper = new(@"D:\Анализ файлов\inst\PE\acpi.sys");
+        PeFileDumper dumper = new(@"D:\Анализ файлов\inst\PE\acpi.sys"); // best Exports example
         // 32 bit imports reads ok
         // 64 bit imports problem
         dumper.Dump();

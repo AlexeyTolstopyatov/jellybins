@@ -8,10 +8,11 @@ namespace JellyBins.PortableExecutable.Models;
 
 public class PeSectionDumper(PeDirectory[] directories, PeSection[] sections, Boolean machine64Bit)
 {
+    #region Static Import Processor
     /// <summary> Deserializes bytes segment to import entries table </summary>
     /// <param name="reader">your content reader instance</param>
     /// <returns> Done <see cref="PeImportsDump"/> structure </returns>
-    public PeImportsDump Imports32Dump(BinaryReader reader)
+    public PeImportsDump ImportsDump(BinaryReader reader)
     {
         PeImportsDump dump = new() 
         {
@@ -54,7 +55,7 @@ public class PeSectionDumper(PeDirectory[] directories, PeSection[] sections, Bo
             List<ImportDll> modules = [];
             foreach (PeImportDescriptor32 descriptor in items)
             {
-                modules.Add(ReadImportDll32(reader, descriptor));
+                modules.Add(ReadImportDll(reader, descriptor));
             }
 
             dump.FoundImports = modules;
@@ -71,7 +72,7 @@ public class PeSectionDumper(PeDirectory[] directories, PeSection[] sections, Bo
     /// <param name="reader"> Current instance of <see cref="BinaryReader"/> </param>
     /// <param name="descriptor32"> Seeking <see cref="PeImportDescriptor32"/> table </param>
     /// <returns> Filled <see cref="ImportDll"/> instance full of module information </returns>
-    private ImportDll ReadImportDll32(BinaryReader reader, PeImportDescriptor32 descriptor32)
+    private ImportDll ReadImportDll(BinaryReader reader, PeImportDescriptor32 descriptor32)
     {
         Int64 nameOffset = Offset(descriptor32.Name);
         reader.BaseStream.Seek(nameOffset, SeekOrigin.Begin);
@@ -147,6 +148,92 @@ public class PeSectionDumper(PeDirectory[] directories, PeSection[] sections, Bo
         
         return result;
     }
+    #endregion
+    #region Export Processor
+    /// <param name="reader"><see cref="BinaryReader"/> instance</param>
+    /// <returns>Processed <see cref="ExportFunction"/> list of dumps</returns>
+    public PeExportsDump ExportsDump(BinaryReader reader)
+    {
+        PeExportsDump dump = new()
+        {
+            Name = "PE Exports (WinAPI: IMAGE_EXPORTS_DIRECTORY)",
+            Segmentation = [],
+            Characteristics = ["0"]
+        };
+        const Int32 exportDirectoryIndex = 0;
+        
+        List<ExportFunction> exports = [];
+
+        if (directories.Length <= exportDirectoryIndex || 
+            directories[exportDirectoryIndex].Size == 0)
+        {
+            return new PeExportsDump();
+        }
+        
+        UInt32 exportRva = directories[exportDirectoryIndex].VirtualAddress;
+        Int64 exportOffset = Offset(exportRva);
+
+        reader.BaseStream.Seek(exportOffset, SeekOrigin.Begin);
+        PeImageExportDirectory exportDir = Fill<PeImageExportDirectory>(reader);
+        
+        dump.ImageExportDirectory = exportDir;
+        
+        reader.BaseStream.Position = Offset(exportDir.Name);
+        
+        String moduleName = ReadTStr(reader);
+        Debug.WriteLine(moduleName);
+        
+        UInt32[] functionAddresses = ReadArray<UInt32>(reader, exportDir.AddressOfFunctions, exportDir.NumberOfFunctions);
+        UInt32[] namePointers = ReadArray<UInt32>(reader, exportDir.AddressOfNames, exportDir.NumberOfNames);
+        UInt16[] ordinals = ReadArray<UInt16>(reader, exportDir.AddressOfNameOrdinals, exportDir.NumberOfNames);
+
+        for (Int32 i = 0; i < exportDir.NumberOfNames; i++)
+        {
+            String functionName = ReadExportString(reader, namePointers[i]);
+            UInt32 ordinal = (ordinals[i] + exportDir.Base);
+            UInt64 address = machine64Bit 
+                ? ReadArray<UInt64>(reader, functionAddresses[ordinals[i]], 1)[0] 
+                : ReadArray<UInt32>(reader, functionAddresses[ordinals[i]], 1)[0];
+
+            exports.Add(new ExportFunction
+            {
+                Name = functionName,
+                Ordinal = ordinal,
+                Address = address
+            });
+        }
+
+        dump.Segmentation = exports;
+        
+        return dump;
+    }
+    private String ReadExportString(BinaryReader reader, UInt32 rva)
+    {
+        Int64 offset = Offset(rva);
+        reader.BaseStream.Seek(offset, SeekOrigin.Begin);
+        List<Byte> bytes = [];
+        Byte b;
+        while ((b = reader.ReadByte()) != 0)
+            bytes.Add(b);
+        return Encoding.ASCII.GetString(bytes.ToArray());
+    }
+
+    #endregion
+    /// <param name="reader"><see cref="BinaryReader"/> instance</param>
+    /// <param name="rva">RVA</param>
+    /// <param name="count">count of elements in segment</param>
+    /// <typeparam name="T">type of array-segment</typeparam>
+    /// <returns>Array of structures</returns>
+    private T[] ReadArray<T>(BinaryReader reader, UInt32 rva, UInt32 count) where T : struct
+    {
+        Int64 offset = Offset(rva);
+        reader.BaseStream.Seek(offset, SeekOrigin.Begin);
+        Int32 size = Marshal.SizeOf<T>();
+        T[] result = new T[count];
+        for (Int32 i = 0; i < count; i++)
+            result[i] = Fill<T>(reader);
+        return result;
+    }
     /// <param name="rva"> Required RVA </param>
     /// <returns> File offset from RVA of selected section </returns>
     /// <exception cref="SectionNotFoundException"> If RVA not belongs to any section </exception>
@@ -208,6 +295,7 @@ public class PeSectionDumper(PeDirectory[] directories, PeSection[] sections, Bo
     {
         return dllName.Length > 256;
     }
+    
 }
 
 public class ImportDll
