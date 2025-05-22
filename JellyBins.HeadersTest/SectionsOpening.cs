@@ -61,8 +61,9 @@ public class SectionsOpeningTest
     [Test]
     public void ParsePeBinary()
     {
-        PeFileDumper dumper = new(@"D:\Анализ файлов\inst\PE\advapi32.dll");
-        
+        PeFileDumper dumper = new(@"D:\Анализ файлов\inst\PE\explorer.exe");
+        // 32 bit imports reads ok
+        // 64 bit imports problem
         dumper.Dump();
         Assert.Pass();
     }

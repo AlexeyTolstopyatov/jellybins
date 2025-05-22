@@ -79,7 +79,7 @@ int main(int argc, const char* argv[])
 				std::string name;
 				WORD hint;
 
-				std::cout << std::endl << " hint | name/ordinal                |  address" << std::endl;
+				std::cout << std::endl << " hint | name/ordinal                |  address " << std::endl;
 
 				//Перебор импортируемых функций
 				if(import_lookup_table != 0 && import_address_table != 0)

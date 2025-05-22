@@ -1,6 +1,6 @@
 ﻿namespace JellyBins.PortableExecutable.Headers;
 
-public struct PeImportDescriptor
+public struct PeImportDescriptor32
 {
     public UInt32 OriginalFirstThunk;
     public UInt32 TimeDateStamp;
