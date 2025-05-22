@@ -76,7 +76,7 @@ public class PeSectionDumper(PeDirectory[] directories, PeSection[] sections, Bo
     {
         Int64 nameOffset = Offset(descriptor32.Name);
         reader.BaseStream.Seek(nameOffset, SeekOrigin.Begin);
-        String dllName = ReadTStr(reader);
+        String dllName = ReadImportString(reader);
         Debug.WriteLine($"IMAGE_IMPORT_TABLE->{dllName}");
         
         // optional [?]
@@ -134,7 +134,7 @@ public class PeSectionDumper(PeDirectory[] directories, PeSection[] sections, Bo
                 {
                     result.Add(new ImportedFunction
                     {
-                        Name = ReadTStr(reader),
+                        Name = ReadImportString(reader),
                         Hint = hint
                     });
                 }
@@ -179,8 +179,9 @@ public class PeSectionDumper(PeDirectory[] directories, PeSection[] sections, Bo
         dump.ImageExportDirectory = exportDir;
         
         reader.BaseStream.Position = Offset(exportDir.Name);
+        dump.Address = (UInt64)Offset(exportDir.Name);
         
-        String moduleName = ReadTStr(reader);
+        String moduleName = ReadImportString(reader);
         Debug.WriteLine(moduleName);
         
         UInt32[] functionAddresses = ReadArray<UInt32>(reader, exportDir.AddressOfFunctions, exportDir.NumberOfFunctions);
@@ -202,11 +203,14 @@ public class PeSectionDumper(PeDirectory[] directories, PeSection[] sections, Bo
                 Address = address
             });
         }
-
         dump.Segmentation = exports;
+        dump.Size = SizeOf(new PeImageExportDirectory());
         
         return dump;
     }
+    /// <param name="reader"><see cref="BinaryReader"/> instance</param>
+    /// <param name="rva">rva of entry name</param>
+    /// <returns> ASCII(Z) string of exported entry</returns>
     private String ReadExportString(BinaryReader reader, UInt32 rva)
     {
         Int64 offset = Offset(rva);
@@ -217,7 +221,6 @@ public class PeSectionDumper(PeDirectory[] directories, PeSection[] sections, Bo
             bytes.Add(b);
         return Encoding.ASCII.GetString(bytes.ToArray());
     }
-
     #endregion
     /// <param name="reader"><see cref="BinaryReader"/> instance</param>
     /// <param name="rva">RVA</param>
@@ -228,7 +231,6 @@ public class PeSectionDumper(PeDirectory[] directories, PeSection[] sections, Bo
     {
         Int64 offset = Offset(rva);
         reader.BaseStream.Seek(offset, SeekOrigin.Begin);
-        Int32 size = Marshal.SizeOf<T>();
         T[] result = new T[count];
         for (Int32 i = 0; i < count; i++)
             result[i] = Fill<T>(reader);
@@ -262,7 +264,7 @@ public class PeSectionDumper(PeDirectory[] directories, PeSection[] sections, Bo
     }
     /// <param name="reader"> <see cref="BinaryReader"/> instance </param>
     /// <returns> ASCIIZ typed string <c>TSTR</c> </returns>
-    private String ReadTStr(BinaryReader reader)
+    private static String ReadImportString(BinaryReader reader)
     {
         List<Byte> bytes = [];
         Byte b;
@@ -274,7 +276,7 @@ public class PeSectionDumper(PeDirectory[] directories, PeSection[] sections, Bo
     /// <param name="reader"> <see cref="BinaryReader"/> instance </param>
     /// <typeparam name="TStruct"> Structure type </typeparam>
     /// <returns> Deserialized structure by pointer </returns>
-    private TStruct Fill<TStruct>(BinaryReader reader) where TStruct : struct
+    private static TStruct Fill<TStruct>(BinaryReader reader) where TStruct : struct
     {
         Byte[] bytes = reader.ReadBytes(Marshal.SizeOf(typeof(TStruct)));
         GCHandle handle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
@@ -295,7 +297,6 @@ public class PeSectionDumper(PeDirectory[] directories, PeSection[] sections, Bo
     {
         return dllName.Length > 256;
     }
-    
 }
 
 public class ImportDll
