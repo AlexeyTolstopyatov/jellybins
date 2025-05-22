@@ -1,0 +1,17 @@
+{
+    "Win16 API": [
+        "KERNEL",
+        "USER",
+        "GDI",
+        "COMMDLG",
+        "TOOLHELP",
+        "SHELL",
+        ""
+    ],
+    "Visual Basic API": [
+        "VB400"
+    ],
+    "Visual Basic VM API": [
+        "MSVBVM50"
+    ]
+}
