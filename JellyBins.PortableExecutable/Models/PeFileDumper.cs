@@ -103,12 +103,11 @@ public class PeFileDumper(String path) : IFileDumper
         PeSectionDumper dumper = new 
         (
             ExtractDirectoriesFromDump(),
-            ExtractSectionsFromDump()
+            ExtractSectionsFromDump(),
+            _machine64Bit
         );
         
-        ImportsDump = _machine64Bit 
-            ? dumper.Imports64Dump(reader) 
-            : dumper.Imports32Dump(reader);
+        ImportsDump = dumper.Imports32Dump(reader);
         
         reader.Close();
     }

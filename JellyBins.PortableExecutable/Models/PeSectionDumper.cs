@@ -6,7 +6,7 @@ using JellyBins.PortableExecutable.Headers;
 
 namespace JellyBins.PortableExecutable.Models;
 
-public class PeSectionDumper(PeDirectory[] directories, PeSection[] sections)
+public class PeSectionDumper(PeDirectory[] directories, PeSection[] sections, Boolean machine64Bit)
 {
     /// <summary> Deserializes bytes segment to import entries table </summary>
     /// <param name="reader">your content reader instance</param>
@@ -20,7 +20,7 @@ public class PeSectionDumper(PeDirectory[] directories, PeSection[] sections)
             Address = 0,
             Segmentation = []
         };
-
+        
         try
         {
             reader.BaseStream.Seek(Offset(directories[1].VirtualAddress), SeekOrigin.Begin); // all sections instead IMPORTS
@@ -68,71 +68,6 @@ public class PeSectionDumper(PeDirectory[] directories, PeSection[] sections)
         
         return dump;
     }
-    /// <summary> Deserializes bytes segment to import entries table </summary>
-    /// <param name="reader">your content reader instance</param>
-    /// <returns> Done <see cref="PeImportsDump"/> structure </returns>
-    public PeImportsDump Imports64Dump(BinaryReader reader)
-    {
-        PeImportsDump dump = new() 
-        {
-            Name = "PE Imports (JellyBins: IMAGE_IMPORT_DIRECTORY_TABLE)",
-            Size = 0,
-            Address = 0,
-            Segmentation = []
-        };
-        
-        if (directories[1].Size == 0 || directories[1].VirtualAddress == 0)
-            return dump;
-        
-        try
-        {
-            reader.BaseStream.Seek(Offset(directories[1].VirtualAddress),
-                SeekOrigin.Begin); // all sections instead IMPORTS
-            List<PeImportDescriptor64> items = [];
-            while (true)
-            {
-                PeImportDescriptor64 item = Fill<PeImportDescriptor64>(reader);
-                if (item.OriginalFirstThunk == 0) 
-                    break;
-
-                items.Add(item);
-            }
-
-            foreach (PeImportDescriptor64 item in items)
-            {
-                reader.BaseStream.Seek(Offset((Int32)(item.Name)), SeekOrigin.Begin);
-                Byte[] name = [];
-                while (true)
-                {
-                    Byte b = Fill<Byte>(reader);
-                    if (b == 0) break;
-
-                    Byte[] dllName = new Byte[name.Length + 1];
-                    name.CopyTo(dllName, 0);
-                    dllName[name.Length] = b;
-                    name = dllName;
-                }
-
-                Debug.WriteLine(Encoding.ASCII.GetString(name));
-            }
-
-            List<ImportDll> modules = [];
-            foreach (PeImportDescriptor64 descriptor in items)
-            {
-                modules.Add(ReadImportDll64(reader, descriptor));
-            }
-
-            dump.FoundImports = modules;
-        }
-        catch
-        {
-            // ignoring
-        }
-        
-        dump.Size = Marshal.SizeOf<PeImportDescriptor32>() * dump.Segmentation.Count;
-
-        return dump;
-    }
     /// <param name="reader"> Current instance of <see cref="BinaryReader"/> </param>
     /// <param name="descriptor32"> Seeking <see cref="PeImportDescriptor32"/> table </param>
     /// <returns> Filled <see cref="ImportDll"/> instance full of module information </returns>
@@ -141,35 +76,14 @@ public class PeSectionDumper(PeDirectory[] directories, PeSection[] sections)
         Int64 nameOffset = Offset(descriptor32.Name);
         reader.BaseStream.Seek(nameOffset, SeekOrigin.Begin);
         String dllName = ReadTStr(reader);
-        Debug.WriteLine($"Processing DLL: {dllName}");
-
+        Debug.WriteLine($"IMAGE_IMPORT_TABLE->{dllName}");
+        
+        // optional [?]
         List<ImportedFunction> oft = 
-            ReadThunk32(reader, descriptor32.OriginalFirstThunk, "OriginalFirstThunk");
+            ReadThunk32(reader, descriptor32.OriginalFirstThunk, "[By OriginalFirstThunk]");
 
         List<ImportedFunction> ft = 
-            ReadThunk32(reader, descriptor32.FirstThunk, "FirstThunk");
-
-        List<ImportedFunction> functions = [];
-        functions.AddRange(oft);
-        functions.AddRange(ft);
-
-        return new ImportDll { DllName = dllName, Functions = functions };
-    }
-    /// <param name="reader"> Current instance of <see cref="BinaryReader"/> </param>
-    /// <param name="descriptor64"> Seeking <see cref="PeImportDescriptor32"/> table </param>
-    /// <returns> Filled <see cref="ImportDll"/> instance full of module information </returns>
-    private ImportDll ReadImportDll64(BinaryReader reader, PeImportDescriptor64 descriptor64)
-    {
-        Int64 nameOffset = Offset((Int64)descriptor64.Name);
-        reader.BaseStream.Seek(nameOffset, SeekOrigin.Begin);
-        String dllName = ReadTStr(reader);
-        Debug.WriteLine($"Processing DLL: {dllName}");
-
-        List<ImportedFunction> oft = 
-            ReadThunk64(reader, descriptor64.OriginalFirstThunk, "OriginalFirstThunk");
-
-        List<ImportedFunction> ft = 
-            ReadThunk64(reader, descriptor64.FirstThunk, "FirstThunk");
+            ReadThunk32(reader, descriptor32.FirstThunk, "[By FirstThunk]");
 
         List<ImportedFunction> functions = [];
         functions.AddRange(oft);
@@ -184,6 +98,10 @@ public class PeSectionDumper(PeDirectory[] directories, PeSection[] sections)
     /// <returns>List of imported functions</returns>
     private List<ImportedFunction> ReadThunk32(BinaryReader reader, UInt32 thunkRva, String tag)
     {
+        UInt32 sizeOfThunk = (UInt32) (machine64Bit ? 0x8 : 0x4); // Size of ImageThunkData
+        UInt64 ordinalBit = machine64Bit ? 0x8000000000000000 : 0x80000000;
+        UInt64 ordinalMask = (UInt64) (machine64Bit ? 0x7FFFFFFFFFFFFFFF : 0x7FFFFFFF);
+        
         List<ImportedFunction> result = [];
         if (thunkRva == 0) 
             return result;
@@ -202,12 +120,12 @@ public class PeSectionDumper(PeDirectory[] directories, PeSection[] sections)
                 
                 UInt16 hint = reader.ReadUInt16();
 
-                if ((thunkData & 0x80000000) != 0)
+                if ((thunkData & ordinalBit) != 0)
                 {
                     result.Add(new ImportedFunction()
                     {
-                        Name = $"@{thunkData & 0xFFFF}",
-                        Ordinal = thunkData & 0xFFFF,
+                        Name = $"@{thunkData & ordinalMask}",
+                        Ordinal = thunkData & ordinalMask,
                         Hint = hint
                     });
                 }
@@ -219,60 +137,7 @@ public class PeSectionDumper(PeDirectory[] directories, PeSection[] sections)
                         Hint = hint
                     });
                 }
-                thunkOffset += 4;
-            }
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"{tag} error: {ex.Message}");
-        }
-        
-        return result;
-    }
-    /// <summary> Use it when Application requires 64bit machine WORD </summary>
-    /// <param name="reader"><see cref="BinaryReader"/> instance</param>
-    /// <param name="thunkRva">RVA of procedures block</param>
-    /// <param name="tag">debug information (#debug only)</param>
-    /// <returns>List of imported functions</returns>
-    private List<ImportedFunction> ReadThunk64(BinaryReader reader, UInt64 thunkRva, String tag)
-    {
-        List<ImportedFunction> result = [];
-        if (thunkRva == 0) 
-            return result;
-        try
-        {
-            Int64 thunkOffset = Offset((Int64)thunkRva);
-            while (true)
-            {
-                reader.BaseStream.Position = thunkOffset;
-                UInt64 thunkData = reader.ReadUInt64();
-                if (thunkData == 0) 
-                    break;
-
-                Int64 nameAddr = Offset((Int64)thunkData);
-                reader.BaseStream.Position = nameAddr;
-                
-                UInt16 hint = reader.ReadUInt16();
-
-                if ((thunkData & 0x8000000000000000) != 0)
-                {
-                    result.Add(new ImportedFunction()
-                    {
-                        Name = $"@{thunkData & 0xFFFF}",
-                        Ordinal = thunkData & 0xFFFF,
-                        Hint = hint
-                    });
-                }
-                else
-                {
-                    result.Add(new ImportedFunction
-                    {
-                        Name = ReadTStr(reader),
-                        Hint = hint
-                    });
-                }
-                
-                thunkOffset += 8;
+                thunkOffset += sizeOfThunk;
             }
         }
         catch (Exception ex)
@@ -336,6 +201,12 @@ public class PeSectionDumper(PeDirectory[] directories, PeSection[] sections)
     private Int32 SizeOf<TStruct>(TStruct structure) where TStruct : struct
     {
         return Marshal.SizeOf(structure);
+    }
+    /// <param name="dllName">name of module</param>
+    /// <returns><c>True</c>if entries length larger than 255 </returns>
+    private Boolean IsModuleNameTooLong(String dllName)
+    {
+        return dllName.Length > 256;
     }
 }
 
