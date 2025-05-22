@@ -50,18 +50,17 @@ public class SectionsOpeningTest
         dumper.Dump();
         Assert.Pass();
     }
-
     /// <summary>
-    /// Characteristics [not implemented]
+    /// Characteristics [done]
     /// Sections [done]
     /// Directories [done]
-    /// Imports/Exports [not implemented]
+    /// Imports/Exports [done]
     /// Runtime Word [not implemented]
     /// </summary>
     [Test]
     public void ParsePeBinary()
     {
-        PeFileDumper dumper = new(@"D:\Анализ файлов\inst\PE\advapi32.dll"); // best Exports example
+        PeFileDumper dumper = new(@"D:\Projects\vb\VB3 Decompiler OCX\prjVB3Decompiler.ocx"); // best Exports example
         // 32 bit imports reads ok
         // 64 bit imports problem
         dumper.Dump();

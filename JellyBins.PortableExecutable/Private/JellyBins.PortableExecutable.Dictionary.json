@@ -1,0 +1,30 @@
+{
+    "Windows Win32 API": [
+        "kernel32.dll",
+        "user32.dll",
+        "gdi32.dll",
+        "shell32.dll",
+        "advapi32.dll",
+        "avifill.dll",
+        "cfgmgr.dll",
+        "avicap.dll",
+        "comctl.dll",
+        "comdlg.dll"
+    ],
+    "Windows Native API": [
+        "ntoskrnl.exe",
+        "ntdll.dll",
+        "ntddk.dll",
+        "kernel"
+    ] ,
+    "Visual Basic VM API": [
+        "msvbvm60.dll",
+        "msvbvm50.dll"
+    ],
+    "Visual Basic 4 API": [
+        "vb100.dll",
+        "vb200.dll",
+        "vb300.dll",
+        "vb400.dll"
+    ]
+}
