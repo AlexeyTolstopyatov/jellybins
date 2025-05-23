@@ -114,6 +114,11 @@ public class PeFileDumper(String path) : IFileDumper
         
         ImportsDump = dumper.ImportsDump(reader);
         ExportsDump = dumper.ExportsDump(reader);
+        UInt32 entryPoint = (Machine64Bit) 
+            ? OptionalHeaderDump.Segmentation.AddressOfEntryPoint
+            : OptionalHeader32Dump.Segmentation.AddressOfEntryPoint;
+        
+        Vb5HeaderDump = dumper.Vb5HeaderDump(reader, entryPoint);
         
         reader.Close();
     }

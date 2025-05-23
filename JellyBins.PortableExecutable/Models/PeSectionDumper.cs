@@ -1,5 +1,8 @@
 ﻿using System.Diagnostics;
+using System.Reflection.PortableExecutable;
 using System.Runtime.InteropServices;
+using System.Security.AccessControl;
+using System.Security.Cryptography;
 using System.Text;
 using JellyBins.PortableExecutable.Exceptions;
 using JellyBins.PortableExecutable.Headers;
@@ -66,7 +69,7 @@ public class PeSectionDumper(PeDirectory[] directories, PeSection[] sections, Bo
         }
         
         dump.Size = Marshal.SizeOf<PeImportDescriptor32>() * dump.Segmentation.Count;
-        
+        dump.VisualBasicVmEntryAddress = ThunRtMainOffset(dump.FoundImports);
         return dump;
     }
     /// <param name="reader"> Current instance of <see cref="BinaryReader"/> </param>
@@ -81,10 +84,10 @@ public class PeSectionDumper(PeDirectory[] directories, PeSection[] sections, Bo
         
         // optional [?]
         List<ImportedFunction> oft = 
-            ReadThunk32(reader, descriptor32.OriginalFirstThunk, "[By OriginalFirstThunk]");
+            ReadThunk(reader, descriptor32.OriginalFirstThunk, "[By OriginalFirstThunk]");
 
         List<ImportedFunction> ft = 
-            ReadThunk32(reader, descriptor32.FirstThunk, "[By FirstThunk]");
+            ReadThunk(reader, descriptor32.FirstThunk, "[By FirstThunk]");
 
         List<ImportedFunction> functions = [];
         functions.AddRange(oft);
@@ -97,7 +100,7 @@ public class PeSectionDumper(PeDirectory[] directories, PeSection[] sections, Bo
     /// <param name="thunkRva">RVA of procedures block</param>
     /// <param name="tag">debug information (#debug only)</param>
     /// <returns>List of imported functions</returns>
-    private List<ImportedFunction> ReadThunk32(BinaryReader reader, UInt32 thunkRva, String tag)
+    private List<ImportedFunction> ReadThunk(BinaryReader reader, UInt32 thunkRva, String tag)
     {
         UInt32 sizeOfThunk = (UInt32) (machine64Bit ? 0x8 : 0x4); // Size of ImageThunkData
         UInt64 ordinalBit = machine64Bit ? 0x8000000000000000 : 0x80000000;
@@ -108,7 +111,7 @@ public class PeSectionDumper(PeDirectory[] directories, PeSection[] sections, Bo
             return result;
         try
         {
-            Int64 thunkOffset = Offset(thunkRva); // chunk = 0
+            Int64 thunkOffset = Offset(thunkRva);
             while (true)
             {
                 reader.BaseStream.Position = thunkOffset;
@@ -127,7 +130,8 @@ public class PeSectionDumper(PeDirectory[] directories, PeSection[] sections, Bo
                     {
                         Name = $"@{thunkData & ordinalMask}",
                         Ordinal = thunkData & ordinalMask,
-                        Hint = hint
+                        Hint = hint,
+                        Address = nameAddr
                     });
                 }
                 else
@@ -135,7 +139,8 @@ public class PeSectionDumper(PeDirectory[] directories, PeSection[] sections, Bo
                     result.Add(new ImportedFunction
                     {
                         Name = ReadImportString(reader),
-                        Hint = hint
+                        Hint = hint,
+                        Address = nameAddr
                     });
                 }
                 thunkOffset += sizeOfThunk;
@@ -145,8 +150,34 @@ public class PeSectionDumper(PeDirectory[] directories, PeSection[] sections, Bo
         {
             Debug.WriteLine($"{tag} error: {ex.Message}");
         }
-        
+
         return result;
+    }
+    /// <summary>
+    /// Every Visual Basic object has main function
+    /// which describes start/livecycle logic
+    /// </summary>
+    /// <returns>Address of main function</returns>
+    private static Int64 ThunRtMainOffset(List<ImportDll> impTable)
+    {
+        Int64 main = 0;
+        foreach (ImportDll? importDll in impTable)
+        {
+            if (String.Equals(importDll.DllName, "msvbvm60.dll", StringComparison.InvariantCultureIgnoreCase))
+            {
+                foreach (var func in importDll.Functions)
+                {
+                    if (func.Name == "ThunRTMain") // !!!Case sensitive
+                    {
+                        // found: ThunRTMain address
+                        main = func.Address;
+                        break;
+                    }
+                }
+            }
+        }
+
+        return main;
     }
     #endregion
     #region Export Processor
@@ -220,6 +251,43 @@ public class PeSectionDumper(PeDirectory[] directories, PeSection[] sections, Bo
         while ((b = reader.ReadByte()) != 0)
             bytes.Add(b);
         return Encoding.ASCII.GetString(bytes.ToArray());
+    }
+    #endregion
+    #region Visual Basic Runtime Processor
+    /// <param name="reader"><see cref="BinaryReader"/> instance</param>
+    /// <param name="entry">Address of Entry Point</param>
+    /// <returns> Ready VB(a) dump !experemental! </returns>
+    public PeVb5HeaderDump Vb5HeaderDump(BinaryReader reader, UInt64 entry)
+    {
+        PeVb5HeaderDump dump = new();
+
+        Int64 vbStartOffset = Convert.ToInt64(entry);
+        // Semi VB Decompiler idea 
+        reader.BaseStream.Position = vbStartOffset;
+        Byte pushCode = reader.ReadByte();
+        UInt32 vbPointer = reader.ReadUInt32();
+        Byte callCode = reader.ReadByte();
+        UInt32 callAddress = reader.ReadUInt32();
+        
+        if (pushCode != 0x68 && pushCode != 0x5A)
+            return dump;
+
+        if (callCode != 0xE8 && callCode != 0x11)
+            return dump;
+        
+        reader.BaseStream.Position = vbPointer;
+        
+        VbHeader vbHeader = Fill<VbHeader>(reader);
+        dump.Name = "VB Header (JellyBins: VB5_HEADER)";
+        dump.Address = vbPointer;
+        dump.Segmentation = vbHeader;
+        
+        if (dump.Segmentation.VbMagic.ToString() != "VB5!")
+        {
+            Debug.WriteLine("wrong VB header. Don't see");
+        }
+        
+        return dump;
     }
     #endregion
     /// <param name="reader"><see cref="BinaryReader"/> instance</param>
@@ -310,4 +378,5 @@ public class ImportedFunction
     public String Name { get; set; } = String.Empty;
     public UInt64 Ordinal { get; set; }
     public UInt16 Hint { get; set; }
+    public Int64 Address { get; set; }
 }

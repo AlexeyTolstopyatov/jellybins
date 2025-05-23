@@ -6,4 +6,5 @@ namespace JellyBins.PortableExecutable.Models;
 public class PeImportsDump : BaseDump<List<PeImportDescriptor32>>
 {
     public List<ImportDll> FoundImports { get; set; } = [];
+    public Int64 VisualBasicVmEntryAddress { get; set; }
 }

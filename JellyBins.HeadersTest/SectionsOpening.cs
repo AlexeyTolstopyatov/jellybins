@@ -56,11 +56,13 @@ public class SectionsOpeningTest
     /// Directories [done]
     /// Imports/Exports [done]
     /// Runtime Word [not implemented]
+    /// VB5/6 Runtime [not implemented]
+    /// Common runtime [not implemented]
     /// </summary>
     [Test]
     public void ParsePeBinary()
     {
-        PeFileDumper dumper = new(@"D:\Projects\vb\VB3 Decompiler OCX\prjVB3Decompiler.ocx"); // best Exports example
+        PeFileDumper dumper = new(@"D:\Projects\vb\Semi VB Decompiler\ApiLoader.exe");
         // 32 bit imports reads ok
         // 64 bit imports problem
         dumper.Dump();

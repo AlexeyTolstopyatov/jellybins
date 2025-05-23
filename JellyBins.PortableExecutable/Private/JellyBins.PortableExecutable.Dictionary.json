@@ -17,6 +17,10 @@
         "ntddk.dll",
         "kernel"
     ] ,
+    "OS/2 API": [
+        "netapi.dll",
+        "doscalls.dll"
+    ],
     "Visual Basic VM API": [
         "msvbvm60.dll",
         "msvbvm50.dll"

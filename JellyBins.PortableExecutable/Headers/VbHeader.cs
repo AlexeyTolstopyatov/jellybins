@@ -5,8 +5,8 @@ namespace JellyBins.PortableExecutable.Headers;
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct VbHeader
 {
-    [MarshalAs(UnmanagedType.U1, SizeConst = 4)]
-    public Byte[] VbMagic;
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+    public Char[] VbMagic;
     public UInt16 RuntimeBuild;
     public UInt64 LanguageDll;
     public UInt64 SecondLanguageDll;
