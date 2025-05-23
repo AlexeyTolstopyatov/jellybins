@@ -1,14 +1,13 @@
 ﻿using System.Runtime.InteropServices;
 using JellyBins.Abstractions;
 using JellyBins.PortableExecutable.Headers;
-using System.Reflection;
-using System.Text.RegularExpressions;
 using static System.TimeZone;
 
 namespace JellyBins.PortableExecutable.Models;
 
 public class PeFileDumper(String path) : IFileDumper
 {
+    public FileSegmentationType SegmentationType { get; } = FileSegmentationType.PortableExecutable;
     public PeFileInfo Info { get; private set; } = new()
     {
         Name = new FileInfo(path).Name,
@@ -80,7 +79,6 @@ public class PeFileDumper(String path) : IFileDumper
         }
         
         List<PeSectionDump> sects = [];
-        // checking sections by offset
         for (Int32 i = 0; i < _numberOfSections; ++i)
         {
             UInt64 address = (UInt64)stream.Position;
@@ -312,12 +310,12 @@ public class PeFileDumper(String path) : IFileDumper
     {
         return (characteristics & 0x0100) == 0; // machine 32 bit flag
     }
-    
+    /// <returns> Application's type based on extension </returns>
     public UInt16 GetExtensionTypeId()
     {
         return _extensionTypeId;
     }
-
+    /// <returns> Application's type based on internal structure </returns>
     public UInt16 GetBinaryTypeId()
     {
         return _binaryTypeId;

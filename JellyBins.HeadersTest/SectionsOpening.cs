@@ -1,3 +1,4 @@
+using JellyBins.Abstractions;
 using JellyBins.LinearExecutable.Models;
 using JellyBins.PortableExecutable.Models;
 using JellyBins.NewExecutable.Models;
@@ -47,6 +48,7 @@ public class SectionsOpeningTest
     public void ParseLxBinary()
     {
         LeFileDumper dumper = new(@"D:\Анализ файлов\inst\LE\ecsshell.exe");
+        
         dumper.Dump();
         Assert.Pass();
     }

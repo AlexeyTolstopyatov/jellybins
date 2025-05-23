@@ -8,6 +8,11 @@
 
     <ItemGroup>
       <ProjectReference Include="..\JellyBins.Abstractions\JellyBins.Abstractions.csproj" />
+      <ProjectReference Include="..\JellyBins.DosCommand\JellyBins.DosCommand.csproj" />
+      <ProjectReference Include="..\JellyBins.HeadersTest\JellyBins.HeadersTest.csproj" />
+      <ProjectReference Include="..\JellyBins.LinearExecutable\JellyBins.LinearExecutable.csproj" />
+      <ProjectReference Include="..\JellyBins.NewExecutable\JellyBins.NewExecutable.csproj" />
+      <ProjectReference Include="..\JellyBins.PortableExecutable\JellyBins.PortableExecutable.csproj" />
     </ItemGroup>
 
     <ItemGroup>

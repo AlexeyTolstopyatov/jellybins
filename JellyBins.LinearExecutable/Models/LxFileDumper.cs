@@ -7,6 +7,7 @@ namespace JellyBins.LinearExecutable.Models;
 
 public class LxFileDumper : IFileDumper
 {
+    public FileSegmentationType SegmentationType { get; } = FileSegmentationType.LinearExecutable;
     public MzHeaderDump MzHeaderDump { get; private set; } = new();
     public LxHeaderDump LxHeaderDump { get; private set; } = new();
     public LxFileInfo Info { get; private set; } = new();

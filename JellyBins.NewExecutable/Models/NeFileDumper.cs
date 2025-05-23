@@ -8,7 +8,8 @@ using JellyBins.NewExecutable.Private;
 namespace JellyBins.NewExecutable.Models;
 
 public class NeFileDumper : IFileDumper
-{ 
+{
+    public FileSegmentationType SegmentationType { get; } = FileSegmentationType.NewExecutable;
     public NeInfo? Info { get; private set; }
     public BaseDump<MzHeader> MzHeaderDump { get; private set; }
     public NeDump NeHeaderDump { get; private set; }

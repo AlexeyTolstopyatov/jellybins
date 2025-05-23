@@ -9,6 +9,7 @@ namespace JellyBins.LinearExecutable.Models;
 
 public class LeFileDumper(String path) : IFileDumper
 {
+    public FileSegmentationType SegmentationType { get; init; } = FileSegmentationType.LinearExecutable;
     private UInt16 _extensionTypeId = 0, _binaryTypeId = 0;
     public Dictionary<UInt16, String> ResidentTable { get; private set; } = [];
     public String[] ImportModulesTable { get; private set; } = [];

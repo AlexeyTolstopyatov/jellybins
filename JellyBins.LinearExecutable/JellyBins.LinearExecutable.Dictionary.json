@@ -1,0 +1,31 @@
+﻿{
+  "OS/2 Native API": [
+    "OS2KRNL",
+    "DOSCALL1",
+    "VIOSYS"
+  ],
+  "OS/2 API": [
+    "DOSCALLS",
+    "QUECALLS",
+    "VIOCALLS",
+    "MONCALLS",
+    "SESMGR"
+  ],
+  "OS/2 Graphics API": [
+    "PMMERGE",
+    "PMWIN",
+    "PMSPL",
+    "PMGPI"
+  ],
+  "Workspace Shell API": [
+    "WPOBJECT",
+    "WPS",
+    "SOM"
+  ],
+  "DOS API": [
+    "VDM"
+  ],
+  "Win-OS/2 API": [
+    "WINOS2"
+  ]
+}

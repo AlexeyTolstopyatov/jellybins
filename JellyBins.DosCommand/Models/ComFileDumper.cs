@@ -4,6 +4,7 @@ namespace JellyBins.DosCommand.Models;
 
 public class ComFileDumper(String path) : IFileDumper
 {
+    public FileSegmentationType SegmentationType { get; } = FileSegmentationType.Dos1Command;
     public ComFileInfo Info { get; private set; } = new()
     {
         Name = new FileInfo(path).Name,

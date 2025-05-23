@@ -18,6 +18,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JellyBins.Abstractions", "J
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JellyBins.LinearExecutable", "JellyBins.LinearExecutable\JellyBins.LinearExecutable.csproj", "{9B6367BE-B079-4521-B8B0-DAD83D6B1846}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "JellyBins.Console", "JellyBins.Console\JellyBins.Console.fsproj", "{37E33753-5EB5-4A95-A472-65CED474802D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,7 @@ Global
 		{31F4A38C-802B-4D03-A444-983302AD1D08} = {27698092-EE73-4E22-8694-045CE004A708}
 		{7EFC4CC8-02A4-4EF9-81E1-32322F870F8D} = {27698092-EE73-4E22-8694-045CE004A708}
 		{9B6367BE-B079-4521-B8B0-DAD83D6B1846} = {27698092-EE73-4E22-8694-045CE004A708}
+		{37E33753-5EB5-4A95-A472-65CED474802D} = {27698092-EE73-4E22-8694-045CE004A708}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{8AC97B55-D621-47C0-B3D6-4E18E4C1274D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -59,5 +62,9 @@ Global
 		{9B6367BE-B079-4521-B8B0-DAD83D6B1846}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9B6367BE-B079-4521-B8B0-DAD83D6B1846}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9B6367BE-B079-4521-B8B0-DAD83D6B1846}.Release|Any CPU.Build.0 = Release|Any CPU
+		{37E33753-5EB5-4A95-A472-65CED474802D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37E33753-5EB5-4A95-A472-65CED474802D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37E33753-5EB5-4A95-A472-65CED474802D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37E33753-5EB5-4A95-A472-65CED474802D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
