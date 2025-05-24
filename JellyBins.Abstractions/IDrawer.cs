@@ -1,7 +1,15 @@
-﻿namespace JellyBins.Abstractions;
+﻿using System.Data;
+
+namespace JellyBins.Abstractions;
 
 public interface IDrawer
 {
-    public Dictionary<String, String> TabledStruct { get; }
-    public void DrawStruct();
+    public DataTable[] HeadersTables { get; }
+    public DataTable[] SectionTables { get; }
+    public DataTable[] ImportsTables { get; }
+    public DataTable[] ExportsTables { get; }
+    public Dictionary<String, String> InfoDictionary { get; }
+    public void MakeHeadersTables();
+    public void MakeSectionsTables();
+    public void MakeInfo();
 }

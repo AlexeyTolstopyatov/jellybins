@@ -1,12 +1,11 @@
 ﻿module JellyBins.Console
     open System
+    open System.Collections.Generic
     open System.Diagnostics
     open System.IO
     open System.Reflection
     open FSharp.Core
-    open JellyBins.Abstractions
     open JellyBins.Core.Factories
-    open JellyBins.NewExecutable.Models
     type AppCommand =
         | AppDump of dOptions: DumpOptions
         | AppInfo of iOptions: InfoOption
@@ -25,15 +24,15 @@
         FilePath: string
     }
     /// <summary>
-    /// 
+    /// Main recognizer
     /// </summary>
     /// <param name="args"></param>
     let (|AppCommand|_|) (args: string list) =
         match args with
         | "dump" :: rest -> Some rest
+        | "info" :: rest -> Some rest
         | "help" :: _ -> Some []    // empty list
         | "version" :: _ -> Some [] // empty list
-        | "info" :: _ -> Some []    // empty list
         | _ -> None
     /// <summary>
     /// <see cref="AppCommand"/> has <c>--verbose</c> flag
@@ -60,7 +59,21 @@
     let (|Info|) = function
         | "-i" -> Some true
         | _ -> Some false
-        
+    
+    [<CompiledName "ParseInfoOptions">]
+    let rec parseInfoOptions args =
+        match args with
+        | filePath :: rest ->
+            let opts = {
+                FilePath = filePath 
+            }
+            parseInfoOptionsRest opts rest
+        | cmdList -> AppInvalid $"unknown info sequence {cmdList}"
+    and parseInfoOptionsRest opts args =
+        match args with
+        | [] -> AppInfo opts
+        | unexpected -> AppInvalid $"Unexpected arguments: %A{unexpected}"
+            
     [<CompiledName "ParseDumpOptions">]
     let rec parseDumpOptions args =
         match args with
@@ -99,9 +112,13 @@
         | ("dump" :: rest) -> parseDumpOptions rest
         | ["help"] -> AppHelp
         | ["version"] -> AppVersion
+        | ("info" :: rest) -> parseInfoOptions rest
         | [] -> AppHelp
         | cmdList -> AppInvalid $"Unknown command sequence: %s{cmdList |> string}"
     
+    let printDictionary (d: Dictionary<string, string>) =
+        for KeyValue(k, v) in d do
+            printfn $"{k}\t{v}"
     let printDump (d: DumpOptions) =
         if d.Verbose then
             printfn $"Dumping file: {d.FilePath}"
@@ -116,7 +133,16 @@
         //            |> ignore
         //            
         ()
-    
+    let printInfo (i: InfoOption) =
+        // verbose option missing
+        let dumper = FileDumperFactory.CreateInstance i.FilePath
+        let drawer = DrawerFactory.CreateInstance dumper
+        
+        drawer.MakeInfo
+            |> ignore
+            
+        printDictionary drawer.InfoDictionary
+        ()
     /// <summary>
     /// Executes translated command
     /// </summary>
@@ -127,10 +153,10 @@
         | AppHelp ->
             printfn "Usage: " // 2 paragraphs
             printfn "  dump [--section] [--headers] [--imports] [--exports] [--info]"
-            printfn "  dump [-s] [-h] [-it] [-et] [-i]"
+            printfn "  dump [-s] [-h] [-it] [-et] [-i] -- Prints dump tables by keys"
+            printfn "  info [path] -- Prints table of common dumping results"
             printfn "  version -- Prints information about this Assembly"
             printfn "  help    -- Prints this page"
-            printfn "  info    -- Prints table of common dumping results"
             exit(0) 
         | AppVersion ->
             printfn "\nJellyBins (C) CoffeeLake 2024-2025" // 2 paragraphs
@@ -145,7 +171,7 @@
             printDump opts
             exit(0)
         | AppInfo opts ->
-            handleCommand AppHelp
+            printInfo opts
         | AppInvalid msg ->
             printfn $"Error: {msg}\n"
     

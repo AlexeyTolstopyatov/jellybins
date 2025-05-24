@@ -9,16 +9,26 @@ namespace JellyBins.Core.Factories;
 
 public static class FileDumperFactory
 {
+    private static IFileDumper FindCommandSigns(String path)
+    {
+        if (File.ReadAllBytes(path).Length < 64 * 1024 * 8)
+            return new ComFileDumper(path);
+
+        throw new KeyNotFoundException("Not COMmand file");
+    }
+    
     /// <param name="path"> fileName </param>
     /// <returns> Type of segmentation </returns>
-    private static FileSegmentationType FindMicrosoftIbmSigns(String path)
+    private static Boolean TryFindMicrosoftIbmSigns(String path, out FileSegmentationType type)
     {
         using FileStream stream = new(path, FileMode.Open);
         using BinaryReader reader = new(stream);
-        FileSegmentationType type = FileSegmentationType.Unknown;
-
+        
         if (reader.ReadUInt16() != 0x5a4d)
-            return type;
+        {
+            type = FileSegmentationType.Unknown;
+            return false;
+        }
 
         stream.Position = 0x3C;
         UInt32 signPointer = reader.ReadUInt32();
@@ -32,9 +42,11 @@ public static class FileDumperFactory
             _ => FileSegmentationType.Dos2MarkZbikowski
         };
         reader.Close();
-        return type;
+        return true;
     }
-    /// <summary> Call this if you don't know your exe-type </summary>
+    /// <summary>
+    /// Call this if you don't know your exe-type
+    /// </summary>
     /// <param name="path"> your path to file </param>
     /// <returns> <see cref="IFileDumper"/> instance </returns>
     /// <exception cref="NotSupportedException">
@@ -47,16 +59,24 @@ public static class FileDumperFactory
     /// </exception>
     public static IFileDumper CreateInstance(String path)
     {
-        FileSegmentationType type = FindMicrosoftIbmSigns(path);
+        FileSegmentationType type;
+
+        if (File.ReadAllBytes(path).Length < 64 * 1024 * 8)
+            return new ComFileDumper(path);
+
+        if (TryFindMicrosoftIbmSigns(path, out type))
+        {
+            return type switch
+            {
+                FileSegmentationType.NewExecutable => new NeFileDumper(path),
+                FileSegmentationType.LinearExecutable => new LeFileDumper(path),
+                FileSegmentationType.PortableExecutable => new PeFileDumper(path),
+                _ => throw new NotSupportedException()
+            };
+        }
         
         return type switch
         {
-            // old format OSes
-            FileSegmentationType.Dos1Command => new ComFileDumper(path),
-            FileSegmentationType.Dos2MarkZbikowski => throw new NotImplementedException(),
-            FileSegmentationType.NewExecutable => new NeFileDumper(path),
-            FileSegmentationType.LinearExecutable => new LeFileDumper(path),
-            FileSegmentationType.PortableExecutable => new PeFileDumper(path),
             // UNIX
             FileSegmentationType.AssemblerOutput => throw new NotImplementedException(),
             FileSegmentationType.ExecutableLinkable => throw new NotImplementedException(),

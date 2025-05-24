@@ -15,8 +15,4 @@
       <ProjectReference Include="..\JellyBins.PortableExecutable\JellyBins.PortableExecutable.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Drawers\" />
-    </ItemGroup>
-
 </Project>
