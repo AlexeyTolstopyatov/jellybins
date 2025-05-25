@@ -44,12 +44,12 @@ public class ComDrawer : IDrawer
             table.Columns.Add("Name");
             table.Columns.Add("Address");
             table.Columns.Add("Size");
-            table.Columns.Add("Characterisrics");
+            //table.Columns.Add("Characterisrics");
 
-            String charSet = sectionDump
-                .Characteristics!
-                .Aggregate("", 
-                    (current, characteristic) => current + characteristic + "\n");
+            // String charSet = sectionDump
+            //     .Characteristics!
+            //     .Aggregate("", 
+            //         (current, characteristic) => current + characteristic + " ");
 
             table.Rows.Add(
                 sectionDump.Name,
@@ -57,8 +57,8 @@ public class ComDrawer : IDrawer
                 sectionDump.Address,
                 sectionDump.Segmentation.Name,
                 sectionDump.Segmentation.Address,
-                sectionDump.Segmentation.Size,
-                charSet);
+                sectionDump.Segmentation.Size
+                /*characteristics*/);
             
             sectionTables.Add(table);
         }
