@@ -180,7 +180,7 @@ public class LeFileDumper(String path) : IFileDumper
     private void FindEntries(BinaryReader reader)
     {
         ExportsDump.Address = (UInt64)reader.BaseStream.Position;
-        ExportsDump.Name = "LE Entries (JellyBins: IMAGE_ENTRIES)";
+        ExportsDump.Name = "LE ObjectEntries (JellyBins: IMAGE_OBJ_ENTRIES)";
         
         reader.BaseStream.Seek(Lva.Offset(LeHeaderDump.Segmentation.EntryTableOffset), SeekOrigin.Begin);
         
@@ -230,7 +230,7 @@ public class LeFileDumper(String path) : IFileDumper
         ImportsDump.Address = (UInt64)reader.BaseStream.Position;
 
         ImportModulesTable = ReadImportModuleNames(reader).ToArray();
-        ImportProceduresTable = ReadImportProcedureNames(reader).ToArray();
+        //ImportProceduresTable = ReadImportProcedureNames(reader).ToArray();
     }
     private String[] FindNames(BinaryReader reader, Int64 offset)
     {

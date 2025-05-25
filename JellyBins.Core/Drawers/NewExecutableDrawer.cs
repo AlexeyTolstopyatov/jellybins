@@ -16,6 +16,7 @@ public class NewExecutableDrawer : IDrawer
         MakeHeadersTables();
         MakeSectionsTables();
         MakeExports();
+        MakeImports();
     }
 
     public DataTable[] HeadersTables { get; private set; } = [];
@@ -160,8 +161,9 @@ public class NewExecutableDrawer : IDrawer
     public void MakeInfo()
     {
         Dictionary<String, String> infoDictionary = [];
-        infoDictionary.Add("FileName", _dumper.Info.Name!);
+        infoDictionary.Add("FileName", _dumper.Info!.Name!);
         infoDictionary.Add("FilePath", _dumper.Info.Path!);
+        infoDictionary.Add("FileTitle", _dumper.Info.ProjectDescription!);
         infoDictionary.Add("Target CPU", _dumper.Info.CpuArchitecture!);
         infoDictionary.Add("Max. WORD", $"{_dumper.Info.CpuWordLength} BIT");
         infoDictionary.Add("Target OS ", _dumper.Info.OperatingSystem!);

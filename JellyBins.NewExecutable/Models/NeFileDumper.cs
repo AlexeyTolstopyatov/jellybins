@@ -311,7 +311,7 @@ public class NeFileDumper : IFileDumper
             UInt16 ordinal = reader.ReadUInt16();
             exports.Add(new NeExportDump()
             {
-                Name = "IMAGE_NONRESIDENT_TABLE_ENTRY",
+                Name = "NE NonResident Entry (JellyBins: IMAGE_NONRES_ENTRY)",
                 Segmentation = new NeExport()
                 {
                     Count = i,
@@ -322,7 +322,7 @@ public class NeFileDumper : IFileDumper
         }
 
         ExportsTableDump = exports.ToArray();
-        Info!.ProjectDescription = exports[0].Name;
+        Info!.ProjectDescription = exports[0].Segmentation.Name;
     }
     private TStruct Fill<TStruct>(BinaryReader reader) where TStruct : struct
     {
