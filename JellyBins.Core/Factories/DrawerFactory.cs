@@ -14,13 +14,11 @@ public class DrawerFactory
     /// <exception cref="NotSupportedException"> If some what you want not in public access </exception>
     public static IDrawer CreateInstance(IFileDumper dumper)
     {
-        dumper.Dump(); // ub?
-        // FIXME: null forgive denied 
-        return dumper.SegmentationType switch
-        {
-            FileSegmentationType.Dos1Command => new ComDrawer((dumper as ComFileDumper)!),
-            
-            _ => throw new NotSupportedException()
-        };
+        dumper.Dump();
+        
+        if (dumper is ComFileDumper comFileDumper)
+            return new ComDrawer(comFileDumper);
+        
+        throw new NotImplementedException();
     }
 }

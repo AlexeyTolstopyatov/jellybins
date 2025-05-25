@@ -110,9 +110,9 @@
         match args with
         | ["dump"] -> AppInvalid "Missing file path for dump command"
         | ("dump" :: rest) -> parseDumpOptions rest
+        | ("info" :: rest) -> parseInfoOptions rest
         | ["help"] -> AppHelp
         | ["version"] -> AppVersion
-        | ("info" :: rest) -> parseInfoOptions rest
         | [] -> AppHelp
         | cmdList -> AppInvalid $"Unknown command sequence: %s{cmdList |> string}"
     
