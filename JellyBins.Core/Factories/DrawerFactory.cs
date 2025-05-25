@@ -1,6 +1,7 @@
 ﻿using JellyBins.Abstractions;
 using JellyBins.Core.Drawers;
 using JellyBins.DosCommand.Models;
+using JellyBins.NewExecutable.Models;
 
 namespace JellyBins.Core.Factories;
 
@@ -16,8 +17,11 @@ public class DrawerFactory
     {
         dumper.Dump();
         
-        if (dumper is ComFileDumper comFileDumper)
-            return new ComDrawer(comFileDumper);
+        if (dumper.SegmentationType == FileSegmentationType.Dos1Command)
+            return new ComDrawer((dumper as ComFileDumper)!); // always true
+        
+        if (dumper.SegmentationType == FileSegmentationType.NewExecutable)
+            return new NewExecutableDrawer((dumper as NeFileDumper)!); // not
         
         throw new NotImplementedException();
     }

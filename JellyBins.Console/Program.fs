@@ -4,7 +4,7 @@ open System
 open System.Data
 open System.Diagnostics
 open System.Reflection
-open JellyBins.LinearExecutable.Headers
+open JellyBins.Core.Factories
 
 /// <summary>
 /// Printer functions contains here
@@ -44,7 +44,6 @@ module Printer =
         let columns = table.Columns
                     |> Seq.cast<DataColumn>
 
-        // максимальная ширина для каждого столбца
         let columnWidths =
             columns
             |> Seq.map (fun col ->
@@ -88,16 +87,15 @@ module Printer =
                 |> String.concat " | "
                 |> printfn "| %s |"
             )
+        printfn ""
     
 /// <summary>
 /// Main Application logic
 /// contains here
 /// </summary>
 module Application =
-    open System
     open System.IO
     open FSharp.Core
-    open JellyBins.Core.Factories
     open Printer
     
     type AppCommand =
@@ -129,41 +127,61 @@ module Application =
         | "version" :: _ -> Some [] // empty list
         | _ -> None
     /// <summary>
-    /// <see cref="AppCommand"/> has <c>--verbose</c> flag
+    /// <see cref="DumpOptions"/> has <c>--verbose</c> flag
     /// </summary>
-    let (|VerboseFlag|_|) = function
-        | "--verbose" :: rest -> Some (true, rest)
-        | "-v" :: rest -> Some (true, rest)
-        | rest -> Some (false, rest)
+    let (|DumpVerboseFlag|_|) = function
+        | "--verbose" :: rest
+        | "-v" :: rest -> Some rest
+        | rest -> None
     /// <summary>
-    /// <see cref="AppCommand"/> has <c>--section</c> flag
+    /// <see cref="DumpOptions"/> has <c>--section</c> flag
     /// </summary>
-    let (|SectionsFlag|) = function
-        | "--sections" -> Some true
-        | "-s" -> Some true
-        | _ -> Some false
-    let (|ImportsFlag|) = function
-        | "--imports" -> Some true
-        | "-it" -> Some true
-        | _ -> Some false
-    let (|ExportsFlag|) = function
-        | "--exports" -> Some true
-        | "-et" -> Some true
-        | _ -> Some false
-    let (|Info|) = function
-        | "-i" -> Some true
-        | _ -> Some false
+    let (|DumpSectionsFlag|_|) = function
+        | "--sections" :: rest
+        | "-s" :: rest -> Some rest
+        | rest -> None
+    /// <summary>
+    /// <see cref="DumpOptions"/> has <c>--headers</c> flag
+    /// </summary>
+    let (|DumpHeadersFlag|_|) = function
+        | "--headers" :: rest
+        | "-h" :: rest -> Some rest
+        | rest -> None
+    /// <summary>
+    /// <see cref="DumpOptions"/> has
+    /// <c>--imports flag</c>
+    /// </summary>
+    let (|DumpImportsFlag|_|) = function
+        | "--imports" :: rest
+        | "-it" :: rest -> Some rest
+        | rest -> None
+    /// <summary>
+    /// <see cref="DumpOptions"/>
+    /// has <c>--exports</c> flag
+    /// </summary>
+    let (|DumpExportsFlag|_|) = function
+        | "--exports" :: rest
+        | "-et" :: rest -> Some rest
+        | rest -> None
+    /// <summary>
+    /// <see cref="DumpOptions"/> has <c>--info</c>
+    /// flag
+    /// </summary>
+    let (|DumpInfo|_|) = function
+        | "--info" :: rest -> Some (true, rest)
+        | "-i" :: rest -> Some (true, rest)
+        | rest -> None
     
     [<CompiledName "ParseInfoOptions">]
-    let rec parseInfoOptions args :AppCommand =
+    let rec parseInfoOptions args : AppCommand =
         match args with
         | filePath :: rest ->
             let opts = {
-                FilePath = filePath 
+                FilePath = filePath
             }
             parseInfoOptionsRest opts rest
         | cmdList -> AppInvalid $"unknown info sequence {cmdList}"
-    and parseInfoOptionsRest opts args :AppCommand =
+    and parseInfoOptionsRest opts args : AppCommand =
         match args with
         | [] -> AppInfo opts
         | unexpected -> AppInvalid $"Unexpected arguments: %A{unexpected}"
@@ -173,32 +191,37 @@ module Application =
         match args with
         | filePath :: rest ->
             let opts = {
-                // declare ALL available options
                 FilePath = filePath
                 Verbose = false
+                Headers = false
                 Sections = false
                 Imports = false
-                Exports = false
-                Headers = false 
+                Exports = false 
             }
-            parseDumpOptionsRest opts rest
+            parseDumpOptionsRest opts rest // throws: TypeInitializer...Exception
         | _ -> AppInvalid "Missing file path"
-    and parseDumpOptionsRest opts args :AppCommand =
+    and parseDumpOptionsRest opts args : AppCommand =
         match args with
-        | VerboseFlag (verbose, rest) ->
-            parseDumpOptionsRest {
-                opts with Verbose = verbose
-            } rest
-     // | Sections idea missed
+        | DumpVerboseFlag rest -> 
+            parseDumpOptionsRest { opts with Verbose = true } rest
+        | DumpHeadersFlag rest -> 
+            parseDumpOptionsRest { opts with Headers = true } rest
+        | DumpSectionsFlag rest -> 
+            parseDumpOptionsRest { opts with Sections = true } rest
+        | DumpImportsFlag rest -> 
+            parseDumpOptionsRest { opts with Imports = true } rest
+        | DumpExportsFlag rest -> 
+            parseDumpOptionsRest { opts with Exports = true } rest
         | [] -> AppDump opts
-        | unexpected -> AppInvalid $"Unexpected arguments: %A{unexpected}"
+        | unexpected -> 
+            AppInvalid $"Unexpected arguments: %A{unexpected}"
 
     /// <summary>
     /// Translates items of <c>argv</c> to F# Atoms
     /// </summary>
     /// <param name="argv">Vector of Command line arguments</param>
     [<CompiledName "ParseCommand">]
-    let parseCommand (argv: string[]) :AppCommand =
+    let parseCommand (argv: string[]) : AppCommand =
         let args = argv
                    |> Array.toList
         match args with
@@ -210,50 +233,55 @@ module Application =
         | [] -> AppHelp
         | cmdList -> AppInvalid $"Unknown command sequence: %s{cmdList |> string}"
     
-    let printDump (d: DumpOptions) :unit =
+    let processDump (d: DumpOptions) : unit =
         if d.Verbose then
             printfn $"Dumping file: {d.FilePath}"
             printfn $"Size:\t %d{FileInfo(d.FilePath).Length * int64 1024}K"
-        // get ready for totally dumping
-        // let dumper = FileDumperFactory.CreateInstance d.FilePath
-        // match dumper.SegmentationType with
-        //     | FileSegmentationType.NewExecutable ->
-        //         dumper.Dump()
-        //         // C# part for tabes drawing (saving segmentation as Dictionaries)
-        //     | _ -> AppInvalid "Unknown binary (NotSupportedException)"
-        //            |> ignore
-        //            
+            printfn $"Options {d}"
+        
+        let dumper = FileDumperFactory.CreateInstance d.FilePath
+        let drawer = DrawerFactory.CreateInstance dumper
+        
+        let printEveryTable (segs: DataTable[]) : unit =
+            segs
+                |> Seq.iter (fun dt -> printDataTable dt)
+            ()
+            
+        if d.Headers then
+            printEveryTable drawer.HeadersTables
+        if d.Sections then
+            printEveryTable drawer.SectionTables
+        if d.Imports then
+            printEveryTable drawer.ImportsTables
+        if d.Exports then
+            printEveryTable drawer.ExportsTables
+            
         ()
-    let printInfo (i: InfoOption) :unit =
+    let processInfo (i: InfoOption) : unit =
         // verbose option missing
         let dumper = FileDumperFactory.CreateInstance i.FilePath
         let drawer = DrawerFactory.CreateInstance dumper
             
         printDictionary drawer.InfoDictionary
-        let printEverySection (segs: DataTable[]) :unit =
-            
-            ()
-            
-        printEverySection drawer.SectionTables
-        ()
+        printfn ""
     /// <summary>
     /// Executes translated command
     /// </summary>
     /// <param name="command"></param>
     [<CompiledName "HandleCommand">]
-    let rec handleCommand (command: AppCommand) :unit =
+    let rec handleCommand (command: AppCommand) : unit =
         match command with
         | AppHelp ->
             printHelp ()
-            exit(0) 
+            exit 0 
         | AppVersion ->
             printAppVersion ()
-            exit(0)
+            exit 0
         | AppDump opts ->
-            printDump opts
-            exit(0)
+            processDump opts
+            exit 0
         | AppInfo opts ->
-            printInfo opts
+            processInfo opts
         | AppInvalid msg ->
             printfn $"Error: {msg}\n"
     
@@ -262,5 +290,4 @@ module Application =
         argv
         |> parseCommand
         |> handleCommand
-        
         0

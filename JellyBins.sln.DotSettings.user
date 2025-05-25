@@ -1,31 +1,7 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=0E02D7D6_002DE3AC_002D4199_002DAF71_002D27E08BCFA777_002Fd_003AModels_002Ff_003AimportsArticle_002Ecpp/@EntryIndexedValue">ExplicitlyExcluded</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=1d5c4178_002D712e_002D422b_002Db4ab_002D48ec6a7d197f/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Session #3" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;And&gt;&#xD;
-    &lt;Or&gt;&#xD;
-      &lt;And&gt;&#xD;
-        &lt;TestAncestor&gt;&#xD;
-          &lt;TestId&gt;NUnit3x::8AC97B55-D621-47C0-B3D6-4E18E4C1274D::net8.0::HeadersTest.SectionsOpeningTest.ParsePeBinary&lt;/TestId&gt;&#xD;
-          &lt;TestId&gt;NUnit3x::8AC97B55-D621-47C0-B3D6-4E18E4C1274D::net8.0::HeadersTest.SectionsOpeningTest.ParseCommand&lt;/TestId&gt;&#xD;
-        &lt;/TestAncestor&gt;&#xD;
-        &lt;Not&gt;&#xD;
-          &lt;TestAncestor&gt;&#xD;
-            &lt;TestId&gt;NUnit3x::8AC97B55-D621-47C0-B3D6-4E18E4C1274D::net8.0::HeadersTest.SectionsOpeningTest.ParseCommand&lt;/TestId&gt;&#xD;
-          &lt;/TestAncestor&gt;&#xD;
-        &lt;/Not&gt;&#xD;
-      &lt;/And&gt;&#xD;
-      &lt;TestAncestor&gt;&#xD;
-        &lt;TestId&gt;NUnit3x::8AC97B55-D621-47C0-B3D6-4E18E4C1274D::net8.0::HeadersTest.SectionsOpeningTest.ParseNeBinary&lt;/TestId&gt;&#xD;
-        &lt;TestId&gt;NUnit3x::8AC97B55-D621-47C0-B3D6-4E18E4C1274D::net8.0::HeadersTest.SectionsOpeningTest.ParseLxBinary&lt;/TestId&gt;&#xD;
-      &lt;/TestAncestor&gt;&#xD;
-    &lt;/Or&gt;&#xD;
-    &lt;Not&gt;&#xD;
-      &lt;TestAncestor&gt;&#xD;
-        &lt;TestId&gt;NUnit3x::8AC97B55-D621-47C0-B3D6-4E18E4C1274D::net8.0::HeadersTest.SectionsOpeningTest.ParseLxBinary&lt;/TestId&gt;&#xD;
-        &lt;TestId&gt;NUnit3x::8AC97B55-D621-47C0-B3D6-4E18E4C1274D::net8.0::HeadersTest.SectionsOpeningTest.ParseNeBinary&lt;/TestId&gt;&#xD;
-      &lt;/TestAncestor&gt;&#xD;
-    &lt;/Not&gt;&#xD;
-  &lt;/And&gt;&#xD;
+  &lt;Solution /&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
 	
 	

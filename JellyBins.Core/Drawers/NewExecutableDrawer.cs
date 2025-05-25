@@ -1,9 +1,7 @@
-﻿using System.Collections.Specialized;
-using System.Data;
+﻿using System.Data;
 using JellyBins.Abstractions;
 using JellyBins.NewExecutable.Headers;
 using JellyBins.NewExecutable.Models;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace JellyBins.Core.Drawers;
 
@@ -17,6 +15,7 @@ public class NewExecutableDrawer : IDrawer
         MakeInfo();
         MakeHeadersTables();
         MakeSectionsTables();
+        MakeExports();
     }
 
     public DataTable[] HeadersTables { get; private set; } = [];
@@ -29,14 +28,28 @@ public class NewExecutableDrawer : IDrawer
     {
         // MZ header \/ NE header.
         DataTable dosHeader = MakeDosHeader();
-        DataTable dosMetadata = MakeDumpMetadata(_dumper.MzHeaderDump);
         DataTable windowsHeader = MakeWindowsHeader();
-        DataTable windowsMetadata = MakeDumpMetadata(_dumper.NeHeaderDump);
-
+        DataTable meta = new();
+        
+        meta.Columns.AddRange([
+            new DataColumn("Name"),
+            new DataColumn("Address"),
+            new DataColumn("Size")
+        ]);
+        meta.Rows.Add(
+            _dumper.MzHeaderDump.Name,
+            _dumper.MzHeaderDump.Address,
+            _dumper.MzHeaderDump.Size
+        );
+        meta.Rows.Add(
+            _dumper.NeHeaderDump.Name,
+            _dumper.NeHeaderDump.Address!.Value.ToString("X"),
+            _dumper.NeHeaderDump.Size!.Value.ToString("X")
+        );
+        
         HeadersTables = [
-            dosMetadata, 
+            meta,
             dosHeader, 
-            windowsMetadata, 
             windowsHeader
         ];
     }
@@ -67,31 +80,7 @@ public class NewExecutableDrawer : IDrawer
         
         return table;
     }
-
-    private DataTable MakeDumpMetadata<T>(BaseDump<T> dump)
-    {
-        DataTable meta = new();
-        meta.Columns.AddRange([
-            new DataColumn("Name"),
-            new DataColumn("Address"),
-            new DataColumn("Size"),
-            new DataColumn("Characteristics")
-        ]);
-        
-        // from String[] to String
-        String charSet = dump
-            .Characteristics!
-            .Aggregate("", 
-                (current, characteristic) => current + characteristic + "\n");
-        
-        meta.Rows.Add(
-            dump.Name,
-            dump.Address,
-            dump.Size,
-            charSet
-        );
-        return meta;
-    }
+    
     private DataTable MakeWindowsHeader()
     {
         NeHeader ne = _dumper.NeHeaderDump.Segmentation;
@@ -130,25 +119,42 @@ public class NewExecutableDrawer : IDrawer
     }
     public void MakeSectionsTables()
     {
-        List<DataTable> segTables = [];
+        DataTable meta = new();
+        DataTable segs = new();
+        
+        meta.Columns.AddRange([
+            new DataColumn("Name"),
+            new DataColumn("Address"),
+            new DataColumn("Size")
+        ]);
+        segs.Columns.AddRange([
+            new DataColumn("Type"), 
+            new DataColumn("#Segment"), 
+            new DataColumn("FileOffset"),
+            new DataColumn("FileLength"),
+            new DataColumn("Flags"),
+            new DataColumn("MinAllocation")
+        ]);
+
         foreach (NeSegmentDump segmentDump in _dumper.SegmentsTableDump)
         {
             NeSegmentInfo seg = segmentDump.Segmentation;
-            DataTable meta = MakeDumpMetadata(segmentDump);
-            DataTable segs = new();
-            segs.Columns.AddRange([new DataColumn("Segment"), new DataColumn("Value")]);
-            segs.Rows.Add(nameof(seg.Type), seg.Type);
-            segs.Rows.Add(nameof(seg.SegmentNumber), seg.SegmentNumber.ToString("X"));
-            segs.Rows.Add(nameof(seg.FileOffset), seg.FileOffset.ToString("X"));
-            segs.Rows.Add(nameof(seg.FileLength), seg.FileLength.ToString("X"));
-            segs.Rows.Add(nameof(seg.Flags), seg.Flags.ToString("X"));
-            segs.Rows.Add(nameof(seg.MinAllocation), seg.MinAllocation.ToString("X"));
-            
-            segTables.Add(meta);
-            segTables.Add(segs);
+            meta.Rows.Add(
+                segmentDump.Name,
+                segmentDump.Address!.Value.ToString("X"),
+                segmentDump.Size!.Value.ToString("X")
+            );
+            segs.Rows.Add(
+                seg.Type,
+                seg.SegmentNumber.ToString("X"),
+                seg.FileOffset.ToString("X"),
+                seg.FileLength.ToString("X"),
+                seg.Flags.ToString("X"),
+                seg.MinAllocation.ToString("X")
+            );
         }
 
-        SectionTables = segTables.ToArray();
+        SectionTables = [meta, segs];
     }
 
     public void MakeInfo()
@@ -165,6 +171,58 @@ public class NewExecutableDrawer : IDrawer
         InfoDictionary = infoDictionary;
     }
 
+    public void MakeImports()
+    {
+        DataTable meta = new();
+        DataTable imps = new();
+        
+        meta.Columns.AddRange([
+            new DataColumn("Name"),
+            new DataColumn("Address"),
+            new DataColumn("Size")
+        ]);
+        imps.Columns.AddRange([
+            new DataColumn("#Name"),
+            new DataColumn("Name")
+        ]);
+        foreach (NeImportDump neImportDump in _dumper.ImportsTableDump)
+        {
+            meta.Rows.Add(
+                neImportDump.Name,
+                neImportDump.Address,
+                neImportDump.Size
+            );
+            imps.Rows.Add(
+                neImportDump.Segmentation.NameLength,
+                neImportDump.Segmentation.Name
+            );
+        }
+
+        ImportsTables = [meta, imps];
+    }
+
+    private void MakeExports()
+    {
+        DataTable exportsTable = new();
+
+        exportsTable.Columns.AddRange([
+            new DataColumn("#"),
+            new DataColumn("Name"),
+            new DataColumn("Ordinal")
+        ]);
+        
+        foreach (NeExportDump neExportDump in _dumper.ExportsTableDump)
+        {
+            exportsTable.Rows.Add(
+                neExportDump.Segmentation.Count,
+                neExportDump.Segmentation.Name,
+                "@" + neExportDump.Segmentation.Ordinal
+            );
+        }
+
+        ExportsTables = [exportsTable];
+    }
+    
     private static String FileTypeToString(FileType type)
     {
         return type.ToString();

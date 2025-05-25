@@ -61,7 +61,8 @@ public static class FileDumperFactory
     {
         FileSegmentationType type;
 
-        if (File.ReadAllBytes(path).Length < 64 * 1024 * 8)
+        if (File.ReadAllBytes(path).Length < 64 * 1024 &&
+            String.Equals(new FileInfo(path).Extension, ".COM", StringComparison.InvariantCultureIgnoreCase))
             return new ComFileDumper(path);
 
         if (TryFindMicrosoftIbmSigns(path, out type))

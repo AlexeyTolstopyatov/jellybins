@@ -33,24 +33,16 @@ public class ComDrawer : IDrawer
     /// </summary>
     public void MakeSectionsTables()
     {
-        List<DataTable> sectionTables = [];
+        DataTable table = new();
+            
+        table.Columns.Add("Dump Name");
+        table.Columns.Add("Dump Size");
+        table.Columns.Add("Dump Address");
+        table.Columns.Add("Name");
+        table.Columns.Add("Address");
+        table.Columns.Add("Size");
         foreach (ComSectionDump sectionDump in _dumper.Sections!)
         {
-            DataTable table = new();
-            
-            table.Columns.Add("Dump Name");
-            table.Columns.Add("Dump Size");
-            table.Columns.Add("Dump Address");
-            table.Columns.Add("Name");
-            table.Columns.Add("Address");
-            table.Columns.Add("Size");
-            //table.Columns.Add("Characterisrics");
-
-            // String charSet = sectionDump
-            //     .Characteristics!
-            //     .Aggregate("", 
-            //         (current, characteristic) => current + characteristic + " ");
-
             table.Rows.Add(
                 sectionDump.Name,
                 sectionDump.Size,
@@ -59,11 +51,9 @@ public class ComDrawer : IDrawer
                 sectionDump.Segmentation.Address,
                 sectionDump.Segmentation.Size
                 /*characteristics*/);
-            
-            sectionTables.Add(table);
         }
 
-        SectionTables = sectionTables.ToArray();
+        SectionTables = [table];
     }
     
     public void MakeInfo()
