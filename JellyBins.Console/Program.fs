@@ -1,5 +1,6 @@
 ﻿namespace JellyBins.Console
 
+open FSharp.Core
 open System
 open System.Data
 open System.Diagnostics
@@ -35,7 +36,7 @@ module Printer =
     let printDataTable (table: DataTable) =
         let safeToString (value: obj) =
             if Convert.IsDBNull(value) then
-                "<null>"
+                " " // Empty cell (<null> dont need anymore)
             else
                 $"%O{value}"
 
@@ -50,29 +51,29 @@ module Printer =
                 let headerWidth = col.ColumnName.Length
                 let contentWidth = 
                     rows
-                    |> Seq.map (fun row -> safeToString row.[col] |> String.length)
+                    |> Seq.map (fun row -> safeToString row[col] |> String.length)
                     |> Seq.append [headerWidth]
                     |> Seq.max
                 (col.Ordinal, (contentWidth + 2))
             )
             |> Map.ofSeq
 
-        let formatString =
+        let _formatString =
             columns
             |> Seq.map (fun col -> 
-                let width = columnWidths.[col.Ordinal] - 4
+                let width = columnWidths[col.Ordinal] - 4
                 sprintf "| %%-%ds " width 
             )
             |> String.concat ""
             |> fun s -> s + "|"
             
         columns
-            |> Seq.map (fun col -> col.ColumnName.PadRight(columnWidths.[col.Ordinal] - 2))
+            |> Seq.map (fun col -> col.ColumnName.PadRight(columnWidths[col.Ordinal] - 2))
             |> String.concat " | "
             |> printfn "| %s |"
 
         columns
-            |> Seq.map (fun col -> String('-', columnWidths.[col.Ordinal] - 2))
+            |> Seq.map (fun col -> String('-', columnWidths[col.Ordinal] - 2))
             |> String.concat "-|-"
             |> printfn "|-%s-|"
 
@@ -80,9 +81,9 @@ module Printer =
             |> Seq.iter (fun row ->
                 columns
                 |> Seq.map (fun col ->
-                    row.[col]
+                    row[col]
                     |> safeToString
-                    |> _.PadRight(columnWidths.[col.Ordinal] - 2)
+                    |> _.PadRight(columnWidths[col.Ordinal] - 2)
                 )
                 |> String.concat " | "
                 |> printfn "| %s |"
@@ -95,7 +96,6 @@ module Printer =
 /// </summary>
 module Application =
     open System.IO
-    open FSharp.Core
     open Printer
     
     type AppCommand =
@@ -132,21 +132,21 @@ module Application =
     let (|DumpVerboseFlag|_|) = function
         | "--verbose" :: rest
         | "-v" :: rest -> Some rest
-        | rest -> None
+        | _ -> None
     /// <summary>
     /// <see cref="DumpOptions"/> has <c>--section</c> flag
     /// </summary>
     let (|DumpSectionsFlag|_|) = function
         | "--sections" :: rest
         | "-s" :: rest -> Some rest
-        | rest -> None
+        | _ -> None
     /// <summary>
     /// <see cref="DumpOptions"/> has <c>--headers</c> flag
     /// </summary>
     let (|DumpHeadersFlag|_|) = function
         | "--headers" :: rest
         | "-h" :: rest -> Some rest
-        | rest -> None
+        | _ -> None
     /// <summary>
     /// <see cref="DumpOptions"/> has
     /// <c>--imports flag</c>
@@ -154,7 +154,7 @@ module Application =
     let (|DumpImportsFlag|_|) = function
         | "--imports" :: rest
         | "-it" :: rest -> Some rest
-        | rest -> None
+        | _ -> None
     /// <summary>
     /// <see cref="DumpOptions"/>
     /// has <c>--exports</c> flag
@@ -162,7 +162,7 @@ module Application =
     let (|DumpExportsFlag|_|) = function
         | "--exports" :: rest
         | "-et" :: rest -> Some rest
-        | rest -> None
+        | _ -> None
     /// <summary>
     /// <see cref="DumpOptions"/> has <c>--info</c>
     /// flag
@@ -170,7 +170,7 @@ module Application =
     let (|DumpInfo|_|) = function
         | "--info" :: rest -> Some (true, rest)
         | "-i" :: rest -> Some (true, rest)
-        | rest -> None
+        | _ -> None
     
     [<CompiledName "ParseInfoOptions">]
     let rec parseInfoOptions args : AppCommand =
@@ -226,8 +226,8 @@ module Application =
                    |> Array.toList
         match args with
         | ["dump"] -> AppInvalid "Missing file path for dump command"
-        | ("dump" :: rest) -> parseDumpOptions rest
-        | ("info" :: rest) -> parseInfoOptions rest
+        | "dump" :: rest -> parseDumpOptions rest
+        | "info" :: rest -> parseInfoOptions rest
         | ["help"] -> AppHelp
         | ["version"] -> AppVersion
         | [] -> AppHelp

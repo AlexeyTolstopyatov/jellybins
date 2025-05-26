@@ -131,8 +131,8 @@ public class NewExecutableDrawer : IDrawer
         segs.Columns.AddRange([
             new DataColumn("Type"), 
             new DataColumn("#Segment"), 
-            new DataColumn("FileOffset"),
-            new DataColumn("FileLength"),
+            new DataColumn("Offset"),
+            new DataColumn("Length"),
             new DataColumn("Flags"),
             new DataColumn("MinAllocation")
         ]);

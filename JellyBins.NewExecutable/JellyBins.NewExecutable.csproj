@@ -4,6 +4,11 @@
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <Version>1.3.1</Version>
+        <Title>JellyBins Win16-OS/2 Dumping utilities </Title>
+        <Copyright>CoffeeLake 2024-2025</Copyright>
+        <PackageProjectUrl>https://github.com/AlexeyTolstopyatov/jellybins</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/AlexeyTolstopyatov/jellybins</RepositoryUrl>
     </PropertyGroup>
 
     <ItemGroup>
