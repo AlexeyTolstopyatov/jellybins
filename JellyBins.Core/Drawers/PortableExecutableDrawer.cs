@@ -18,7 +18,6 @@ public class PortableExecutableDrawer : IDrawer
         MakeExports();
         MakeImports();
     }
-    
     public DataTable[] HeadersTables { get; private set; } = [];
     public DataTable[] SectionTables { get; private set; } = [];
     public DataTable[] ImportsTables { get; private set; } = [];
@@ -255,12 +254,15 @@ public class PortableExecutableDrawer : IDrawer
         Dictionary<String, String> infoDictionary = [];
         infoDictionary.Add("FileName", _dumper.Info.Name!);
         infoDictionary.Add("FilePath", _dumper.Info.Path!);
+        infoDictionary.Add("BirthDay", _dumper.Info.DateTimeStamp!);
         infoDictionary.Add("Target CPU", _dumper.Info.CpuArchitecture!);
         infoDictionary.Add("Max. WORD", $"{_dumper.Info.CpuWordLength} BIT");
         infoDictionary.Add("Target OS ", _dumper.Info.OperatingSystem!);
         infoDictionary.Add("Target OS ver.", _dumper.Info.OperatingSystemVersion!);
+        infoDictionary.Add("Minimum OS ver.", _dumper.Info.MinimumSystemVersion!);
         infoDictionary.Add("FileType", FileTypeToString((FileType)_dumper.GetBinaryTypeId()));
         infoDictionary.Add("ExtType ", FileTypeToString((FileType)_dumper.GetExtensionTypeId()));
+        
         InfoDictionary = infoDictionary;
     }
 
@@ -301,9 +303,9 @@ public class PortableExecutableDrawer : IDrawer
             Columns = { "Name", "Address", "Size" }
         };
         meta.Rows.Add(
-            _dumper.ExportsDump.Name,
-            _dumper.ExportsDump.Address,
-            _dumper.ExportsDump.Size
+            _dumper.ImportsDump.Name,
+            _dumper.ImportsDump.Address,
+            _dumper.ImportsDump.Size
         );
 
         DataTable imports = new()

@@ -1,6 +1,9 @@
-﻿namespace JellyBins.PortableExecutable.Models;
+﻿using JellyBins.Abstractions;
+using JellyBins.PortableExecutable.Headers;
 
-public class PeOptionalHeaderRomDump
+namespace JellyBins.PortableExecutable.Models;
+
+public class PeOptionalHeaderRomDump : BaseDump<PeOptionalHeaderRom>
 {
     
 }

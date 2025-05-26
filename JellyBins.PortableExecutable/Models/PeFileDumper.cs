@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Globalization;
+using System.Runtime.InteropServices;
 using JellyBins.Abstractions;
 using JellyBins.PortableExecutable.Headers;
 using static System.TimeZone;
@@ -112,7 +113,7 @@ public class PeFileDumper(String path) : IFileDumper
         
         ImportsDump = dumper.ImportsDump(reader);
         ExportsDump = dumper.ExportsDump(reader);
-        UInt32 entryPoint = (Machine64Bit) 
+        UInt32 entryPoint = Machine64Bit
             ? OptionalHeaderDump.Segmentation.AddressOfEntryPoint
             : OptionalHeader32Dump.Segmentation.AddressOfEntryPoint;
         
@@ -210,13 +211,35 @@ public class PeFileDumper(String path) : IFileDumper
         if ((c & 0x0100) != 0) chars.Add("image_file_32bit_machine".ToUpper());
         if ((c & 0x0200) != 0) chars.Add("image_debug_stripped".ToUpper());
         if ((c & 0x0400) != 0) chars.Add("image_file_media_run_from_swap".ToUpper());
-        if ((c & 0x0800) != 0) chars.Add("net_run_from_swap".ToUpper());
+        if ((c & 0x0800) != 0) chars.Add("image_net_run_from_swap".ToUpper());
         if ((c & 0x1000) != 0) chars.Add("image_file_system".ToUpper());
         if ((c & 0x2000) != 0) chars.Add("image_file_dll".ToUpper());
         if ((c & 0x4000) != 0) chars.Add("image_file_up_system_only".ToUpper());
         if ((c & 0x8000) != 0) chars.Add("image_file_bytes_reverse_hi".ToUpper());
 
         FileHeaderDump.Characteristics = chars.ToArray();
+
+        UInt16 machine = FileHeaderDump.Segmentation.Machine;
+        Info.CpuArchitecture = machine switch
+        {
+            0x014c => "Intel i386",
+            0x200  => "Intel Itanium",
+            0x010c => "Intel i860",
+            0x8664 => "Amd64",
+            0xaa64 => "Arm64 (LE)",
+            0x01c => "Arm (LE)",
+            _ => "?"
+        };
+        Info.OperatingSystem = OptionalHeaderRomDump.Name == null 
+            ? "Microsoft Windows" 
+            : "EFI bytecode";
+        
+        Info.CpuWordLength = (UInt32?)(Machine64Bit ? 64 : 32);
+        if ((c & 0x2000) != 0)
+            _binaryTypeId = (UInt16)FileType.DynamicLibrary;
+        else
+            _binaryTypeId = (UInt16)FileType.Application;
+        
     }
     /// <summary>
     /// Extracts all registered flags from field
@@ -240,9 +263,25 @@ public class PeFileDumper(String path) : IFileDumper
         if ((c & 0x8000) != 0) chars.Add("image_dllcharacteristics_terminal_server_aware".ToUpper());
 
         if (Machine64Bit)
+        {
             OptionalHeaderDump.Characteristics = chars.ToArray();
+            Info.MinimumSystemVersion =
+                $"{OptionalHeaderDump.Segmentation.MajorSubsystemVersion}.{OptionalHeaderDump.Segmentation.MinorSubsystemVersion}";
+            Info.OperatingSystemVersion =
+                $"{OptionalHeaderDump.Segmentation.MajorOperatingSystemVersion}.{OptionalHeaderDump.Segmentation.MinorOperatingSystemVersion}";
+        }
         else
+        {
             OptionalHeader32Dump.Characteristics = chars.ToArray();
+            Info.MinimumSystemVersion =
+                $"{OptionalHeader32Dump.Segmentation.MajorSubsystemVersion}.{OptionalHeader32Dump.Segmentation.MinorSubsystemVersion}";
+            Info.OperatingSystemVersion =
+                $"{OptionalHeader32Dump.Segmentation.MajorOperatingSystemVersion}.{OptionalHeader32Dump.Segmentation.MinorOperatingSystemVersion}";
+        }
+        if ((c & 0x2000) != 0)
+            _binaryTypeId = (UInt16)FileType.Driver;
+        
+        
     }
     /// <summary>
     /// Translates byte values to registered section's characteristics
@@ -303,6 +342,7 @@ public class PeFileDumper(String path) : IFileDumper
         stamp += CurrentTimeZone.GetUtcOffset(stamp);
         
         FileHeaderDump.TimeStamp = stamp;
+        Info.DateTimeStamp = stamp.ToString(CultureInfo.InvariantCulture);
     }
     /// <param name="characteristics"><see cref="PeFileHeader"/> characteristics</param>
     /// <returns><c>True</c> if <c>IMAGE_MACHINE_32_BIT</c> not found</returns>

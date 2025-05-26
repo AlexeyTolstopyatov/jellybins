@@ -124,7 +124,16 @@ public class LeFileDumper(String path) : IFileDumper
             0x5 => "IBM Personality",
             _ => "?"
         };
-
+        // гадание на кофейной гуще
+        Info.OperatingSystemVersion = LeHeaderDump.Segmentation.OSType switch
+        {
+            0x1 => "2.0",
+            0x2 => "3.0",
+            0x3 => "4.0",
+            0x4 => "3.5",
+            0x5 => "?",
+            _ => "1.0"
+        };
         Info.CpuArchitecture = LeHeaderDump.Segmentation.CPUType switch
         {
             0x01 => "Intel i286",
