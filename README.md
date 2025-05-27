@@ -1,6 +1,6 @@
 # JellyBins
 
-<img src="JellyBins.Assets/beans128.png" align="right"/>
+<img src="JellyBins.Assets/beans512.png" height="128" width="128" align="right"/>
 
 JellyBins is a little software, which represents functional
 for dumping binaries. This is not debugger, enough. 
@@ -58,7 +58,13 @@ interfaces for project's internals. (e.g. `IFileDumper` or `IDrawer`)
 
 ### Documentation and Sources
 
-See `JellyBins.Documents` catalog in repo.
+ - [Usage of JellyBins Console application](README_JBC.md)
+ - [NE Format (segmentation details)](JellyBins.Documents/Microsoft%20NE%20Segmentation.pdf)
+ - [LE Format (OS/2 16-32 bit binary model)](JellyBins.Documents/IBM%20LE%20Segments.html.pdf)
+ - [LX Format (OS/2 OMF Segmentation)](JellyBins.Documents/OS2_OMF_and_LX_Object_Formats_Revision_8_199406.pdf)
+ - [Visual Basic Virtual Machine metadata](JellyBins.Documents/Visual%20Basic%20Compiled%20PE%20Internals.pdf)
+ - [Semi VB Decompiler PCode4.bas](JellyBins.Documents/modPCode4.bas)
+ - [.NET Runtime metadata](JellyBins.Documents/The%20.NET%20File%20Format.pdf)
 
 ### Icons
 Taken from [icon8](https://icons8.com/), licensed for free usage.
