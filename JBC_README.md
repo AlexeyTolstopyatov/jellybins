@@ -12,8 +12,8 @@ binary static analysis. using F#
 
 ### JellyBins `BaseDump<T>` structure
 
-When you make dump of application, first table was not
-expected information. This table names "BaseDump" 
+When you make dump of application, first table never be
+an expected information. This table names - "BaseDump" 
 Base dump structure describes Dumper's behaviour and
 don't have main goal to show you raw bytes.
 
