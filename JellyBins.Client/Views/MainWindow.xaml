@@ -1,0 +1,47 @@
+﻿<mica:MicaWindow x:Class="JellyBins.Client.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:JellyBins.Client.ViewModels"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        xmlns:mica="clr-namespace:MicaWPF.Controls;assembly=MicaWPF"
+        xmlns:views="clr-namespace:JellyBins.Client.Views"
+        mc:Ignorable="d"
+        Title="JellyBins" 
+        Height="512" 
+        Width="1024">
+    <Window.DataContext>
+        <local:MainWindowViewModel/>
+    </Window.DataContext>
+    <Grid>
+        <!-- Left-side Cards Collection -->
+        <ui:NavigationView
+            PaneDisplayMode="Left"
+            IsBackButtonVisible="Collapsed"
+            IsTabStop="True"
+            IsPaneOpen="True"
+            OpenPaneLength="250">
+            <ui:NavigationView.MenuItems>
+                <ui:NavigationViewItem
+                    Content="Home"
+                    Icon="{ui:SymbolIcon Home24}"
+                    Command="{Binding ShowHomePageCommand}"
+                    TargetPageType="{x:Type views:HomePage}"/>
+                <ui:NavigationViewItem
+                    Content="General Information"
+                    Icon="{ui:SymbolIcon Info24}">
+                </ui:NavigationViewItem>
+                <ui:NavigationViewItem
+                    Content="Dump"
+                    IsEnabled="True"
+                    Icon="{ui:SymbolIcon Drafts24}">
+                </ui:NavigationViewItem>
+                <ui:NavigationViewItem
+                    Content="About"
+                    Icon="{ui:SymbolIcon Info24}">
+                </ui:NavigationViewItem>
+            </ui:NavigationView.MenuItems>
+        </ui:NavigationView>
+    </Grid>
+</mica:MicaWindow>

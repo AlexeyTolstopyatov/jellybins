@@ -1,0 +1,96 @@
+﻿<Page x:Class="JellyBins.Client.Views.HomePage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:local="clr-namespace:JellyBins.Client.ViewModels"
+      mc:Ignorable="d"
+      Title="HomePage"
+      Height="Auto" 
+      Width="Auto">
+    <Page.DataContext>
+        <local:HomePageViewModel/>
+    </Page.DataContext>
+    <StackPanel
+        VerticalAlignment="Top">
+        <DockPanel 
+            LastChildFill="False"
+            Margin="20">
+            <!--Info-->
+            <ui:Card>
+                <ui:Card.Content>
+                    <StackPanel>
+                        <TextBlock
+                            Text="Info"
+                            FontSize="21"
+                            Padding="5"/>
+                        <StackPanel 
+                            Orientation="Horizontal">
+                            <ui:SymbolIcon
+                                Margin="10"
+                                Symbol="Info24"/>
+                            <ui:TextBlock
+                                MaxWidth="200"
+                                TextWrapping="WrapWithOverflow"
+                                Text="Make shorten dump. Collect general information about binary"/>
+                        </StackPanel>
+                        <Button
+                            Command="{Binding MakeInfoPage}"
+                            Margin="0,10, 0, 0"
+                            Content="Make"/>
+                    </StackPanel>
+                </ui:Card.Content>
+            </ui:Card>
+            <!--Dump-->
+            <ui:Card>
+                <ui:Card.Content>
+                    <StackPanel>
+                        <TextBlock
+                            Text="Dump"
+                            FontSize="21"
+                            Padding="5"/>
+                        <StackPanel 
+                            Orientation="Horizontal">
+                            <ui:SymbolIcon
+                                Margin="10"
+                                Symbol="Settings24"/>
+                            <ui:TextBlock
+                                MaxWidth="200"
+                                TextWrapping="WrapWithOverflow"
+                                Text="Make a dump of object's tables. (Experimental support BigEndian architecture types)"/>
+                        </StackPanel>
+                        <Button
+                            Command="{Binding MakeDumpPage}"
+                            Margin="0,10, 0, 0"
+                            Content="Make"/>
+                    </StackPanel>
+                </ui:Card.Content>
+            </ui:Card>
+            <!--Full Dump-->
+            <ui:Card>
+                <ui:Card.Content>
+                    <StackPanel>
+                        <TextBlock
+                            Text="Full Binary map"
+                            FontSize="21"
+                            Padding="5"/>
+                        <StackPanel 
+                            Orientation="Horizontal">
+                            <ui:SymbolIcon
+                                Margin="10"
+                                Symbol="Database24"/>
+                            <ui:TextBlock
+                                MaxWidth="200"
+                                TextWrapping="WrapWithOverflow"
+                                Text="Prepare all pages of data about required binary. (info and dump command will be call)"/>
+                        </StackPanel>
+                        <Button
+                            Margin="0,10, 0, 0"
+                            Content="Make"/>
+                    </StackPanel>
+                </ui:Card.Content>
+            </ui:Card>
+        </DockPanel>
+    </StackPanel>
+</Page>
