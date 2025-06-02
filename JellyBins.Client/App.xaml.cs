@@ -1,6 +1,7 @@
-﻿using System.Configuration;
-using System.Data;
-using System.Windows;
+﻿using System.Windows;
+using JellyBins.Abstractions;
+using JellyBins.Client.ViewModels;
+using JellyBins.Client.Views;
 
 namespace JellyBins.Client;
 

@@ -14,34 +14,22 @@
     <Window.DataContext>
         <local:MainWindowViewModel/>
     </Window.DataContext>
-    <Grid>
-        <!-- Left-side Cards Collection -->
-        <ui:NavigationView
-            PaneDisplayMode="Left"
-            IsBackButtonVisible="Collapsed"
-            IsTabStop="True"
-            IsPaneOpen="True"
-            OpenPaneLength="250">
-            <ui:NavigationView.MenuItems>
-                <ui:NavigationViewItem
-                    Content="Home"
-                    Icon="{ui:SymbolIcon Home24}"
-                    Command="{Binding ShowHomePageCommand}"
-                    TargetPageType="{x:Type views:HomePage}"/>
-                <ui:NavigationViewItem
-                    Content="General Information"
-                    Icon="{ui:SymbolIcon Info24}">
-                </ui:NavigationViewItem>
-                <ui:NavigationViewItem
-                    Content="Dump"
-                    IsEnabled="True"
-                    Icon="{ui:SymbolIcon Drafts24}">
-                </ui:NavigationViewItem>
-                <ui:NavigationViewItem
-                    Content="About"
-                    Icon="{ui:SymbolIcon Info24}">
-                </ui:NavigationViewItem>
-            </ui:NavigationView.MenuItems>
-        </ui:NavigationView>
-    </Grid>
+    <ui:NavigationView
+        IsBackButtonVisible="Collapsed"
+        OpenPaneLength="200"
+        PaneTitle="JellyBins"
+        Transition="FadeInWithSlide"
+        PaneDisplayMode="Left">
+        <ui:NavigationView.MenuItems>
+            <ui:NavigationViewItem
+                Tag="MainPage"
+                TargetPageType="{x:Type views:MainWindowWorkspacePage}"
+                Content="General Information"
+                Command="{Binding ShowHomePageCommand}"
+                Icon="{ui:SymbolIcon Drafts24}"/>
+            <ui:NavigationViewItem
+                Content="About"
+                Icon="{ui:SymbolIcon Info24}"/>
+        </ui:NavigationView.MenuItems>
+    </ui:NavigationView>
 </mica:MicaWindow>

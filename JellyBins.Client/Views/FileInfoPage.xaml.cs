@@ -2,9 +2,9 @@
 
 namespace JellyBins.Client.Views;
 
-public partial class HomePage : Page
+public partial class FileInfoPage : Page
 {
-    public HomePage()
+    public FileInfoPage()
     {
         InitializeComponent();
     }
