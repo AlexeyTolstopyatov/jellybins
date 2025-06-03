@@ -17,6 +17,8 @@ public class NewExecutableDrawer : IDrawer
         MakeSectionsTables();
         MakeExports();
         MakeImports();
+        ExtractCharacteristics();
+        MakeExternToolChain();
     }
 
     public DataTable[] HeadersTables { get; private set; } = [];
@@ -173,6 +175,17 @@ public class NewExecutableDrawer : IDrawer
         InfoDictionary = infoDictionary;
     }
 
+    public String[] Characteristics { get; private set; } = [];
+    public String[] ExternToolChain { get; private set; } = [];
+
+    private void MakeExternToolChain()
+    {
+        ExternToolChain = new ModuleProcessor(_dumper)
+            .TryToKnowUsedModules()
+            //.Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+    }
+    
     public void MakeImports()
     {
         DataTable meta = new();
@@ -223,6 +236,11 @@ public class NewExecutableDrawer : IDrawer
         }
 
         ExportsTables = [exportsTable];
+    }
+
+    private void ExtractCharacteristics()
+    {
+        Characteristics = _dumper.NeHeaderDump.Characteristics!;
     }
     
     private static String FileTypeToString(FileType type)

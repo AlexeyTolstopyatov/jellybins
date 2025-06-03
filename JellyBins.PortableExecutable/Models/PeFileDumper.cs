@@ -116,8 +116,15 @@ public class PeFileDumper(String path) : IFileDumper
         UInt32 entryPoint = Machine64Bit
             ? OptionalHeaderDump.Segmentation.AddressOfEntryPoint
             : OptionalHeader32Dump.Segmentation.AddressOfEntryPoint;
-        
-        Vb5HeaderDump = dumper.Vb5HeaderDump(reader, entryPoint);
+
+        try
+        {
+            Vb5HeaderDump = dumper.Vb5HeaderDump(reader, entryPoint);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
         
         reader.Close();
     }
@@ -280,8 +287,6 @@ public class PeFileDumper(String path) : IFileDumper
         }
         if ((c & 0x2000) != 0)
             _binaryTypeId = (UInt16)FileType.Driver;
-        
-        
     }
     /// <summary>
     /// Translates byte values to registered section's characteristics

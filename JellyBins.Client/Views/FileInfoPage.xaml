@@ -11,18 +11,21 @@
     <Page.DataContext>
         <local:FileInfoPageViewModel/>
     </Page.DataContext>
-    <Grid>
-        <ui:Card>
+    <WrapPanel
+        Orientation="Horizontal">
+        <ui:Card
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top">
             <ui:Card.Content>
                 <StackPanel>
                     <TextBlock
                         TextWrapping="WrapWithOverflow"
                         FontSize="21"
                         Text="{Binding Model.Name}"
-                        Margin="10"/>
+                        Margin="10,10,10,0"/>
                     <TextBlock
                         TextWrapping="WrapWithOverflow"
-                        Margin="10"
+                        Margin="10, 5, 10, 5"
                         Text="{Binding Model.Path}"/>
                     <ui:Card>
                         <ui:Card.Content>
@@ -50,23 +53,113 @@
                             </StackPanel>
                         </ui:Card.Content>
                     </ui:Card>
-                    <ItemsControl
-                        ItemsSource="{Binding Model.InfoDictionary}">
-                        <ItemsControl.ItemTemplate>
+                    <TextBlock
+                        MaxWidth="622"
+                        Margin="10,5,10,5"
+                        Text="Those information takes from main Program Header and describes names of flags."
+                        TextWrapping="WrapWithOverflow"/>
+                    <ui:VirtualizingGridView
+                        SpacingMode="BetweenItemsOnly"
+                        StretchItems="True"
+                        Margin="10,10,10,0"
+                        MaxWidth="622"
+                        ItemsSource="{Binding Model.Characteristics}">
+                        <ui:VirtualizingGridView.ItemTemplate>
                             <DataTemplate>
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-                                    <Label Grid.Column="0" Content="{Binding Key}"/>
-                                    <Label Grid.Column="1" Content="{Binding Value}"/>
-                                </Grid>
+                                <ui:TextBlock
+                                    ToolTip="{Binding}"
+                                    FontFamily="Consolas"
+                                    Margin="5"
+                                    Text="{Binding}">
+                                    
+                                </ui:TextBlock>
                             </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+                        </ui:VirtualizingGridView.ItemTemplate>
+                    </ui:VirtualizingGridView>
                 </StackPanel>
             </ui:Card.Content>
         </ui:Card>
-    </Grid>
+        <ui:Card
+            VerticalAlignment="Top"
+            HorizontalAlignment="Left">
+            <ui:Card.Content>
+                <StackPanel>
+                    <TextBlock
+                        Margin="10,0,10,10"
+                        Text="Optional Fields"
+                        FontSize="21"/>
+                    <TextBlock
+                        MaxWidth="300"
+                        Margin="10, 0, 10, 10"
+                        TextWrapping="Wrap"
+                        Text="Depends on binary format, some fields of this group may not contain expected information."/>
+                    <ui:Card
+                        Width="300">
+                        <ui:Card.Content>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="Date of creation"/>
+                                    <TextBlock Text="Minimum OS version"/>
+                                    <TextBlock Text="Description"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock 
+                                        TextWrapping="Wrap"
+                                        Text="{Binding Model.DateStamp}"/>
+                                    <TextBlock 
+                                        TextWrapping="Wrap"
+                                        Text="{Binding Model.MinimumOsVersion}"/>
+                                    <TextBlock
+                                        Text="{Binding Model.Title}"
+                                        TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Grid>
+                        </ui:Card.Content>
+                    </ui:Card>
+                </StackPanel>
+            </ui:Card.Content>
+        </ui:Card>
+        <ui:Card
+            VerticalAlignment="Top"
+            HorizontalAlignment="Left">
+            <ui:Card.Content>
+                <StackPanel>
+                    <TextBlock
+                        Margin="10,0,10,5"
+                        Text="Suggested external Toolchain"
+                        FontSize="21"/>
+                    <TextBlock
+                        Margin="10,0,10,10"
+                        TextWrapping="WrapWithOverflow"
+                        MaxWidth="300"
+                        Text="Those information takes from user's Dictionary. All found module names comapres with registered (saved in *.json file) categories"/>
+                    <TextBlock
+                        MaxWidth="300"
+                        Margin="10,5,10,5"
+                        TextWrapping="Wrap"
+                        Text="This block is optional. If dictionaries not exists in Application's directory, this block will be empty"/>
+                    <ui:VirtualizingGridView
+                        MaxWidth="300"
+                        StretchItems="True"
+                        IsSynchronizedWithCurrentItem="True"
+                        SpacingMode="Uniform"
+                        ItemsSource="{Binding Model.ExternToolChain}">
+                        <ui:VirtualizingGridView.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock 
+                                    FontFamily="Consolas"
+                                    Margin="5"
+                                    TextWrapping="Wrap"
+                                    Text="{Binding}"/>
+                            </DataTemplate>
+                        </ui:VirtualizingGridView.ItemTemplate>
+                    </ui:VirtualizingGridView>
+                </StackPanel>
+            </ui:Card.Content>
+        </ui:Card>
+    </WrapPanel>
 </Page>

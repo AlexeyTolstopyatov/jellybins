@@ -54,7 +54,7 @@ public class ModuleProcessor(IFileDumper dumper) : IModuleProcessor
         if (!File.Exists(dictionaryPath))
             return [];
 
-        var list = JsonSerializer.Deserialize<Dictionary<String, String[]>>(File.ReadAllText(dictionaryPath))!;
+        Dictionary<String, String[]>? list = JsonSerializer.Deserialize<Dictionary<String, String[]>>(File.ReadAllText(dictionaryPath))!;
         
         foreach (String dumpedDllName in ExtractDllNamesFromDump())
         {

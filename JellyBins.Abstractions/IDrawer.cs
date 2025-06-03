@@ -12,4 +12,6 @@ public interface IDrawer
     public void MakeHeadersTables();
     public void MakeSectionsTables();
     public void MakeInfo();
+    public String[] Characteristics { get; }
+    public String[] ExternToolChain { get; }
 }

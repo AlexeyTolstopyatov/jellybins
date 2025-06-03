@@ -17,6 +17,8 @@ public class PortableExecutableDrawer : IDrawer
         MakeSectionsTables();
         MakeExports();
         MakeImports();
+        ExtractCharacteristics();
+        MakeExternToolChain();
     }
     public DataTable[] HeadersTables { get; private set; } = [];
     public DataTable[] SectionTables { get; private set; } = [];
@@ -264,6 +266,34 @@ public class PortableExecutableDrawer : IDrawer
         infoDictionary.Add("ExtType ", FileTypeToString((FileType)_dumper.GetExtensionTypeId()));
         
         InfoDictionary = infoDictionary;
+    }
+
+    public String[] Characteristics { get; private set; } = [];
+    public String[] ExternToolChain { get; private set; } = [];
+    
+    private void MakeExternToolChain()
+    {
+        ExternToolChain = new ModuleProcessor(_dumper)
+            .TryToKnowUsedModules()
+            //.Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+    }
+    
+    private void ExtractCharacteristics()
+    {
+        List<String> all = [];
+        if (_dumper.Machine64Bit)
+        {
+            all.AddRange(_dumper.FileHeaderDump.Characteristics!);
+            all.AddRange(_dumper.OptionalHeaderDump.Characteristics!);
+        }
+        else
+        {
+            all.AddRange(_dumper.FileHeaderDump.Characteristics!);
+            all.AddRange(_dumper.OptionalHeader32Dump.Characteristics!);
+        }
+
+        Characteristics = all.ToArray();
     }
 
     private void MakeExports()

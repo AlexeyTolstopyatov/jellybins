@@ -14,6 +14,7 @@ public class ComDrawer : IDrawer
         MakeInfo();
         MakeHeadersTables();
         MakeSectionsTables();
+        ExtractCharacteristics();
     }
     public DataTable[] HeadersTables { get; private set; } = [];
     public DataTable[] SectionTables { get; private set; } = [];
@@ -70,6 +71,15 @@ public class ComDrawer : IDrawer
         InfoDictionary = infoDictionary;
     }
 
+    public String[] Characteristics { get; private set; } = [];
+    public String[] ExternToolChain { get; } = [];
+
+    private void ExtractCharacteristics()
+    {
+        // if factory-level exception didnt throw -> this object always not null
+        Characteristics = _dumper.Sections![0].Characteristics!;
+    }
+    
     private static String FileTypeToString(FileType type)
     {
         return type.ToString();

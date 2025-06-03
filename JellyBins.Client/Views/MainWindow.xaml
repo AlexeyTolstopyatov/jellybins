@@ -15,16 +15,17 @@
         <local:MainWindowViewModel/>
     </Window.DataContext>
     <ui:NavigationView
+        IsPaneToggleVisible="True"
         IsBackButtonVisible="Collapsed"
         OpenPaneLength="200"
-        PaneTitle="JellyBins"
         Transition="FadeInWithSlide"
         PaneDisplayMode="Left">
         <ui:NavigationView.MenuItems>
             <ui:NavigationViewItem
                 Tag="MainPage"
+                IsMenuElement="True"
                 TargetPageType="{x:Type views:MainWindowWorkspacePage}"
-                Content="General Information"
+                Content="New Document"
                 Command="{Binding ShowHomePageCommand}"
                 Icon="{ui:SymbolIcon Drafts24}"/>
             <ui:NavigationViewItem
