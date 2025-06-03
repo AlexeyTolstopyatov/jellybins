@@ -223,6 +223,8 @@ public class LinearExecutableDrawer : IDrawer
 
     public String[] Characteristics { get; private set; } = [];
     public String[] ExternToolChain { get; private set; } = [];
+    public String[][] SectionsCharacteristics { get; private set; }
+    public String[][] HeadersCharacteristics { get; private set; }
 
     private void MakeExternToolChain()
     {
@@ -235,6 +237,20 @@ public class LinearExecutableDrawer : IDrawer
     private void ExtractCharacteristics()
     {
         Characteristics = _dumper.LeHeaderDump.Characteristics!;
+        
+        List<String[]> all =
+        [
+            _dumper.MzHeaderDump.Characteristics!,
+            _dumper.LeHeaderDump.Characteristics!
+        ];
+        List<String[]> sections = [];
+        foreach (LeObjectDump dump in _dumper.ObjectsTableDump)
+        {
+            sections.Add(dump.Characteristics!);
+        }
+
+        SectionsCharacteristics = sections.ToArray();
+        HeadersCharacteristics = all.ToArray();
     }
 
     private static String FileTypeToString(FileType type)

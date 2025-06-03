@@ -73,11 +73,21 @@ public class ComDrawer : IDrawer
 
     public String[] Characteristics { get; private set; } = [];
     public String[] ExternToolChain { get; } = [];
+    public String[][] SectionsCharacteristics { get; private set; } = [];
+    public String[][] HeadersCharacteristics { get; } = [];
 
     private void ExtractCharacteristics()
     {
         // if factory-level exception didnt throw -> this object always not null
         Characteristics = _dumper.Sections![0].Characteristics!;
+
+        List<String[]> sections = [];
+        foreach (ComSectionDump dump in _dumper.Sections)
+        {
+            sections.Add(dump.Characteristics!);
+        }
+
+        SectionsCharacteristics = sections.ToArray();
     }
     
     private static String FileTypeToString(FileType type)

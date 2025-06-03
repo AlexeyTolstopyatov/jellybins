@@ -1,0 +1,95 @@
+﻿<Page x:Class="JellyBins.Client.Views.FileDumpPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:local="clr-namespace:JellyBins.Client.ViewModels"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      mc:Ignorable="d"
+      Title="FileDumpPage" 
+      Height="Auto" Width="Auto">
+    <Page.DataContext>
+        <local:FileDumpPageViewModel/>
+    </Page.DataContext>
+    <Grid
+        VerticalAlignment="Top"
+        HorizontalAlignment="Left">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <ScrollViewer>
+            <TabControl>
+                <TabItem
+                    IsManipulationEnabled="False"
+                    Header="Program Headers"
+                    VerticalAlignment="Top"
+                    HorizontalAlignment="Left">
+                    <StackPanel>
+                        <TextBlock
+                            FontSize="21"
+                            Text="Program Headers"/>
+                        <ItemsControl
+                            ItemsSource="{Binding Model.Headers}">
+                            
+                            <ItemsControl.ItemContainerStyle>
+                                <Style TargetType="ContentPresenter">
+                                    <Setter Property="HorizontalAlignment" Value="Left"/>
+                                    <Setter Property="Margin" Value="0 0 0 10"/>
+                                </Style>
+                            </ItemsControl.ItemContainerStyle>
+    
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Top"
+                                        Orientation="Vertical"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <DataGrid
+                                        FontFamily="Consolas"
+                                        FontSize="16"
+                                        Margin="5"
+                                        d:ItemsSource="{d:SampleData}"
+                                        ItemsSource="{Binding}"
+                                        IsReadOnly="True"/>
+                                </DataTemplate> 
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </TabItem>
+                <TabItem
+                    Header="Program Sections"
+                    VerticalAlignment="Top"
+                    HorizontalAlignment="Left">
+                    <StackPanel>
+                        <TextBlock
+                            Text="Program Sections"
+                            FontSize="21"/>
+                        <ItemsControl
+                            ItemsSource="{Binding Model.Sections}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel Orientation="Vertical"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <DataGrid
+                                        FontSize="16"
+                                        FontFamily="Consolas"
+                                        Margin="10"
+                                        IsReadOnly="True"
+                                        ItemsSource="{Binding}"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </TabItem>
+            </TabControl>
+        </ScrollViewer>
+    </Grid>
+</Page>

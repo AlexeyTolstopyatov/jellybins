@@ -14,4 +14,6 @@ public interface IDrawer
     public void MakeInfo();
     public String[] Characteristics { get; }
     public String[] ExternToolChain { get; }
+    public String[][] SectionsCharacteristics { get; }
+    public String[][] HeadersCharacteristics { get; }
 }

@@ -1,7 +1,4 @@
-﻿using System.Data;
-using System.Diagnostics.Eventing.Reader;
-using JellyBins.Abstractions;
-using JellyBins.Core;
+﻿using JellyBins.Abstractions;
 
 namespace JellyBins.Client.Models;
 

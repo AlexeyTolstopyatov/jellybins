@@ -270,7 +270,9 @@ public class PortableExecutableDrawer : IDrawer
 
     public String[] Characteristics { get; private set; } = [];
     public String[] ExternToolChain { get; private set; } = [];
-    
+    public String[][] SectionsCharacteristics { get; private set; }
+    public String[][] HeadersCharacteristics { get; private set; }
+
     private void MakeExternToolChain()
     {
         ExternToolChain = new ModuleProcessor(_dumper)
@@ -282,18 +284,39 @@ public class PortableExecutableDrawer : IDrawer
     private void ExtractCharacteristics()
     {
         List<String> all = [];
+        List<String[]> headers = [];
         if (_dumper.Machine64Bit)
         {
             all.AddRange(_dumper.FileHeaderDump.Characteristics!);
             all.AddRange(_dumper.OptionalHeaderDump.Characteristics!);
+            headers.Add(_dumper.FileHeaderDump.Characteristics!);
+            headers.Add(_dumper.OptionalHeaderDump.Characteristics!);
         }
         else
         {
             all.AddRange(_dumper.FileHeaderDump.Characteristics!);
             all.AddRange(_dumper.OptionalHeader32Dump.Characteristics!);
+            headers.Add(_dumper.FileHeaderDump.Characteristics!);
+            headers.Add(_dumper.OptionalHeaderDump.Characteristics!);
         }
 
         Characteristics = all.ToArray();
+        
+        
+        List<String[]> sections = [];
+        foreach (var dump in _dumper.DirectoryDumps)
+        {
+            sections.Add(dump.Characteristics!);
+        }
+
+        foreach (PeSectionDump dump in _dumper.SectionDumps)
+        {
+            sections.Add(dump.Characteristics!);
+        }
+
+        SectionsCharacteristics = sections.ToArray();
+        HeadersCharacteristics = headers.ToArray();
+        
     }
 
     private void MakeExports()

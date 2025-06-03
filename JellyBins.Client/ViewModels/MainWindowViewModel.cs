@@ -20,7 +20,7 @@ public class MainWindowViewModel : ViewModel
     {
         ShowHomePageCommand = new Command(ShowHomePage);
         MakeAllCommand = new Command(PrepareAllPages);
-        MakeDumpCommand = new Command(PrepareAllPages);
+        MakeDumpCommand = new Command(PrepareDumpPage);
         MakeInfoCommand = new Command(PrepareAllPages);
         
         Instance = this;
@@ -93,6 +93,22 @@ public class MainWindowViewModel : ViewModel
         PageContainer = new FileInfoPage()
         {
             DataContext = new FileInfoPageViewModel(drawer)
+        };
+    }
+
+    private void PrepareDumpPage()
+    {
+        String path = GetFilePath();
+        IDrawer? drawer = GetDrawer(path);
+        
+        if (drawer == null)
+            return; // ignore
+
+        DataStorage = drawer;
+
+        PageContainer = new FileDumpPage()
+        {
+            DataContext = new FileDumpPageViewModel(drawer)
         };
     }
 }

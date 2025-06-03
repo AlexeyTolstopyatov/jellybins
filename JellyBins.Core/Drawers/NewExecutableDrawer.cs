@@ -177,7 +177,10 @@ public class NewExecutableDrawer : IDrawer
 
     public String[] Characteristics { get; private set; } = [];
     public String[] ExternToolChain { get; private set; } = [];
-
+    public String[][] SectionsCharacteristics { get; private set; } = [];
+    public String[][] HeadersCharacteristics { get; private set; } = [];
+    
+    
     private void MakeExternToolChain()
     {
         ExternToolChain = new ModuleProcessor(_dumper)
@@ -241,6 +244,20 @@ public class NewExecutableDrawer : IDrawer
     private void ExtractCharacteristics()
     {
         Characteristics = _dumper.NeHeaderDump.Characteristics!;
+
+        List<String[]> all =
+        [
+            _dumper.MzHeaderDump.Characteristics!,
+            _dumper.NeHeaderDump.Characteristics!
+        ];
+        List<String[]> sections = [];
+        foreach (NeSegmentDump dump in _dumper.SegmentsTableDump)
+        {
+            sections.Add(dump.Characteristics!);
+        }
+
+        SectionsCharacteristics = sections.ToArray();
+        HeadersCharacteristics = all.ToArray();
     }
     
     private static String FileTypeToString(FileType type)
