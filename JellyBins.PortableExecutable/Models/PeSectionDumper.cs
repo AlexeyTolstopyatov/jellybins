@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using System.Text;
 using JellyBins.PortableExecutable.Exceptions;
 using JellyBins.PortableExecutable.Headers;
+using Byte = System.Byte;
 
 namespace JellyBins.PortableExecutable.Models;
 
@@ -254,41 +255,12 @@ public class PeSectionDumper(PeDirectory[] directories, PeSection[] sections, Bo
     }
     #endregion
     #region Visual Basic Runtime Processor
-    /// <param name="reader"><see cref="BinaryReader"/> instance</param>
-    /// <param name="entry">Address of Entry Point</param>
-    /// <returns> Ready VB(a) dump !experemental! </returns>
-    public PeVb5HeaderDump Vb5HeaderDump(BinaryReader reader, UInt64 entry)
+
+    public Object GetVbBoxedDump()
     {
-        PeVb5HeaderDump dump = new();
-
-        Int64 vbStartOffset = Convert.ToInt64(entry);
-        // Semi VB Decompiler idea 
-        reader.BaseStream.Position = vbStartOffset;
-        Byte pushCode = reader.ReadByte();
-        UInt32 vbPointer = reader.ReadUInt32();
-        Byte callCode = reader.ReadByte();
-        UInt32 callAddress = reader.ReadUInt32();
-        
-        if (pushCode != 0x68 && pushCode != 0x5A)
-            return dump;
-
-        if (callCode != 0xE8 && callCode != 0x11)
-            return dump;
-        
-        reader.BaseStream.Position = vbPointer;
-        
-        VbHeader vbHeader = Fill<VbHeader>(reader);
-        dump.Name = "VB Header (JellyBins: VB5_HEADER)";
-        dump.Address = vbPointer;
-        dump.Segmentation = vbHeader;
-        
-        if (dump.Segmentation.VbMagic.ToString() != "VB5!")
-        {
-            Debug.WriteLine("wrong VB header. Don't see");
-        }
-        
-        return dump;
+        return 0;
     }
+    
     #endregion
     /// <param name="reader"><see cref="BinaryReader"/> instance</param>
     /// <param name="rva">RVA</param>

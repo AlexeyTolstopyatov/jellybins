@@ -64,9 +64,9 @@ public class SectionsOpeningTest
     [Test]
     public void ParsePeBinary()
     {
-        PeFileDumper dumper = new(@"D:\Projects\vb\Semi VB Decompiler\ApiLoader.exe");
+        PeFileDumper dumper = new(@"D:\Projects\vb\Semi VB Decompiler\Install Folder\SemiVBDecompiler.exe");
         // 32 bit imports reads ok
-        // 64 bit imports problem
+        // 64 bit imports ok
         dumper.Dump();
         Assert.Pass();
     }

@@ -33,6 +33,12 @@ public class PeFileDumper(String path) : IFileDumper
     private UInt32 _numberOfRvaAndSizes;
     private UInt32 _numberOfSections;
     public Boolean Machine64Bit { get; private set; }
+
+    public Boolean HasVb4Data { get; private set; }
+    public Boolean HasOldVb4Data { get; private set; }
+    public Boolean HasVb5Data { get; private set; }
+    public Boolean HasCorData { get; private set; }
+    
     /// <summary>
     /// Makes full dump of required binary.
     /// Use all public fields of <see cref="PeFileDumper"/> instance
@@ -103,27 +109,20 @@ public class PeFileDumper(String path) : IFileDumper
         FindCharacteristics();
         FindDllCharacteristics();
         FindTimeStamp();
-
+        
         PeSectionDumper dumper = new 
         (
             ExtractDirectoriesFromDump(),
             ExtractSectionsFromDump(),
             Machine64Bit
         );
-        
         ImportsDump = dumper.ImportsDump(reader);
         ExportsDump = dumper.ExportsDump(reader);
-        UInt32 entryPoint = Machine64Bit
-            ? OptionalHeaderDump.Segmentation.AddressOfEntryPoint
-            : OptionalHeader32Dump.Segmentation.AddressOfEntryPoint;
 
-        try
+        if (DirectoryDumps[14].Segmentation.Size != 0)
         {
-            Vb5HeaderDump = dumper.Vb5HeaderDump(reader, entryPoint);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
+            // Common Runtime
+            
         }
         
         reader.Close();
@@ -186,12 +185,11 @@ public class PeFileDumper(String path) : IFileDumper
         List<PeDirectoryDump> directoryDumps = [];
         for (Int32 i = 0; i < _numberOfRvaAndSizes; ++i)
         {
-            String name = $"PE Data Directory (JellyBins: {names[i]})";
+            String name = $"PE Directory (JellyBins: {names[i]})";
             Int32 size = 8;
             PeDirectoryDump dump = new()
             {
                 Name = name,
-                Characteristics = ["DATA_OFFSET_RVA"],
                 Size = size,
                 Segmentation = directories[i]
             };

@@ -14,18 +14,62 @@
     <Grid
         VerticalAlignment="Top"
         HorizontalAlignment="Left">
-        <ScrollViewer>
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition 
-                        Width="*" 
-                        MinWidth="350"/>
-                    <ColumnDefinition 
-                        Width="3*" 
-                        MinWidth="700"/>
-                </Grid.ColumnDefinitions>
-                <!--Application Structure -->
-                <ScrollViewer>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition 
+                    Width="*" 
+                    MinWidth="350"/>
+                <ColumnDefinition
+                    MinWidth="700"
+                    Width="Auto"/>
+                <ColumnDefinition
+                    Width="*"
+                    MinWidth="350"/>
+            </Grid.ColumnDefinitions>
+            <!--Application Structure -->
+            <ScrollViewer>
+                <StackPanel>
+                    <Expander
+                        Margin="10, 0, 10, 10"
+                        IsExpanded="True"
+                        Header="General File Information">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="CPU"/>
+                                <TextBlock Text="Maximum word"/>
+                            </StackPanel>
+                            <StackPanel
+                                Grid.Column="1">
+                                <TextBlock Text="{Binding Model.CpuArchitecture}"/>
+                                <TextBlock Text="{Binding Model.CpuMaxWord}"/>
+                            </StackPanel>
+                        </Grid>
+                    </Expander>
+                    <Expander
+                        Margin="10, 0, 10, 10"
+                        Header="Imported Modules">
+                        <ui:VirtualizingGridView
+                            StretchItems="True"
+                            SpacingMode="Uniform"
+                            ItemsSource="{Binding Model.ExternToolChain}">
+                            <ui:VirtualizingGridView.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <ui:SymbolIcon
+                                            Margin="5"
+                                            Symbol="Library24"/>
+                                        <TextBlock
+                                            FontWeight="Medium"
+                                            Text="{Binding}"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ui:VirtualizingGridView.ItemTemplate>
+                        </ui:VirtualizingGridView>
+                    </Expander>
                     <ItemsControl 
                         ItemsSource="{Binding Model.Headers}" 
                         Margin="10, 0, 10, 10">
@@ -45,7 +89,7 @@
                                                         <ColumnDefinition Width="250"/>
                                                         <ColumnDefinition Width="*"/>
                                                     </Grid.ColumnDefinitions>
-                                                    <TextBlock 
+                                                    <TextBlock
                                                         Grid.Column="0" 
                                                         ToolTip="{Binding ItemArray[0]}"
                                                         Text="{Binding ItemArray[0]}" 
@@ -66,124 +110,136 @@
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
-                </ScrollViewer>
-                <StackPanel
-                    HorizontalAlignment="Left"
-                    VerticalAlignment="Top"
-                    Orientation="Vertical"
-                    Grid.Column="1">
-                    <!--DUMP CONTAINER -->
-                    <ui:Card>
-                        <ui:Card.Content>
-                            <StackPanel>
-                                <TextBlock
-                                    Text="File Sections"
-                                    FontWeight="Medium"
-                                    FontSize="21"/>
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="3*"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-                                    <ItemsControl
-                                        ItemsSource="{Binding Model.Sections}" 
-                                        Margin="16">
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
-                                                <Grid>
-                                                    <ui:CardExpander
-                                                        Header="{Binding TableName}"
-                                                        Icon="{ui:SymbolIcon Bookmark24}"
-                                                        Margin="0,0,0,10">
-                                                        <Grid>
-                                                            <DataGrid
-                                                                FontSize="16"
-                                                                FontFamily="Consolas"
-                                                                ItemsSource="{Binding}"/>
-                                                        </Grid>
-                                                    </ui:CardExpander>
-                                                </Grid>
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
-                                </Grid>
-                            </StackPanel>
-                        </ui:Card.Content>
-                    </ui:Card>
-                    <ui:Card>
-                        <ui:Card.Content>
-                            <StackPanel>
-                                <TextBlock
-                                    Text="Export Names"
-                                    FontWeight="Medium"
-                                    FontSize="21"/>
-                                <ItemsControl
-                                    ItemsSource="{Binding Model.Exports}" 
-                                    Margin="16">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Grid>
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition Height="Auto"/>
-                                                    <RowDefinition Height="*"/>
-                                                </Grid.RowDefinitions>
-                                                <ui:CardExpander
-                                                    Grid.Row="1"
-                                                    Icon="{ui:SymbolIcon ArrowExportLtr24}"
-                                                    Header="{Binding TableName}"
-                                                    Margin="0,0,0,10">
-                                                    <Grid>
-                                                        <DataGrid
-                                                            FontSize="16"
-                                                            FontFamily="Consolas"
-                                                            ItemsSource="{Binding}"/>
-                                                    </Grid>
-                                                </ui:CardExpander>
-                                            </Grid>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </StackPanel>
-                        </ui:Card.Content>
-                    </ui:Card>
-                    <ui:Card>
-                        <ui:Card.Content>
-                            <StackPanel>
-                                <TextBlock
-                                    Text="Import Names"
-                                    FontWeight="Medium"
-                                    FontSize="21"/>
-                                <ItemsControl
-                                    ItemsSource="{Binding Model.Imports}" 
-                                    Margin="16">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Grid>
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition Height="Auto"/>
-                                                    <RowDefinition Height="*"/>
-                                                </Grid.RowDefinitions>
-                                                <ui:CardExpander
-                                                    Icon="{ui:SymbolIcon ArrowImport24}"
-                                                    Header="{Binding TableName}"
-                                                    Grid.Row="1"
-                                                    Margin="0,0,0,10">
-                                                    <Grid>
-                                                        <DataGrid
-                                                            FontSize="16"
-                                                            FontFamily="Consolas"
-                                                            ItemsSource="{Binding}"/>
-                                                    </Grid>
-                                                </ui:CardExpander>
-                                            </Grid>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </StackPanel>
-                        </ui:Card.Content>
-                    </ui:Card>
                 </StackPanel>
-            </Grid>
-        </ScrollViewer>
+            </ScrollViewer>
+            <StackPanel
+                MinWidth="700"
+                Grid.Column="1"
+                Orientation="Vertical"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top">
+                <!--DUMP CONTAINER -->
+                <ui:Card>
+                    <ui:Card.Content>
+                        <StackPanel>
+                            <TextBlock
+                                FontSize="21"
+                                Text="{Binding Model.Name}"/>
+                            <TextBlock
+                                Text="{Binding Model.Path}"
+                                Margin="0,0,0,10"/>
+                            <TextBlock
+                                Text="File Sections"
+                                FontWeight="Medium"
+                                FontSize="21"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="3*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <ItemsControl
+                                    ItemsSource="{Binding Model.Sections}" 
+                                    Margin="16">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid>
+                                                <ui:CardExpander
+                                                    Header="{Binding TableName}"
+                                                    Icon="{ui:SymbolIcon Bookmark24}"
+                                                    Margin="0,0,0,10">
+                                                    <Grid>
+                                                        <DataGrid
+                                                            FontSize="16"
+                                                            FontFamily="Consolas"
+                                                            ItemsSource="{Binding}"/>
+                                                    </Grid>
+                                                </ui:CardExpander>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Grid>
+                        </StackPanel>
+                    </ui:Card.Content>
+                </ui:Card>
+                <ui:Card>
+                    <ui:Card.Content>
+                        <StackPanel>
+                            <TextBlock
+                                Text="Export Names"
+                                FontWeight="Medium"
+                                FontSize="21"/>
+                            <ItemsControl
+                                ItemsSource="{Binding Model.Exports}" 
+                                Margin="16">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="*"/>
+                                            </Grid.RowDefinitions>
+                                            <ui:CardExpander
+                                                Grid.Row="1"
+                                                Icon="{ui:SymbolIcon ArrowExportLtr24}"
+                                                Header="{Binding TableName}"
+                                                Margin="0,0,0,10">
+                                                <Grid>
+                                                    <DataGrid
+                                                        FontSize="16"
+                                                        FontFamily="Consolas"
+                                                        ItemsSource="{Binding}"/>
+                                                </Grid>
+                                            </ui:CardExpander>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </ui:Card.Content>
+                </ui:Card>
+                <ui:Card>
+                    <ui:Card.Content>
+                        <StackPanel>
+                            <TextBlock
+                                Text="Import Names"
+                                FontWeight="Medium"
+                                FontSize="21"/>
+                            <ItemsControl
+                                ItemsSource="{Binding Model.Imports}" 
+                                Margin="16">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="*"/>
+                                            </Grid.RowDefinitions>
+                                            <ui:CardExpander
+                                                Icon="{ui:SymbolIcon ArrowImport24}"
+                                                Header="{Binding TableName}"
+                                                Grid.Row="1"
+                                                Margin="0,0,0,10">
+                                                <Grid>
+                                                    <DataGrid
+                                                        FontSize="16"
+                                                        FontFamily="Consolas"
+                                                        ItemsSource="{Binding}"/>
+                                                </Grid>
+                                            </ui:CardExpander>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </ui:Card.Content>
+                </ui:Card>
+            </StackPanel>
+            <!-- Extra information blocks goes here -->
+            <StackPanel
+                Grid.Column="2">
+                
+            </StackPanel>
+        </Grid>
     </Grid>
 </Page>

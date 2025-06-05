@@ -2,18 +2,24 @@
 
 namespace JellyBins.PortableExecutable.Headers;
 
+/*
+ * This information took from "Visual Basic Image Components".pdf
+ * see in repo: https://github.com/AlexeyToltopyatov/JellyBins/JellyBins.Documents/
+ */
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct VbHeader
+public struct Vb5Header
 {
     [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
     public Char[] VbMagic;
     public UInt16 RuntimeBuild;
-    public UInt64 LanguageDll;
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 14)]
+    public Char[] LanguageDll;
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 14)]
     public UInt64 SecondLanguageDll;
     public UInt16 RuntimeRevision;
     public UInt32 LanguageId;
     public UInt32 SecondLanguageId;
-    public UInt32 SubMainPointer;
+    public UInt32 SubMainAddress;
     public UInt32 ProjectDataPointer;
     public UInt32 IntegerCtlsFlagLow;
     public UInt32 IntegerCtlsFlagHigh;
