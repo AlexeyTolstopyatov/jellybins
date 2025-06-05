@@ -68,8 +68,8 @@ public class PeFileDumper(String path) : IFileDumper
         // PE header/2 construct
         if (!IsMachine64Bit(FileHeaderDump.Segmentation.Characteristics))
         {
-            OptionalHeader32Dump.Segmentation = Fill<PeOptionalHeader32>(reader);
             OptionalHeader32Dump.Address = (UInt64)stream.Position;
+            OptionalHeader32Dump.Segmentation = Fill<PeOptionalHeader32>(reader);
             OptionalHeader32Dump.Size = SizeOf(OptionalHeader32Dump.Segmentation);
             OptionalHeader32Dump.Name = "PE Optional Header (WinAPI: IMAGE_OPTIONAL32_HEADER)";
             _numberOfRvaAndSizes = OptionalHeader32Dump.Segmentation.NumberOfRvaAndSizes;
@@ -77,8 +77,8 @@ public class PeFileDumper(String path) : IFileDumper
         }
         else
         {
+            OptionalHeaderDump.Address = (UInt64)stream.Position;
             OptionalHeaderDump.Segmentation = Fill<PeOptionalHeader>(reader);
-            OptionalHeaderDump.Address = MzHeaderDump.Segmentation.e_lfanew;
             OptionalHeaderDump.Size = SizeOf(FileHeaderDump.Segmentation);
             OptionalHeaderDump.Name = "PE Optional Header (WinAPI: IMAGE_OPTIONAL_HEADER)";
             _numberOfRvaAndSizes = OptionalHeaderDump.Segmentation.NumberOfRvaAndSizes;
@@ -86,6 +86,8 @@ public class PeFileDumper(String path) : IFileDumper
         }
         
         List<PeSectionDump> sects = [];
+        
+        // FIXME: sometimes sections dont have VA (VA = 0)
         for (Int32 i = 0; i < _numberOfSections; ++i)
         {
             UInt64 address = (UInt64)stream.Position;
@@ -187,7 +189,7 @@ public class PeFileDumper(String path) : IFileDumper
             : OptionalHeader32Dump.Segmentation.Directories;
         
         List<PeDirectoryDump> directoryDumps = [];
-        for (Int32 i = 0; i < 16; ++i)
+        for (Int32 i = 0; i < 16; ++i) // Windows loader ignores records, rec# > 16.
         {
             String name = $"PE Directory (JellyBins: {names[i]})";
             Int32 size = 8;

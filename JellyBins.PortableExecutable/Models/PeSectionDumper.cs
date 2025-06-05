@@ -308,7 +308,8 @@ public class PeSectionDumper(PeDirectory[] directories, PeSection[] sections, Bo
     /// <returns> <see cref="PeSection"/> Which RVA belongs </returns>
     /// <exception cref="SectionNotFoundException"> If RVA not belongs to any section </exception>
     private PeSection Section(Int64 rva)
-    {
+    {   // rva = {uint} 2019914798 
+        // rva = {long} 2019914798 
         // RVA в PE всегда 32-битное, преобразуем к uint
         UInt32 rva32 = Convert.ToUInt32(rva); // instead casting
         foreach (PeSection section in sections.OrderBy(s => s.VirtualAddress))
