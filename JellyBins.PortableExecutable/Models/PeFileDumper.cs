@@ -122,7 +122,8 @@ public class PeFileDumper(String path) : IFileDumper
         if (DirectoryDumps[14].Segmentation.Size != 0)
         {
             // Common Runtime
-            
+            Cor20HeaderDump = dumper.CorDump(reader);
+            HasCorData = true;
         }
         
         reader.Close();

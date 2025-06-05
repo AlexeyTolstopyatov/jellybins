@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Drawing;
 using System.Reflection.PortableExecutable;
 using System.Runtime.InteropServices;
 using System.Security.AccessControl;
@@ -12,6 +13,24 @@ namespace JellyBins.PortableExecutable.Models;
 
 public class PeSectionDumper(PeDirectory[] directories, PeSection[] sections, Boolean machine64Bit)
 {
+    /// <summary> Deserializes bytes segment to import entries table </summary>
+    /// <param name="reader">your content reader instance</param>
+    /// <returns> Done <see cref="Cor20Header"/> structure </returns>
+    public PeCor20HeaderDump CorDump(BinaryReader reader)
+    {
+        PeCor20HeaderDump dump = new();
+
+        Int64 corOffset = Offset(directories[14].VirtualAddress);
+        reader.BaseStream.Seek(corOffset, SeekOrigin.Begin);
+        dump.Segmentation = Fill<Cor20Header>(reader);
+
+        dump.Address = (UInt64)corOffset;
+        dump.Name = "CLR Header (WinAPI: IMAGE_COR20_HEADER)";
+        dump.Size = SizeOf(dump.Segmentation);
+        
+        return dump;
+    }
+    
     #region Static Import Processor
     /// <summary> Deserializes bytes segment to import entries table </summary>
     /// <param name="reader">your content reader instance</param>

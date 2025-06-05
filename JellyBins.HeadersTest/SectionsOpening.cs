@@ -64,7 +64,7 @@ public class SectionsOpeningTest
     [Test]
     public void ParsePeBinary()
     {
-        PeFileDumper dumper = new(@"D:\Projects\vb\Semi VB Decompiler\Install Folder\SemiVBDecompiler.exe");
+        PeFileDumper dumper = new(@"D:\GitHub\JellyBins\JellyBins.Console\bin\Debug\net8.0\JellyBins.Console.dll");
         // 32 bit imports reads ok
         // 64 bit imports ok
         dumper.Dump();

@@ -58,8 +58,20 @@ public class PortableExecutableDrawer : IDrawer
         DataTable optionalHeader = _dumper.Machine64Bit
             ? MakeOptionalHeader()
             : MakeOptional32Header();
+        
+        List<DataTable> dts = [meta, dosHeader, fileHeader, optionalHeader];
+        
+        if (_dumper.HasCorData)
+        {
+            dts.ElementAt(0).Rows.Add(
+                _dumper.Cor20HeaderDump.Name,
+                _dumper.Cor20HeaderDump.Address,
+                _dumper.Cor20HeaderDump.Size
+            );
+            dts.Add(MakeCor20Header());
+        }
 
-        HeadersTables = [meta, dosHeader, fileHeader, optionalHeader];
+        HeadersTables = dts.ToArray();
     }
 
     private DataTable MakeDosHeader()
@@ -194,6 +206,25 @@ public class PortableExecutableDrawer : IDrawer
         table.Rows.Add(nameof(optional.SizeOfHeapCommit), optional.SizeOfHeapCommit.ToString("X"));
         table.Rows.Add(nameof(optional.LoaderFlags), optional.LoaderFlags.ToString("X"));
         table.Rows.Add(nameof(optional.NumberOfRvaAndSizes), optional.NumberOfRvaAndSizes.ToString("X"));
+        
+        return table;
+    }
+
+    private DataTable MakeCor20Header()
+    {
+        DataTable table = new()
+        {
+            Columns = { "Segment", "Value" },
+            TableName = "CLR Part"
+        };
+
+        table.Rows.Add(nameof(_dumper.Cor20HeaderDump.Segmentation.SizeOfHead), _dumper.Cor20HeaderDump.Segmentation.SizeOfHead.ToString("X"));
+        table.Rows.Add(nameof(_dumper.Cor20HeaderDump.Segmentation.MajorRuntimeVersion), _dumper.Cor20HeaderDump.Segmentation.MajorRuntimeVersion.ToString("X"));
+        table.Rows.Add(nameof(_dumper.Cor20HeaderDump.Segmentation.MinorRuntimeVersion), _dumper.Cor20HeaderDump.Segmentation.MinorRuntimeVersion.ToString("X"));
+        table.Rows.Add(nameof(_dumper.Cor20HeaderDump.Segmentation.MetaDataOffset), _dumper.Cor20HeaderDump.Segmentation.MetaDataOffset.ToString("X"));
+        table.Rows.Add(nameof(_dumper.Cor20HeaderDump.Segmentation.LinkerFlags), _dumper.Cor20HeaderDump.Segmentation.LinkerFlags.ToString("X"));
+        table.Rows.Add(nameof(_dumper.Cor20HeaderDump.Segmentation.EntryPointRva), _dumper.Cor20HeaderDump.Segmentation.EntryPointRva.ToString("X"));
+        table.Rows.Add(nameof(_dumper.Cor20HeaderDump.Segmentation.EntryPointToken), _dumper.Cor20HeaderDump.Segmentation.EntryPointToken.ToString("X"));
         
         return table;
     }
