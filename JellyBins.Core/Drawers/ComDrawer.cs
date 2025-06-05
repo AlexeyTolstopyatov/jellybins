@@ -34,7 +34,10 @@ public class ComDrawer : IDrawer
     /// </summary>
     public void MakeSectionsTables()
     {
-        DataTable table = new();
+        DataTable table = new()
+        {
+            TableName = ".COM Sections Summary"
+        };
             
         table.Columns.Add("Dump Name");
         table.Columns.Add("Dump Size");

@@ -1,5 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 using System.Windows.Input;
 using JellyBins.Abstractions;
 using JellyBins.Client.Services;

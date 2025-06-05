@@ -30,7 +30,8 @@ public class LinearExecutableDrawer : IDrawer
     {
         DataTable meta = new()
         {
-            Columns = { "Name", "Address", "Size" }
+            Columns = { "Name", "Address", "Size" },
+            TableName = "Dumper Metadata"
         };
         meta.Rows.Add(
             _dumper.MzHeaderDump.Name,
@@ -50,7 +51,10 @@ public class LinearExecutableDrawer : IDrawer
     private DataTable MakeDosHeader()
     {
         MzHeader mz = _dumper.MzHeaderDump.Segmentation;
-        DataTable table = new();
+        DataTable table = new()
+        {
+            TableName = "DOS/2 Executable"
+        };
         table.Columns.AddRange([new DataColumn("Segment"), new DataColumn("Value")]);
 
         table.Rows.Add(nameof(mz.e_sign), mz.e_sign.ToString("X"));
@@ -77,7 +81,10 @@ public class LinearExecutableDrawer : IDrawer
     {
         LeHeader linear = _dumper.LeHeaderDump.Segmentation;
         
-        DataTable table = new();
+        DataTable table = new()
+        {
+            TableName = "OS/2 Linear Executable"
+        };
         table.Columns.AddRange([new DataColumn("Segment"), new DataColumn("Value")]);
 
         table.Rows.Add(nameof(linear.SignatureWord), linear.SignatureWord.ToString("X"));
@@ -130,8 +137,24 @@ public class LinearExecutableDrawer : IDrawer
     }
     public void MakeSectionsTables()
     {
-        DataTable meta = new() { Columns = { "Name", "Address", "Size" } };
-        DataTable dirs = new() { Columns = { "VirtualAddress", "#PageTable", "#PageTableEntries", "BaseRelocAddress", "ObjectFlags" }};
+        DataTable meta = new()
+        {
+            Columns = { "Name", "Address", "Size" },
+            TableName = "Dumper Metadata"
+        };
+        DataTable dirs = new()
+        {
+            TableName = "Object Sections Summary",
+            Columns =
+            {
+                "(Suggesting) Name",
+                "VirtualAddress", 
+                "#PageTable", 
+                "#PageTableEntries", 
+                "BaseRelocAddress", 
+                "ObjectFlags"
+            }
+        };
         foreach (LeObjectDump objectDump in _dumper.ObjectsTableDump)
         {
             LeObjectHeader obj = objectDump.Segmentation;
@@ -141,6 +164,7 @@ public class LinearExecutableDrawer : IDrawer
                 objectDump.Size!.Value.ToString("X")
             );
             dirs.Rows.Add(
+                objectDump.SuggestedObjectName,
                 obj.VirtualSize,
                 obj.PageTableIndex.ToString("X"),
                 obj.PageTableEntries.ToString("X"),
@@ -154,13 +178,20 @@ public class LinearExecutableDrawer : IDrawer
 
     private void MakeExportTables()
     {
-        DataTable meta = new() { Columns = { "Name", "Address", "Size" } };
+        DataTable meta = new()
+        {
+            Columns = { "Name", "Address", "Size" },
+            TableName = "Dumper Metadata"
+        };
         meta.Rows.Add(
             _dumper.ExportsDump.Name,
             _dumper.ExportsDump.Address,
             _dumper.ExportsDump.Size
         );
-        DataTable exportsTable = new();
+        DataTable exportsTable = new()
+        {
+            TableName = "Export Names Summary"
+        };
 
         exportsTable.Columns.AddRange([
             new DataColumn("Name"),
@@ -184,13 +215,21 @@ public class LinearExecutableDrawer : IDrawer
 
     private void MakeImportTables()
     {
-        DataTable meta = new() { Columns = { "Name", "Address", "Size" } };
+        DataTable meta = new()
+        {
+            Columns = { "Name", "Address", "Size" },
+            TableName = "Dumper Metadata"
+        };
         meta.Rows.Add(
             _dumper.ImportsDump.Name,
             _dumper.ImportsDump.Address,
             _dumper.ImportsDump.Size
         );
-        DataTable imports = new(){ Columns = { "Module", "Procedure", "ByOrdinal", "Ordinal" } };
+        DataTable imports = new()
+        {
+            TableName = "Import Names Summary",
+            Columns = { "Module", "Procedure", "ByOrdinal", "Ordinal" }
+        };
         
         _dumper.ImportsDump.Segmentation ??= [];
         

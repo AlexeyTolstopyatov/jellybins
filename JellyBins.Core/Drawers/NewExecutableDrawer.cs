@@ -32,7 +32,10 @@ public class NewExecutableDrawer : IDrawer
         // MZ header \/ NE header.
         DataTable dosHeader = MakeDosHeader();
         DataTable windowsHeader = MakeWindowsHeader();
-        DataTable meta = new();
+        DataTable meta = new()
+        {
+            TableName = "Dumper Metadata"
+        };
         
         meta.Columns.AddRange([
             new DataColumn("Name"),
@@ -60,7 +63,10 @@ public class NewExecutableDrawer : IDrawer
     private DataTable MakeDosHeader()
     {
         MzHeader mz = _dumper.MzHeaderDump.Segmentation;
-        DataTable table = new();
+        DataTable table = new()
+        {
+            TableName = "DOS/2 Executable"
+        };
         table.Columns.AddRange([new DataColumn("Segment"), new DataColumn("Value")]);
 
         table.Rows.Add(nameof(mz.e_sign), mz.e_sign.ToString("X"));
@@ -87,7 +93,10 @@ public class NewExecutableDrawer : IDrawer
     private DataTable MakeWindowsHeader()
     {
         NeHeader ne = _dumper.NeHeaderDump.Segmentation;
-        DataTable table = new();
+        DataTable table = new()
+        {
+            TableName = "Windows-OS/2 New Executable"
+        };
         
         table.Columns.AddRange([new DataColumn("Segment"), new DataColumn("Value")]);
         table.Rows.Add(nameof(ne.magic), ne.magic.ToString("X"));
@@ -122,8 +131,14 @@ public class NewExecutableDrawer : IDrawer
     }
     public void MakeSectionsTables()
     {
-        DataTable meta = new();
-        DataTable segs = new();
+        DataTable meta = new()
+        {
+            TableName = "Dumper Metadata"
+        };
+        DataTable segs = new()
+        {
+            TableName = "Object Segments Summary"
+        };
         
         meta.Columns.AddRange([
             new DataColumn("Name"),
@@ -131,12 +146,12 @@ public class NewExecutableDrawer : IDrawer
             new DataColumn("Size")
         ]);
         segs.Columns.AddRange([
-            new DataColumn("Type"), 
+            new DataColumn("Segmentation Type"), 
             new DataColumn("#Segment"), 
-            new DataColumn("Offset"),
-            new DataColumn("Length"),
-            new DataColumn("Flags"),
-            new DataColumn("MinAllocation")
+            new DataColumn("Relative Offset (NVA)"),
+            new DataColumn("Segment Length"),
+            new DataColumn("Segment Characteristics"),
+            new DataColumn("Minimum Allocation")
         ]);
 
         foreach (NeSegmentDump segmentDump in _dumper.SegmentsTableDump)
@@ -191,8 +206,14 @@ public class NewExecutableDrawer : IDrawer
     
     public void MakeImports()
     {
-        DataTable meta = new();
-        DataTable imps = new();
+        DataTable meta = new()
+        {
+            TableName = "Dumper Metadata"
+        };
+        DataTable imps = new()
+        {
+            TableName = "Import Names Summary"
+        };
         
         meta.Columns.AddRange([
             new DataColumn("Name"),
@@ -201,7 +222,7 @@ public class NewExecutableDrawer : IDrawer
         ]);
         imps.Columns.AddRange([
             new DataColumn("#Name"),
-            new DataColumn("Name")
+            new DataColumn("Module Name")
         ]);
         foreach (NeImportDump neImportDump in _dumper.ImportsTableDump)
         {
@@ -221,7 +242,10 @@ public class NewExecutableDrawer : IDrawer
 
     private void MakeExports()
     {
-        DataTable exportsTable = new();
+        DataTable exportsTable = new()
+        {
+            TableName = "Export Names Summary"
+        };
 
         exportsTable.Columns.AddRange([
             new DataColumn("#"),

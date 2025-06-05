@@ -12,8 +12,8 @@ public struct NeSegmentInfo
     public UInt16 MinAllocation { get; set; }
     public String Type => (Flags & 0x0007) switch
     {
-        0x0000 => "CODE",
-        0x0001 => "DATA",
-        _ => "UNKNOWN"
+        0x0000 => "CODE16",
+        0x0001 => "DATA16",
+        _ => String.Empty
     };
 }

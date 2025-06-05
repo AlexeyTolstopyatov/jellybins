@@ -29,6 +29,7 @@ public class PortableExecutableDrawer : IDrawer
     {
         DataTable meta = new()
         {
+            TableName = "Dumper Metadata",
             Columns = { "Name", "Address", "Size" }
         };
         meta.Rows.Add(
@@ -64,7 +65,10 @@ public class PortableExecutableDrawer : IDrawer
     private DataTable MakeDosHeader()
     {
         MzHeader mz = _dumper.MzHeaderDump.Segmentation;
-        DataTable table = new();
+        DataTable table = new()
+        {
+            TableName = "DOS/2 Executable"
+        };
         table.Columns.AddRange([new DataColumn("Segment"), new DataColumn("Value")]);
 
         table.Rows.Add(nameof(mz.e_sign), mz.e_sign.ToString("X"));
@@ -91,7 +95,10 @@ public class PortableExecutableDrawer : IDrawer
     private DataTable MakeFileHeader()
     {
         PeFileHeader mz = _dumper.FileHeaderDump.Segmentation;
-        DataTable table = new();
+        DataTable table = new()
+        {
+            TableName = "Portable Executable"
+        };
         table.Columns.AddRange([new DataColumn("Segment"), new DataColumn("Value")]);
 
         table.Rows.Add(nameof(mz.Machine), mz.Machine.ToString("X"));
@@ -108,7 +115,10 @@ public class PortableExecutableDrawer : IDrawer
     private DataTable MakeOptionalHeader()
     {
         PeOptionalHeader optional = _dumper.OptionalHeaderDump.Segmentation;
-        DataTable table = new();
+        DataTable table = new()
+        {
+            TableName = "Optional Part (64-bit fields)"
+        };
         table.Columns.AddRange([new DataColumn("Segment"), new DataColumn("Value")]);
 
         table.Rows.Add(nameof(optional.Magic), optional.Magic.ToString("X"));
@@ -148,7 +158,10 @@ public class PortableExecutableDrawer : IDrawer
     private DataTable MakeOptional32Header()
     {
         PeOptionalHeader32 optional = _dumper.OptionalHeader32Dump.Segmentation;
-        DataTable table = new();
+        DataTable table = new()
+        {
+            TableName = "Optional Part (32-bit fields)"
+        };
         table.Columns.AddRange([new DataColumn("Segment"), new DataColumn("Value")]);
 
         table.Rows.Add(nameof(optional.Magic), optional.Magic.ToString("X"));
@@ -188,27 +201,25 @@ public class PortableExecutableDrawer : IDrawer
     {
         DataTable meta = new()
         {
-            Columns = { "Name", "Address", "Size" }
+            TableName = "Dumper Metadata & Directories Summary",
+            Columns = { "Name", "Address", "Size", "Virtual Address", "Virtual Size" }
         };
-        DataTable dirs = new()
-        {
-            Columns =
-            {
-                "VirtualAddress",
-                "Size",
-            }
-        };
+
         DataTable sections = new()
         {
+            TableName = "Dumper Metadata & Sections Summary",
             Columns = 
             {
+                "Struct Name",
+                "Address",
+                "Size",
                 "Name", 
                 "VirtualAddress",
                 "VirtualSize",
                 "SizeOfRawData",
-                "PointerToRawData",
-                "PointerToRelocs",
-                "PointerToLine#",
+                "*RawData",
+                "*Relocs",
+                "*Line#",
                 "#Relocs",
                 "#LineNumbers",
                 "Characteristics" 
@@ -217,24 +228,24 @@ public class PortableExecutableDrawer : IDrawer
         
         foreach (PeDirectoryDump dump in _dumper.DirectoryDumps)
         {
+            if (dump.Segmentation.Size == 0 || dump.Segmentation.VirtualAddress == 0)
+                continue;
+            
             meta.Rows.Add(
                 dump.Name,
                 dump.Address,
-                dump.Size
-            );
-            dirs.Rows.Add(
+                dump.Size,
                 dump.Segmentation.VirtualAddress.ToString("X"),
                 dump.Segmentation.Size.ToString("X")
             );
         }
+        
         foreach (PeSectionDump dump in _dumper.SectionDumps)
         {
-            meta.Rows.Add(
+            sections.Rows.Add(
                 dump.Name,
                 dump.Address,
-                dump.Size
-            );
-            sections.Rows.Add(
+                dump.Size,
                 new String(dump.Segmentation.Name.Where(x => x != '\0').ToArray()),
                 dump.Segmentation.VirtualAddress.ToString("X"),
                 dump.Segmentation.VirtualSize.ToString("X"),
@@ -248,7 +259,7 @@ public class PortableExecutableDrawer : IDrawer
             );
         }
 
-        SectionTables = [meta, dirs, sections];
+        SectionTables = [meta, sections];
     }
 
     public void MakeInfo()
@@ -323,6 +334,7 @@ public class PortableExecutableDrawer : IDrawer
     {
         DataTable meta = new()
         {
+            TableName = "Dumper Metadata",
             Columns = { "Name", "Address", "Size" }
         };
         meta.Rows.Add(
@@ -333,6 +345,7 @@ public class PortableExecutableDrawer : IDrawer
         
         DataTable exports = new()
         {
+            TableName = "Export Names Summary",
             Columns = { "Name", "Ordinal", "Address" }
         };
 
@@ -353,6 +366,7 @@ public class PortableExecutableDrawer : IDrawer
     {
         DataTable meta = new()
         {
+            TableName = "Dumper Metadata",
             Columns = { "Name", "Address", "Size" }
         };
         meta.Rows.Add(
@@ -363,6 +377,7 @@ public class PortableExecutableDrawer : IDrawer
 
         DataTable imports = new()
         {
+            TableName = "Import Names Summary",
             Columns =
             {
                 "From",
