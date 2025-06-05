@@ -15,5 +15,9 @@ public class FileDumpModel(IDrawer drawer)
     public DataTable[] Exports { get; private set; } = drawer.ExportsTables;
     public String[] ExternToolChain { get; private set; } = drawer.ExternToolChain;
     public String[][] HeadersCharacteristics { get; private set; } = drawer.HeadersCharacteristics;
+    public String[] SectionNames { get; private set; } =
+        drawer.SectionTables
+            .Select(dt => dt.Columns[0].ToString())
+            .ToArray();
     public String[][] SectionsCharacteristics { get; private set; } = drawer.SectionsCharacteristics;
 }
