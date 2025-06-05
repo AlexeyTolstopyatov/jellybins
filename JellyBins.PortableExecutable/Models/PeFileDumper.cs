@@ -116,8 +116,6 @@ public class PeFileDumper(String path) : IFileDumper
             ExtractSectionsFromDump(),
             Machine64Bit
         );
-        ImportsDump = dumper.ImportsDump(reader);
-        ExportsDump = dumper.ExportsDump(reader);
 
         if (DirectoryDumps[14].Segmentation.Size != 0)
         {
@@ -125,6 +123,11 @@ public class PeFileDumper(String path) : IFileDumper
             Cor20HeaderDump = dumper.CorDump(reader);
             HasCorData = true;
         }
+        if (DirectoryDumps[0].Segmentation.Size != 0)
+            ExportsDump = dumper.ExportsDump(reader);
+
+        if (DirectoryDumps[1].Segmentation.Size != 0)
+            ImportsDump = dumper.ImportsDump(reader);
         
         reader.Close();
     }
@@ -184,7 +187,7 @@ public class PeFileDumper(String path) : IFileDumper
             : OptionalHeader32Dump.Segmentation.Directories;
         
         List<PeDirectoryDump> directoryDumps = [];
-        for (Int32 i = 0; i < _numberOfRvaAndSizes; ++i)
+        for (Int32 i = 0; i < 16; ++i)
         {
             String name = $"PE Directory (JellyBins: {names[i]})";
             Int32 size = 8;

@@ -69,6 +69,7 @@ public class PortableExecutableDrawer : IDrawer
                 _dumper.Cor20HeaderDump.Size
             );
             dts.Add(MakeCor20Header());
+            ExternToolChain = [".NET Runtime"];
         }
 
         HeadersTables = dts.ToArray();
