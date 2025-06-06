@@ -33,5 +33,5 @@ for researching exporting names.
 <img src="JellyBins.Assets/pe.png">
 
 ### Additions
-Planned to add [JellyMangler](github.com/AlexeyTolstopyatov/JellyMangler) part of this project
+Planned to add [JellyMangle](https://github.com/AlexeyTolstopyatov/JellyMangle) part of this project
 to undecorate IAT entries to C++ 17 declaration.
