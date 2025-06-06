@@ -194,3 +194,14 @@ next rules:
 2) Naming: `JellyBins.<Segmentation Format>.Dictionary.json`
 3) Structure like in `(*)`
 
+### Additions
+Planned to add [JellyMangler](github.com/AlexeyTolstopyatov/JellyMangler) part of this project
+to undecorate IAT entries to C++ 17 declaration.
+
+```
+PS D:\GitHub\JellyBins\JellyBins.Console\bin\Debug\net8.0> ./JellyBins.Console.exe (un)dec <expr> --msvc
+
+PS D:\GitHub\JellyBins\JellyBins.Console\bin\Debug\net8.0> ./JellyBins.Console.exe (un)dec <expr> --itanium
+
+PS D:\GitHub\JellyBins\JellyBins.Console\bin\Debug\net8.0> ./JellyBins.Console.exe (un)dec <expr> --rustc
+```
