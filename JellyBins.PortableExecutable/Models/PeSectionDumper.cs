@@ -1,9 +1,5 @@
 ﻿using System.Diagnostics;
-using System.Drawing;
-using System.Reflection.PortableExecutable;
 using System.Runtime.InteropServices;
-using System.Security.AccessControl;
-using System.Security.Cryptography;
 using System.Text;
 using JellyBins.PortableExecutable.Exceptions;
 using JellyBins.PortableExecutable.Headers;
