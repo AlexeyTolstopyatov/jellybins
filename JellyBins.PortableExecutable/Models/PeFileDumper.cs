@@ -119,19 +119,24 @@ public class PeFileDumper(String path) : IFileDumper
             Machine64Bit
         );
 
-        if (DirectoryDumps[14].Segmentation.Size != 0)
+        if (DirectoryExists(DirectoryDumps[14].Segmentation))
         {
             // Common Runtime
             Cor20HeaderDump = dumper.CorDump(reader);
             HasCorData = true;
         }
-        if (DirectoryDumps[0].Segmentation.Size != 0)
+        if (DirectoryExists(DirectoryDumps[0].Segmentation))
             ExportsDump = dumper.ExportsDump(reader);
 
-        if (DirectoryDumps[1].Segmentation.Size != 0)
+        if (DirectoryExists(DirectoryDumps[1].Segmentation))
             ImportsDump = dumper.ImportsDump(reader);
         
         reader.Close();
+    }
+
+    private Boolean DirectoryExists(PeDirectory d)
+    {
+        return d is not {Size: 0, VirtualAddress: 0};
     }
     /// <returns> All structures of <see cref="PeDirectory"/>[] array </returns>
     private PeDirectory[] ExtractDirectoriesFromDump()
