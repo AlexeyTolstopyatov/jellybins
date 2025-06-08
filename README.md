@@ -19,6 +19,16 @@ for seeing map of binary.
 | `ELF` "Executable Linkable"       | Modern `UNIX`-like Operating Systems. Files don't have extension or have `.o`,  `.so`, `.d`          | []    |
 | `Mach-O` "Mach Object"            | Apple `macOS`/`OS X`/`MacOS X` has special segmentation format for objects and programs.             | []    |
 
+More about every supported object's segmentation:
+ - [PE Format](SUPPORT_PE.md)
+ - [NE Format](SUPPORT_NE.md)
+ - [LE Format](SUPPORT_LE.md)
+ - COM Format
+ - A-OUT Format
+ - MZ Format
+ - ELF Format
+ - Mach-o Format
+
 ### Core insights
 
 A `JellyBins.Core.dll` contains generics or common Entities/Methods. Those internals like a bridge between user and library, needs to automate
@@ -59,6 +69,7 @@ interfaces for project's internals. (e.g. `IFileDumper` or `IDrawer`)
 ### Documentation and Sources
 
  - [Usage of JellyBins Console application](README_JBC.md)
+ - [Windowed JellyBins Client](README_JBW.md)
  - [NE Format (segmentation details)](JellyBins.Documents/Microsoft%20NE%20Segmentation.pdf)
  - [LE Format (OS/2 16-32 bit binary model)](JellyBins.Documents/IBM%20LE%20Segments.html.pdf)
  - [LX Format (OS/2 OMF Segmentation)](JellyBins.Documents/OS2_OMF_and_LX_Object_Formats_Revision_8_199406.pdf)
