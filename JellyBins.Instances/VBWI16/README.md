@@ -1,59 +1,22 @@
-using System.Runtime.InteropServices;
+# CALLDLLS16
+This application sources completely took from Microsoft samples and linked to PCode `NE`
+binary.
 
-namespace JellyBins.PortableExecutable.Headers;
+<img src="vb4proj16dbg.png">
 
-/* This information took from Semi VB Decompiler
-   by VBGamer45
-   
-Private Type VB4HEADERType
-    sig As Long 'SIG 129 53 84 182
-    CompilerFileVersion As Integer
-    int1 As Integer
-    int2 As Integer
-    int3 As Integer
-    int4 As Integer
-    int5 As Integer
-    int6 As Integer
-    int7 As Integer
-    int8 As Integer
-    int9 As Integer
-    int10 As Integer
-    int11 As Integer
-    int12 As Integer
-    int13 As Integer
-    int14 As Integer
-    int15 As Integer
-    LangID As Integer
-    int16 As Integer
-    int17 As Integer
-    int18 As Integer
-    aSubMain As Long
-    Address2 As Long
-    i1 As Integer
-    i2 As Integer
-    i3 As Integer
-    i4 As Integer
-    i5 As Integer
-    i6 As Integer
-    iExeNameLength As Integer
-    iProjectSavedNameLength As Integer
-    iHelpFileLength As Integer
-    iProjectNameLength As Integer
-    FormCount As Integer
-    int19 As Integer
-    NumberOfExternalComponets As Integer
-    int20 As Integer  'The same in each file 176d
-    aGuiTable As Long  'GUI Pointer
-    Address4 As Long
-    aExternalComponetTable As Long '??Not a 100% sure
-    aProjectInfo2 As Long  'Project Info2?  
-End Type
- */
+### Main goal
+Find diffenences between Visual Basic 4 header and old header (VB 4.0 too).
 
-[StructLayout(LayoutKind.Sequential)]
-public struct Vb4Header
-{
-    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+Disassembled structure looks like this:
+
+All datatypes translates to undependent C# primitives
+for saving size of every ~brain cell~ field.
+
+I make no sence what differences in between, and this is my research work.
+
+```csharp
+// took from Semi VBDecompiler by VBGamer45
+public struct Vb4Header {
     public Char[] Signature;
     public UInt16 CompilerVersion;
     public UInt16 Undefined1;
@@ -91,12 +54,14 @@ public struct Vb4Header
     public UInt16 InEachFile176d;
     public UInt32 GuiTableOffset;
     public UInt32 UndefinedTableOffset;
-    public UInt32 ExternComponentTableOffset; // not 100% sure
+    public UInt32 ExternComponentTableOffset;
     public UInt32 ProjectInfoTableOffset;
 }
-[StructLayout(LayoutKind.Sequential)]
-public struct OldVb4Header
-{
+```
+
+```csharp
+// took from Semi VBDecompiler by VBGamer45
+public struct OldVb4Header{
     public Byte PushCode;
     public UInt32 PushAddress;
     public Byte CallProcedureCode;
@@ -121,4 +86,6 @@ public struct OldVb4Header
     [MarshalAs(UnmanagedType.ByValArray, SizeConst = 19)]
     public Byte[] Ba;
     public UInt32 LAddress6;
-}
+} 
+```
+

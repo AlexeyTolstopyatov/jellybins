@@ -39,11 +39,19 @@ that is really VB 4.0 application.
 | `VB4_HEADER`           | []     |
 | `VB4_OLD_HEADER`       | []     |
 
+You can find little linked examples of VB 4.0 programs
+in repo:
+ - [CALLDLLS16](JellyBins.Instances/CALLDLLS16/README.md)
+ - [CALLDLLS32](JellyBins.Instances/CALLDLLS32/README.md)
+
 ### Visual Basic 3
 
 It is very difficult to make assumptions about the embedded VB 3.0 structures
 in the NE segmented file, since
 there are practically no materials on this topic left, and the only possible analysis tools that could be downloaded were obfuscated.
+
+Example of VB 3.0 application
+ - [WINFO](JellyBins.Instances/WINFO/README.md)
 
 At least the number of fields, their order, and their capacity (cell data type) are known, but it will take a lot of experimentation to find out their names.
 
